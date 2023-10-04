@@ -3,4 +3,5 @@ langchain
 pyirsdk
 elevenlabs
 
-Note: There's also a need for mpv, which is not a straightforward install. Need to figure out the best way to handle that.
+Note: There's also a need for mpv for live streaming, which is not a straightforward install.
+Need to figure out the best way to handle that.
