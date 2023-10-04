@@ -106,7 +106,8 @@ while True:
             audio = elevenlabs.generate(
                 text=output,
                 voice="Harry",
-                model="eleven_monolingual_v1"
+                model="eleven_monolingual_v1",
+                stream=True
             )
 
-            elevenlabs.play(audio)
+            elevenlabs.stream(audio)
