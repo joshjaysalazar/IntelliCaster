@@ -1,0 +1,5 @@
+# Change the name of this file to settings.toml to activate it
+
+[keys]
+openai_api_key = "YOUR_API_KEY_HERE"
+elevenlabs_api_key = "YOUR_API_KEY_HERE"
