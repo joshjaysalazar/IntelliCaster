@@ -26,7 +26,7 @@ class App(ctk.CTk):
         self.txt_messages = ctk.CTkTextbox(
             master=self,
             width=600,
-            height=200,
+            height=150,
             state="disabled",
             font=ctk.CTkFont(size=14)
         )
