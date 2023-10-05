@@ -1,8 +1,9 @@
 # VSCode
 .vscode/
 
-# Ignore keys.py files for security purposes
+# Ignore certain files for security purposes
 keys.py
+settings.toml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
