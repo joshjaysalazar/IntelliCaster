@@ -140,7 +140,12 @@ class App(ctk.CTk):
             padx=20,
             pady=(0, 20)
         )
-        self.ent_openai_key = ctk.CTkEntry(master=self.frm_settings)
+        self.ent_openai_key = ctk.CTkEntry(
+            master=self.frm_settings,
+            font=ctk.CTkFont(size=14)
+        )
+        text = self.settings["keys"]["openai_api_key"]
+        self.ent_openai_key.insert(0, text)
         self.ent_openai_key.grid(
             row=1,
             column=1,
@@ -161,7 +166,12 @@ class App(ctk.CTk):
             padx=20,
             pady=(0, 20)
         )
-        self.ent_elevenlabs_key = ctk.CTkEntry(master=self.frm_settings)
+        self.ent_elevenlabs_key = ctk.CTkEntry(
+            master=self.frm_settings,
+            font=ctk.CTkFont(size=14)
+        )
+        text = self.settings["keys"]["elevenlabs_api_key"]
+        self.ent_elevenlabs_key.insert(0, text)
         self.ent_elevenlabs_key.grid(
             row=2,
             column=1,
