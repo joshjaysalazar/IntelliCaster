@@ -186,7 +186,7 @@ class App(ctk.CTk):
             text="Save Settings",
             height=50,
             font=ctk.CTkFont(size=18, weight="bold"),
-            command=lambda: self.add_message("Settings saved!")
+            command=self.save_settings
         )
         self.btn_save_settings.grid(
             row=3,
@@ -230,3 +230,12 @@ class App(ctk.CTk):
             self.btn_start_stop.configure(text="⏵ Start Commentary")
 
         self.add_message("Start/Stop button pressed")
+
+    def save_settings(self, event=None):
+        # Update settings with values from entry boxes
+        self.settings["keys"]["openai_api_key"] = self.ent_openai_key.get()
+        self.settings["keys"]["elevenlabs_api_key"] = self.ent_elevenlabs_key.get()
+
+        # Save settings to file
+        with open("settings.ini", "w") as f:
+            self.settings.write(f)

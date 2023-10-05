@@ -1,11 +1,11 @@
-import tomllib
+import configparser
 from core.app import App
 
 
 def main():
     # Load the settings file
-    with open("settings.toml", "rb") as f:
-        settings = tomllib.load(f)
+    settings = configparser.ConfigParser()
+    settings.read("settings.ini")
 
     # Create the app
     app = App(settings)

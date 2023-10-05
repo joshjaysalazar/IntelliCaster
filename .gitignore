@@ -3,7 +3,7 @@
 
 # Ignore certain files for security purposes
 keys.py
-settings.toml
+settings.ini
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
