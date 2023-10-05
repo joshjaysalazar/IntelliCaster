@@ -16,6 +16,9 @@ class App(ctk.CTk):
         # Create widgets
         self.create_widgets()
 
+        # Add ready message
+        self.add_message("Ready to start commentary...")
+
     def create_widgets(self):
         # Create title label
         self.lbl_title = ctk.CTkLabel(
