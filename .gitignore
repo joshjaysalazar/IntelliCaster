@@ -1,3 +1,6 @@
+# Ignore keys.py files for security purposes
+keys.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
