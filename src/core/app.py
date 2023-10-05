@@ -2,8 +2,11 @@ import customtkinter as ctk
 
 
 class App(ctk.CTk):
-    def __init__(self):
+    def __init__(self, settings):
         super().__init__()
+        
+        # Member variables
+        self.settings = settings
 
         # Set window properties
         ctk.set_appearance_mode("Dark")
