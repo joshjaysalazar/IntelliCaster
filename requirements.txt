@@ -1,5 +1,4 @@
 openai
-langchain
 pyirsdk
 elevenlabs
 customtkinter
