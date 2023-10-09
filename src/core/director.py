@@ -100,7 +100,12 @@ class Director:
             # Check for overtakes
             overtake = self.detect_overtakes(prev_drivers)
             if overtake:
-                add_message(overtake)
+                commentary = self.text_generator.generate_commentary(
+                    overtake,
+                    "play-by-play",
+                    "excited"
+                )
+                add_message(commentary)
             
             # Wait 1 second
             time.sleep(1)

@@ -53,7 +53,7 @@ class TextGenerator:
             max_tokens=256
         )
         
-        answer = response["choices"][0]["message"]["content"]
+        answer = response.choices[0].text.strip()
         self.previous_responses.append((event, answer))
         
         return answer
