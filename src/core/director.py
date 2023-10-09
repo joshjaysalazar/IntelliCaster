@@ -82,18 +82,23 @@ class Director:
                         overtaken = item
                         break
                 
-                # If there are digits in either driver's name, remove them
-                driver["name"] = self.remove_numbers(driver["name"])
-                overtaken["name"] = self.remove_numbers(overtaken["name"])
-
-                # If an legitimate overtake was found, return that information
+                # If either driver is in the pits, don't report the overtake
+                if driver["in_pits"] or overtaken["in_pits"]:
+                    continue
+                
+                # If an legitimate overtake was found, generate the commentary
+                driver_name = self.remove_numbers(driver["name"])
+                overtaken_name = self.remove_numbers(overtaken["name"])
                 output = (
-                    f"{driver['name']} has overtaken "
-                    f"{overtaken['name']} for "
+                    f"{driver_name} has overtaken "
+                    f"{overtaken_name} for "
                     f"P{driver['position']}"
                 )
         
         if output:
+            # Move the camera to focus on the overtaking driver
+            self.ir.cam_switch_num(driver["number"], 11)
+
             # Generate the text commentary
             commentary = self.text_generator.generate(
                 output,
