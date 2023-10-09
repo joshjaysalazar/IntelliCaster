@@ -89,7 +89,7 @@ class Director:
         # If no overtakes were found, return None
         return None
 
-    def run(self):
+    def run(self, add_message):
         while self.running:
             # Store the previous state of the drivers
             prev_drivers = self.drivers.copy()
@@ -100,7 +100,7 @@ class Director:
             # Check for overtakes
             overtake = self.detect_overtakes(prev_drivers)
             if overtake:
-                print(overtake)
+                add_message(overtake)
             
             # Wait 1 second
             time.sleep(1)

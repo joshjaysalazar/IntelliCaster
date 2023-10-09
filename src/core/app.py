@@ -93,7 +93,7 @@ class App(ctk.CTk):
         self.txt_messages = ctk.CTkTextbox(
             master=self.frm_home,
             width=600,
-            height=150,
+            height=300,
             state="disabled",
             font=ctk.CTkFont(size=14)
         )
@@ -256,7 +256,9 @@ class App(ctk.CTk):
 
             # Run the director in a separate thread
             self.director.running = True
-            threading.Thread(target=self.director.run).start()
+            threading.Thread(
+                target=self.director.run, args=(self.add_message,)
+            ).start()
 
             # Add message
             self.add_message("Commentary started!")
