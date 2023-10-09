@@ -13,24 +13,15 @@ class TextGenerator:
         # Create an empty list to hold previous responses
         self.previous_responses = []
     
-    def generate_commentary(self, event, role, tone):
-        # Role must be either "play-by-play" or "color commentary"
-        if role not in ["play-by-play", "color commentary"]:
-            raise ValueError(
-                "Role must be either 'play-by-play' or 'color commentary'"
-            )
-        
+    def generate_commentary(self, event, role, tone, limit):        
         # Create an empty prompt
         prompt = ""
 
         # Add behavioral instructions
         prompt += "You are providing commentary to a race.\n"
-        prompt += "You'll use previous events as context.\n"
-        prompt += "You'll use drivers' last names.\n"
-        if role == "play-by-play":
-            prompt += "You'll keep your response limited to 10 words.\n"
-        else:
-            prompt += "You'll keep your response limited to 20 words.\n"
+        prompt += "Use previous events as context.\n"
+        prompt += "Prefer to use drivers' last names, rarely use full names.\n"
+        prompt += f"Your responses MUST NOT exceed {limit} words.\n"
         
         # Build the prompt
         prompt += f"Role: {role}\n"

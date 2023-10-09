@@ -118,7 +118,8 @@ class Director:
                 commentary = self.text_generator.generate_commentary(
                     overtake,
                     "play-by-play",
-                    "excited"
+                    "excited",
+                    10
                 )
                 add_message(commentary)
             
