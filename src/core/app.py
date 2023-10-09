@@ -196,7 +196,7 @@ class App(ctk.CTk):
         # Create Director section
         self.lbl_director = ctk.CTkLabel(
             master=self.frm_settings,
-            text="Direcotr",
+            text="Director",
             font=ctk.CTkFont(size=18, weight="bold")
         )
         self.lbl_director.grid(
