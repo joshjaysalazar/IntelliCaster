@@ -60,12 +60,7 @@ class Director:
         for i, driver in enumerate(self.drivers):
             driver["position"] = i + 1
 
-        print(self.drivers)
-
     def detect_overtakes(self, prev_drivers):
-        # Set the default output to None
-        output = None
-
         # Go through all the drivers
         for driver in self.drivers:
             # Get this driver's previous information
@@ -84,8 +79,18 @@ class Director:
                         overtaken = item
                         break
                 
+                # If no driver was found, don't report the overtake
+                if not overtaken:
+                    continue
+
                 # If either driver is in the pits, don't report the overtake
                 if driver["in_pits"] or overtaken["in_pits"]:
+                    continue
+
+                # If laps completed is negative (DNF), don't report the overtake
+                if driver["laps_completed"] < 0:
+                    continue
+                if overtaken["laps_completed"] < 0:
                     continue
 
                 # If an legitimate overtake was found, generate the commentary
@@ -97,22 +102,27 @@ class Director:
                     f"P{driver['position']}"
                 )
         
-        if output:
-            # Move the camera to focus on the overtaking driver
-            self.ir.cam_switch_num(driver["number"], 11)
+                # Move the camera to focus on the overtaking driver
+                self.ir.cam_switch_num(driver["number"], 11)
+                
+                # TESTING print the driver's name and number
+                print(f"{driver['name']} - {driver['number']}")
 
-            # Generate the text commentary
-            commentary = self.text_generator.generate(
-                output,
-                "play-by-play",
-                "excited",
-                10,
-                "Be sure to include the position of the overtaking driver."
-            )
-            self.add_message(commentary)
+                # Generate the text commentary
+                commentary = self.text_generator.generate(
+                    output,
+                    "play-by-play",
+                    "excited",
+                    10,
+                    "Be sure to include the position of the overtaking driver."
+                )
+                self.add_message(commentary)
 
-            # Generate the voice commentary
-            self.voice_generator.generate(commentary)
+                # Generate the voice commentary
+                # self.voice_generator.generate(commentary)
+
+                # End this iteration of the loop
+                break
 
     def remove_numbers(self, name):
         # Create a list of digits
