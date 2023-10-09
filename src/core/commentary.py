@@ -13,7 +13,7 @@ class TextGenerator:
         # Create an empty list to hold previous responses
         self.previous_responses = []
     
-    def generate_commentary(self, event, role, tone, limit, info):        
+    def generate(self, event, role, tone, limit, info):        
         # Create an empty prompt
         prompt = ""
 
@@ -58,3 +58,14 @@ class VoiceGenerator:
 
         # Set the API key
         elevenlabs.set_api_key(self.settings["keys"]["elevenlabs_api_key"])
+
+    def generate(self, text, voice="Harry"):
+        # Generate and play audio
+        audio = elevenlabs.generate(
+            text=text,
+            voice=voice,
+            model="eleven_monolingual_v1",
+            stream=True
+        )
+
+        elevenlabs.stream(audio)

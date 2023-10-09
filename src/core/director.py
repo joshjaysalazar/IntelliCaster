@@ -94,7 +94,8 @@ class Director:
                 )
         
         if output:
-            commentary = self.text_generator.generate_commentary(
+            # Generate the text commentary
+            commentary = self.text_generator.generate(
                 output,
                 "play-by-play",
                 "excited",
@@ -102,6 +103,9 @@ class Director:
                 "Be sure to include the position of the overtaking driver."
             )
             self.add_message(commentary)
+
+            # Generate the voice commentary
+            self.voice_generator.generate(commentary)
 
     def remove_numbers(self, name):
         # Create a list of digits
