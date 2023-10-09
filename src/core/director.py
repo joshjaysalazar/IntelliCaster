@@ -123,7 +123,7 @@ class Director:
                 )
                 add_message(commentary)
             
-            # Wait 1 second
-            time.sleep(1)
+            # Wait the amount of time specified in the settings
+            time.sleep(float(self.settings["director"]["update_frequency"]))
 
             

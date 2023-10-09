@@ -137,6 +137,7 @@ class App(ctk.CTk):
         )
         row += 1
 
+        # Create API key entry boxe for OpenAI
         self.lbl_openai_key = ctk.CTkLabel(
             master=self.frm_settings,
             text="OpenAI API Key",
@@ -164,6 +165,7 @@ class App(ctk.CTk):
         )
         row += 1
 
+        # Create API key entry boxe for ElevenLabs
         self.lbl_elevenlabs_key = ctk.CTkLabel(
             master=self.frm_settings,
             text="ElevenLabs API Key",
@@ -186,6 +188,50 @@ class App(ctk.CTk):
             row=row,
             column=1,
             sticky="ew",
+            padx=(0, 20),
+            pady=(0, 20)
+        )
+        row += 1
+
+        # Create Director section
+        self.lbl_director = ctk.CTkLabel(
+            master=self.frm_settings,
+            text="Direcotr",
+            font=ctk.CTkFont(size=18, weight="bold")
+        )
+        self.lbl_director.grid(
+            row=row,
+            column=0,
+            columnspan=2,
+            sticky="ew",
+            pady=20
+        )
+        row += 1
+
+        # Create update frequency entry box
+        self.lbl_update_frequency = ctk.CTkLabel(
+            master=self.frm_settings,
+            text="Update Frequency (seconds)",
+            font=ctk.CTkFont(size=14)
+        )
+        self.lbl_update_frequency.grid(
+            row=row,
+            column=0,
+            sticky="e",
+            padx=20,
+            pady=(0, 20)
+        )
+        self.ent_update_frequency = ctk.CTkEntry(
+            master=self.frm_settings,
+            font=ctk.CTkFont(size=14),
+            width=50
+        )
+        text = self.settings["director"]["update_frequency"]
+        self.ent_update_frequency.insert(0, text)
+        self.ent_update_frequency.grid(
+            row=row,
+            column=1,
+            sticky="w",
             padx=(0, 20),
             pady=(0, 20)
         )
@@ -278,6 +324,7 @@ class App(ctk.CTk):
         # Update settings with values from entry boxes
         self.settings["keys"]["openai_api_key"] = self.ent_openai_key.get()
         self.settings["keys"]["elevenlabs_api_key"] = self.ent_elevenlabs_key.get()
+        self.settings["director"]["update_frequency"] = self.ent_update_frequency.get()
 
         # Save settings to file
         with open("settings.ini", "w") as f:
