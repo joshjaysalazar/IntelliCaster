@@ -237,6 +237,50 @@ class App(ctk.CTk):
         )
         row += 1
 
+        # Create commentary section
+        self.lbl_commentary = ctk.CTkLabel(
+            master=self.frm_settings,
+            text="Commentary",
+            font=ctk.CTkFont(size=18, weight="bold")
+        )
+        self.lbl_commentary.grid(
+            row=row,
+            column=0,
+            columnspan=2,
+            sticky="ew",
+            pady=20
+        )
+        row += 1
+
+        # Create memory limit entry box
+        self.lbl_memory_limit = ctk.CTkLabel(
+            master=self.frm_settings,
+            text="Memory Limit (messages)",
+            font=ctk.CTkFont(size=14)
+        )
+        self.lbl_memory_limit.grid(
+            row=row,
+            column=0,
+            sticky="e",
+            padx=20,
+            pady=(0, 20)
+        )
+        self.ent_memory_limit = ctk.CTkEntry(
+            master=self.frm_settings,
+            font=ctk.CTkFont(size=14),
+            width=50
+        )
+        text = self.settings["commentary"]["memory_limit"]
+        self.ent_memory_limit.insert(0, text)
+        self.ent_memory_limit.grid(
+            row=row,
+            column=1,
+            sticky="w",
+            padx=(0, 20),
+            pady=(0, 20)
+        )
+        row += 1
+
         # Create save settings button
         self.btn_save_settings = ctk.CTkButton(
             master=self.frm_settings,
@@ -325,6 +369,7 @@ class App(ctk.CTk):
         self.settings["keys"]["openai_api_key"] = self.ent_openai_key.get()
         self.settings["keys"]["elevenlabs_api_key"] = self.ent_elevenlabs_key.get()
         self.settings["director"]["update_frequency"] = self.ent_update_frequency.get()
+        self.settings["commentary"]["memory_limit"] = self.ent_memory_limit.get()
 
         # Save settings to file
         with open("settings.ini", "w") as f:

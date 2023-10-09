@@ -27,9 +27,10 @@ class TextGenerator:
         prompt += f"Role: {role}\n"
         prompt += f"Tone: {tone}\n"
         
-        # Add the previous responses (limit to 5) if there are any
-        if len(self.previous_responses) > 5:
-            for e, a in self.previous_responses[-5:]:
+        # Add the previous responses (limited by settings) if there are any
+        limit = int(self.settings["commentary"]["memory_limit"])
+        if len(self.previous_responses) > limit:
+            for e, a in self.previous_responses[-limit:]:
                 prompt += f"Human: {e}\nAI: {a}\n"
         elif len(self.previous_responses) > 0:
             for e, a in self.previous_responses:
