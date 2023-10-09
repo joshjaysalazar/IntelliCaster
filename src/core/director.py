@@ -60,6 +60,8 @@ class Director:
         for i, driver in enumerate(self.drivers):
             driver["position"] = i + 1
 
+        print(self.drivers)
+
     def detect_overtakes(self, prev_drivers):
         # Set the default output to None
         output = None
@@ -85,7 +87,7 @@ class Director:
                 # If either driver is in the pits, don't report the overtake
                 if driver["in_pits"] or overtaken["in_pits"]:
                     continue
-                
+
                 # If an legitimate overtake was found, generate the commentary
                 driver_name = self.remove_numbers(driver["name"])
                 overtaken_name = self.remove_numbers(overtaken["name"])
