@@ -239,3 +239,6 @@ class App(ctk.CTk):
         # Save settings to file
         with open("settings.ini", "w") as f:
             self.settings.write(f)
+
+        # Add message
+        self.add_message("Settings saved!")
