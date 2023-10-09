@@ -106,6 +106,8 @@ class App(ctk.CTk):
         self.btn_start_stop.pack(padx=20, pady=20)
     
     def create_settings(self):
+        row = 0
+
         # Create content frame
         self.frm_settings = ctk.CTkScrollableFrame(
             master=self,
@@ -121,12 +123,13 @@ class App(ctk.CTk):
             font=ctk.CTkFont(size=18, weight="bold")
         )
         self.lbl_api_keys.grid(
-            row=0,
+            row=row,
             column=0,
             columnspan=2,
             sticky="ew",
             pady=20
         )
+        row += 1
 
         self.lbl_openai_key = ctk.CTkLabel(
             master=self.frm_settings,
@@ -134,7 +137,7 @@ class App(ctk.CTk):
             font=ctk.CTkFont(size=14)
         )
         self.lbl_openai_key.grid(
-            row=1,
+            row=row,
             column=0,
             sticky="e",
             padx=20,
@@ -147,12 +150,13 @@ class App(ctk.CTk):
         text = self.settings["keys"]["openai_api_key"]
         self.ent_openai_key.insert(0, text)
         self.ent_openai_key.grid(
-            row=1,
+            row=row,
             column=1,
             sticky="ew",
             padx=(0, 20),
             pady=(0, 20)
         )
+        row += 1
 
         self.lbl_elevenlabs_key = ctk.CTkLabel(
             master=self.frm_settings,
@@ -160,7 +164,7 @@ class App(ctk.CTk):
             font=ctk.CTkFont(size=14)
         )
         self.lbl_elevenlabs_key.grid(
-            row=2,
+            row=row,
             column=0,
             sticky="e",
             padx=20,
@@ -173,12 +177,13 @@ class App(ctk.CTk):
         text = self.settings["keys"]["elevenlabs_api_key"]
         self.ent_elevenlabs_key.insert(0, text)
         self.ent_elevenlabs_key.grid(
-            row=2,
+            row=row,
             column=1,
             sticky="ew",
             padx=(0, 20),
             pady=(0, 20)
         )
+        row += 1
 
         # Create save settings button
         self.btn_save_settings = ctk.CTkButton(
@@ -189,13 +194,30 @@ class App(ctk.CTk):
             command=self.save_settings
         )
         self.btn_save_settings.grid(
-            row=3,
+            row=row,
             column=0,
             columnspan=2,
             sticky="ew",
             padx=20,
             pady=20
         )
+        row += 1
+
+        # Create settings saved label and hide it
+        self.lbl_settings_saved = ctk.CTkLabel(
+            master=self.frm_settings,
+            text="Settings saved!",
+            font=ctk.CTkFont(size=14)
+        )
+        self.lbl_settings_saved.grid(
+            row=row,
+            column=0,
+            columnspan=2,
+            sticky="ew",
+            padx=20
+        )
+        self.lbl_settings_saved.grid_remove()
+        row += 1
 
     def add_message(self, message):
         self.txt_messages.configure(state="normal")
@@ -242,3 +264,9 @@ class App(ctk.CTk):
 
         # Add message
         self.add_message("Settings saved!")
+
+        # Show settings saved label
+        self.lbl_settings_saved.grid()
+
+        # Hide settings saved label after 3 seconds
+        self.after(3000, self.lbl_settings_saved.grid_remove)
