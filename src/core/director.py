@@ -98,7 +98,8 @@ class Director:
                 output,
                 "play-by-play",
                 "excited",
-                10
+                10,
+                "Be sure to include the position of the overtaking driver."
             )
             self.add_message(commentary)
 

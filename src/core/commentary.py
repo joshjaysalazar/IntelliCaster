@@ -13,7 +13,7 @@ class TextGenerator:
         # Create an empty list to hold previous responses
         self.previous_responses = []
     
-    def generate_commentary(self, event, role, tone, limit):        
+    def generate_commentary(self, event, role, tone, limit, info):        
         # Create an empty prompt
         prompt = ""
 
@@ -26,6 +26,7 @@ class TextGenerator:
         # Build the prompt
         prompt += f"Role: {role}\n"
         prompt += f"Tone: {tone}\n"
+        prompt += f"Additional Info: {info}\n"
         
         # Add the previous responses (limited by settings) if there are any
         limit = int(self.settings["commentary"]["memory_limit"])
