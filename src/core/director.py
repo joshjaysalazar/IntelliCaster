@@ -72,22 +72,37 @@ class Director:
             # If a driver's position has decreased, they have overtaken someone
             if prev_driver and driver["position"] < prev_driver["position"]:
                 # Find the driver whose position is 1 higher than this driver's
-                overtaken_driver = None
+                overtaken = None
                 for item in self.drivers:
                     if item["position"] == driver["position"] + 1:
-                        overtaken_driver = item
+                        overtaken = item
                         break
                 
+                # If there are digits in either driver's name, remove them
+                driver["name"] = self.remove_numbers(driver["name"])
+                overtaken["name"] = self.remove_numbers(overtaken["name"])
+
                 # If an legitimate overtake was found, return that information
                 output = (
                     f"{driver['name']} has overtaken "
-                    f"{overtaken_driver['name']} for "
+                    f"{overtaken['name']} for "
                     f"P{driver['position']}"
                 )
                 return output
 
         # If no overtakes were found, return None
         return None
+
+    def remove_numbers(self, name):
+        # Create a list of digits
+        digits = [str(i) for i in range(10)]
+
+        # Remove any digits from the name
+        for digit in digits:
+            name = name.replace(digit, "")
+        
+        # Return the name
+        return name
 
     def run(self, add_message):
         while self.running:
