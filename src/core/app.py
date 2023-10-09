@@ -95,6 +95,7 @@ class App(ctk.CTk):
             width=600,
             height=300,
             state="disabled",
+            wrap="word",
             font=ctk.CTkFont(size=14)
         )
         self.txt_messages.pack(padx=20, pady=20)
