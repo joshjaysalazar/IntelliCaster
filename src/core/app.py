@@ -1,4 +1,6 @@
 import customtkinter as ctk
+import threading
+from core import director
 
 
 class App(ctk.CTk):
@@ -25,6 +27,9 @@ class App(ctk.CTk):
 
         # Select home frame
         self.show_frame(frame="home")
+
+        # Create the director
+        self.director = director.Director(self.settings)
 
         # Add ready message
         self.add_message("Ready to start commentary...")
@@ -245,13 +250,26 @@ class App(ctk.CTk):
             self.frm_settings.grid_forget()
 
     def start_stop(self, event=None):
-        # Change button text
         if self.btn_start_stop.cget("text") == "⏵ Start Commentary":
+            # Change button text
             self.btn_start_stop.configure(text="⏹ Stop Commentary")
+
+            # Run the director in a separate thread
+            self.director.running = True
+            threading.Thread(target=self.director.run).start()
+
+            # Add message
+            self.add_message("Commentary started!")
+
         else:
+            # Change button text
             self.btn_start_stop.configure(text="⏵ Start Commentary")
 
-        self.add_message("Start/Stop button pressed")
+            # Stop the director
+            self.director.running = False
+
+            # Add message
+            self.add_message("Commentary stopped!")
 
     def save_settings(self, event=None):
         # Update settings with values from entry boxes
