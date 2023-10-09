@@ -29,7 +29,7 @@ class App(ctk.CTk):
         self.show_frame(frame="home")
 
         # Create the director
-        self.director = director.Director(self.settings)
+        self.director = director.Director(self.settings, self.add_message)
 
         # Add ready message
         self.add_message("Ready to start commentary...")
@@ -347,9 +347,7 @@ class App(ctk.CTk):
 
             # Run the director in a separate thread
             self.director.running = True
-            threading.Thread(
-                target=self.director.run, args=(self.add_message,)
-            ).start()
+            threading.Thread(target=self.director.run).start()
 
             # Add message
             self.add_message("Commentary started!")

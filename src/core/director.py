@@ -4,9 +4,10 @@ from core import commentary
 
 
 class Director:
-    def __init__(self, settings):
+    def __init__(self, settings, add_message):
         # Member variables
         self.settings = settings
+        self.add_message = add_message
 
         # Set up the iRacing SDK
         self.ir = irsdk.IRSDK()
@@ -60,6 +61,9 @@ class Director:
             driver["position"] = i + 1
 
     def detect_overtakes(self, prev_drivers):
+        # Set the default output to None
+        output = None
+
         # Go through all the drivers
         for driver in self.drivers:
             # Get this driver's previous information
@@ -88,10 +92,15 @@ class Director:
                     f"{overtaken['name']} for "
                     f"P{driver['position']}"
                 )
-                return output
-
-        # If no overtakes were found, return None
-        return None
+        
+        if output:
+            commentary = self.text_generator.generate_commentary(
+                output,
+                "play-by-play",
+                "excited",
+                10
+            )
+            self.add_message(commentary)
 
     def remove_numbers(self, name):
         # Create a list of digits
@@ -104,7 +113,7 @@ class Director:
         # Return the name
         return name
 
-    def run(self, add_message):
+    def run(self):
         while self.running:
             # Store the previous state of the drivers
             prev_drivers = self.drivers.copy()
@@ -113,15 +122,7 @@ class Director:
             self.update_drivers()
 
             # Check for overtakes
-            overtake = self.detect_overtakes(prev_drivers)
-            if overtake:
-                commentary = self.text_generator.generate_commentary(
-                    overtake,
-                    "play-by-play",
-                    "excited",
-                    10
-                )
-                add_message(commentary)
+            self.detect_overtakes(prev_drivers)
             
             # Wait the amount of time specified in the settings
             time.sleep(float(self.settings["director"]["update_frequency"]))
