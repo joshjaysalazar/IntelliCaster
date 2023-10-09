@@ -104,9 +104,6 @@ class Director:
         
                 # Move the camera to focus on the overtaking driver
                 self.ir.cam_switch_num(driver["number"], 11)
-                
-                # TESTING print the driver's name and number
-                print(f"{driver['name']} - {driver['number']}")
 
                 # Generate the text commentary
                 commentary = self.text_generator.generate(
@@ -119,7 +116,7 @@ class Director:
                 self.add_message(commentary)
 
                 # Generate the voice commentary
-                # self.voice_generator.generate(commentary)
+                self.voice_generator.generate(commentary)
 
                 # End this iteration of the loop
                 break
