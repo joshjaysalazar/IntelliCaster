@@ -13,11 +13,11 @@ class TextGenerator:
         # Create an empty list to hold previous responses
         self.previous_responses = []
     
-    def generate_commentary(self, question, role, tone):
+    def generate_commentary(self, event, role, tone):
         # Role must be either "play-by-play" or "color commentary"
         if role not in ["play-by-play", "color commentary"]:
             raise ValueError(
-                "Role must be either \"play-by-play\" or \"color commentary\""
+                "Role must be either 'play-by-play' or 'color commentary'"
             )
         
         # Create an empty prompt
@@ -36,11 +36,15 @@ class TextGenerator:
         prompt += f"Role: {role}\n"
         prompt += f"Tone: {tone}\n"
         
-        # Add the previous responses (limit to 5)
-        for q, a in self.previous_responses[-5:]:
-            prompt += f"Human: {q}\nAI: {a}\n"
+        # Add the previous responses (limit to 5) if there are any
+        if len(self.previous_responses) > 5:
+            for e, a in self.previous_responses[-5:]:
+                prompt += f"Human: {e}\nAI: {a}\n"
+        elif len(self.previous_responses) > 0:
+            for e, a in self.previous_responses:
+                prompt += f"Human: {e}\nAI: {a}\n"
 
-        prompt += f"Human: {question}\nAI:\n"
+        prompt += f"Human: {event}\nAI:\n"
         
         # Call the API
         response = openai.Completion.create(
@@ -50,7 +54,7 @@ class TextGenerator:
         )
         
         answer = response["choices"][0]["message"]["content"]
-        self.previous_responses.append((question, answer))
+        self.previous_responses.append((event, answer))
         
         return answer
 
