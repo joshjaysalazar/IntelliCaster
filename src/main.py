@@ -1,5 +1,6 @@
 import configparser
 from core.app import App
+from utility.makesettings import create_settings_file
 
 
 def main():
@@ -8,6 +9,9 @@ def main():
     This function initializes the settings from an INI file, creates an instance
     of the App class, and enters the Tkinter main loop.
     """
+    # Create a new settings file if it doesn't yet exist
+    create_settings_file("settings.ini")
+
     # Load the settings file
     settings = configparser.ConfigParser()
     settings.read("settings.ini")
