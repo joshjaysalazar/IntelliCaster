@@ -44,6 +44,7 @@ class Director:
                     "number": self.ir["DriverInfo"]["Drivers"][i]["CarNumber"],
                     "position": pos,
                     "gap_to_leader": self.ir["CarIdxF2Time"][i],
+                    "laps_started": self.ir["CarIdxLap"][i],
                     "laps_completed": self.ir["CarIdxLapCompleted"][i],
                     "track_position": self.ir["CarIdxLapDistPct"][i],
                     "in_pits": self.ir["CarIdxOnPitRoad"][i]
