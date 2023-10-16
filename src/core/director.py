@@ -16,6 +16,11 @@ class Director:
         # Create an empty list to track drivers
         self.drivers = []
 
+        # Track race start status
+        self.race_started = False
+        self.race_start_time = None
+        self.race_time = None
+
         # Create the commentary generators
         self.text_generator = commentary.TextGenerator(self.settings)
         self.voice_generator = commentary.VoiceGenerator(self.settings)
@@ -95,10 +100,6 @@ class Director:
                 if overtaken["laps_completed"] < 0:
                     continue
 
-                # If race hasn't started yet, don't report the overtake
-                if self.ir["RaceLaps"] == 0:
-                    continue
-
                 # If an legitimate overtake was found, generate the commentary
                 driver_name = self.remove_numbers(driver["name"])
                 overtaken_name = self.remove_numbers(overtaken["name"])
@@ -140,14 +141,25 @@ class Director:
 
     def run(self):
         while self.running:
+            # Detect if the race has started
+            if self.ir["RaceLaps"] == 1 and self.race_started == False:
+                self.race_started = True
+                self.race_start_time = self.ir["SessionTime"]
+
+            # If the race has already started, update the race length
+            else:
+                self.race_time = self.ir["SessionTime"] - self.race_start_time
+
             # Store the previous state of the drivers
             prev_drivers = self.drivers.copy()
 
             # Update the drivers list
             self.update_drivers()
 
-            # Check for overtakes
-            self.detect_overtakes(prev_drivers)
+            # If the race has started, generate commentary
+            if self.race_started:
+                # Check for overtakes
+                self.detect_overtakes(prev_drivers)
             
             # Wait the amount of time specified in the settings
             time.sleep(float(self.settings["director"]["update_frequency"]))
