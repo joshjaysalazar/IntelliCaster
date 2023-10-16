@@ -4,6 +4,15 @@ from core import commentary
 
 
 class Director:
+    """
+    Manages the overall direction of race simulations.
+    
+    The Director class orchestrates the simulation by monitoring the state of 
+    the race and generating commentary. It interfaces with the iRacing SDK to 
+    collect real-time data, maintains the state of drivers, detects overtakes, 
+    and coordinates with the TextGenerator and VoiceGenerator classes for 
+    real-time commentary.
+    """
     def __init__(self, settings, add_message):
         """Initialize the Director class with necessary settings and utilities.
 

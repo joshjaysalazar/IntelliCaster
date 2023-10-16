@@ -4,6 +4,14 @@ from core import director
 
 
 class App(ctk.CTk):
+    """
+    The main application class for IntelliCaster, a sim racing commentary app.
+    
+    This class extends ctk.CTk to create the main GUI window and functionality
+    for the IntelliCaster application. It provides the user interface for
+    starting and stopping the race commentary, navigating through different
+    frames such as 'Home' and 'Settings', and adjusting various settings.
+    """
     def __init__(self, settings):
         """Initialize the App class.
 
