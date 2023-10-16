@@ -95,6 +95,10 @@ class Director:
                 if overtaken["laps_completed"] < 0:
                     continue
 
+                # If race hasn't started yet, don't report the overtake
+                if self.ir["RaceLaps"] == 0:
+                    continue
+
                 # If an legitimate overtake was found, generate the commentary
                 driver_name = self.remove_numbers(driver["name"])
                 overtaken_name = self.remove_numbers(overtaken["name"])
