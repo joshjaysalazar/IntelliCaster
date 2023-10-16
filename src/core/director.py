@@ -47,7 +47,8 @@ class Director:
                     "laps_started": self.ir["CarIdxLap"][i],
                     "laps_completed": self.ir["CarIdxLapCompleted"][i],
                     "track_position": self.ir["CarIdxLapDistPct"][i],
-                    "in_pits": self.ir["CarIdxOnPitRoad"][i]
+                    "in_pits": self.ir["CarIdxOnPitRoad"][i],
+                    "last_lap": self.ir["CarIdxLastLapTime"][i],
                     }
                 )
         
