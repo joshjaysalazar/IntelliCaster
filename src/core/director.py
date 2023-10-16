@@ -142,7 +142,7 @@ class Director:
     def run(self):
         while self.running:
             # Detect if the race has started
-            if self.ir["RaceLaps"] == 1 and self.race_started == False:
+            if self.ir["RaceLaps"] > 0 and self.race_started == False:
                 self.race_started = True
                 self.race_start_time = self.ir["SessionTime"]
 
