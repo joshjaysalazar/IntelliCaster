@@ -61,54 +61,31 @@ class Director:
         # Set running to False
         self.running = False
 
-    def update_drivers(self):
-        """Update and sort the list of drivers in the race.
+    def check_all_cars_started(self):
+        """Check if all cars in the race have started.
 
-        This method clears the existing list of drivers and repopulates it with
-        current details from the iRacing SDK. It then sorts the drivers based on
-        laps completed and track position.
-        
-        The resulting list of drivers will contain dictionaries with details
-        like name, car number, position, gap to leader, and other race-specific
-        info.
+        This method checks if all cars have crossed the starting line and 
+        started racing. It considers the race time, drivers' laps completed, and
+        lap percentages.
+
+        Returns:
+            bool: True if all cars have started, False otherwise.
         """
-        # Clear the drivers list
-        self.drivers = []
+        # If drivers list is empty, return False
+        if self.drivers == []:
+            return False
 
-        # Update the drivers list
-        if self.ir["CarIdxPosition"] != []:
-            for i, pos in enumerate(self.ir["CarIdxPosition"]):
-                # Exclude the pace car and cars that don't exist
-                if pos == 0: 
-                    continue
-                # Exclude disconnected drivers
-                if not self.ir["DriverInfo"]["Drivers"][i]["UserName"]:
-                    continue
+        # Check if race recently started
+        if self.race_time <= 20:
+            # Check if each car has crossed the line
+            for driver in self.drivers:           
+                d = driver["laps_completed"] + driver["lap_percent"]
+                # If between 0.8 and 1, car hasn't started first lap
+                if 0.8 < d < 1:
+                    return False
 
-                # Add the driver to the list
-                self.drivers.append(
-                    {
-                    "name": self.ir["DriverInfo"]["Drivers"][i]["UserName"],
-                    "number": self.ir["DriverInfo"]["Drivers"][i]["CarNumber"],
-                    "position": pos,
-                    "gap_to_leader": self.ir["CarIdxF2Time"][i],
-                    "laps_started": self.ir["CarIdxLap"][i],
-                    "laps_completed": self.ir["CarIdxLapCompleted"][i],
-                    "lap_percent": self.ir["CarIdxLapDistPct"][i],
-                    "in_pits": self.ir["CarIdxOnPitRoad"][i],
-                    "last_lap": self.ir["CarIdxLastLapTime"][i],
-                    }
-                )
-        
-        # Sort the list by laps completed + track position
-        self.drivers.sort(
-            key=lambda x: x["laps_completed"] + x["lap_percent"],
-            reverse=True
-        )
-
-        # Update positions based on the sorted list
-        for i, driver in enumerate(self.drivers):
-            driver["position"] = i + 1
+        # If all cars have started, return True
+        return True
 
     def detect_overtakes(self, prev_drivers):
         """Detect and report overtakes during the race.
@@ -210,32 +187,6 @@ class Director:
         # Return the name
         return name
 
-    def check_all_cars_started(self):
-        """Check if all cars in the race have started.
-
-        This method checks if all cars have crossed the starting line and 
-        started racing. It considers the race time, drivers' laps completed, and
-        lap percentages.
-
-        Returns:
-            bool: True if all cars have started, False otherwise.
-        """
-        # If drivers list is empty, return False
-        if self.drivers == []:
-            return False
-
-        # Check if race recently started
-        if self.race_time <= 20:
-            # Check if each car has crossed the line
-            for driver in self.drivers:           
-                d = driver["laps_completed"] + driver["lap_percent"]
-                # If between 0.8 and 1, car hasn't started first lap
-                if 0.8 < d < 1:
-                    return False
-
-        # If all cars have started, return True
-        return True
-
     def run(self):
         """The main loop for the Director class.
 
@@ -270,3 +221,52 @@ class Director:
             
             # Wait the amount of time specified in the settings
             time.sleep(float(self.settings["director"]["update_frequency"]))
+
+    def update_drivers(self):
+        """Update and sort the list of drivers in the race.
+
+        This method clears the existing list of drivers and repopulates it with
+        current details from the iRacing SDK. It then sorts the drivers based on
+        laps completed and track position.
+        
+        The resulting list of drivers will contain dictionaries with details
+        like name, car number, position, gap to leader, and other race-specific
+        info.
+        """
+        # Clear the drivers list
+        self.drivers = []
+
+        # Update the drivers list
+        if self.ir["CarIdxPosition"] != []:
+            for i, pos in enumerate(self.ir["CarIdxPosition"]):
+                # Exclude the pace car and cars that don't exist
+                if pos == 0: 
+                    continue
+                # Exclude disconnected drivers
+                if not self.ir["DriverInfo"]["Drivers"][i]["UserName"]:
+                    continue
+
+                # Add the driver to the list
+                self.drivers.append(
+                    {
+                    "name": self.ir["DriverInfo"]["Drivers"][i]["UserName"],
+                    "number": self.ir["DriverInfo"]["Drivers"][i]["CarNumber"],
+                    "position": pos,
+                    "gap_to_leader": self.ir["CarIdxF2Time"][i],
+                    "laps_started": self.ir["CarIdxLap"][i],
+                    "laps_completed": self.ir["CarIdxLapCompleted"][i],
+                    "lap_percent": self.ir["CarIdxLapDistPct"][i],
+                    "in_pits": self.ir["CarIdxOnPitRoad"][i],
+                    "last_lap": self.ir["CarIdxLastLapTime"][i],
+                    }
+                )
+        
+        # Sort the list by laps completed + track position
+        self.drivers.sort(
+            key=lambda x: x["laps_completed"] + x["lap_percent"],
+            reverse=True
+        )
+
+        # Update positions based on the sorted list
+        for i, driver in enumerate(self.drivers):
+            driver["position"] = i + 1

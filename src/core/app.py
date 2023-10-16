@@ -56,6 +56,54 @@ class App(ctk.CTk):
         # Add ready message
         self.add_message("Ready to start commentary...")
     
+    def add_message(self, message):
+        """Add a new message to the messages text box widget.
+    
+        Appends the given message at the top of the text box and disables 
+        editing afterward.
+        
+        Args:
+            message (str): The message to append to the text box.
+        """
+        self.txt_messages.configure(state="normal")
+        self.txt_messages.insert("0.0", message + "\n")
+        self.txt_messages.configure(state="disabled")
+
+    def create_home(self):
+        """Create the home frame and its components.
+    
+        Initializes a frame designated for the 'Home' tab. The frame contains
+        a text box for messages and a button to start or stop the commentary.
+        """
+        # Create content frame
+        self.frm_home = ctk.CTkFrame(
+            master=self,
+            corner_radius=0,
+            fg_color="transparent"
+        )
+
+        # Create message box
+        self.txt_messages = ctk.CTkTextbox(
+            master=self.frm_home,
+            width=600,
+            height=300,
+            state="disabled",
+            wrap="word",
+            font=ctk.CTkFont(size=14)
+        )
+        self.txt_messages.pack(padx=20, pady=20)
+
+        # Create start/stop button
+        self.btn_start_stop = ctk.CTkButton(
+            master=self.frm_home,
+            text="⏵ Start Commentary",
+            width=300,
+            height=50,
+            font=ctk.CTkFont(size=18, weight="bold"),
+            command=self.start_stop
+        )
+        self.btn_start_stop.pack(padx=20, pady=20)
+
     def create_navigation(self):
         """Create the navigation frame and its components.
     
@@ -108,41 +156,6 @@ class App(ctk.CTk):
             command=lambda: self.show_frame(frame="settings")
         )
         self.btn_settings.grid(row=2, column=0, sticky="ew")
-
-    def create_home(self):
-        """Create the home frame and its components.
-    
-        Initializes a frame designated for the 'Home' tab. The frame contains
-        a text box for messages and a button to start or stop the commentary.
-        """
-        # Create content frame
-        self.frm_home = ctk.CTkFrame(
-            master=self,
-            corner_radius=0,
-            fg_color="transparent"
-        )
-
-        # Create message box
-        self.txt_messages = ctk.CTkTextbox(
-            master=self.frm_home,
-            width=600,
-            height=300,
-            state="disabled",
-            wrap="word",
-            font=ctk.CTkFont(size=14)
-        )
-        self.txt_messages.pack(padx=20, pady=20)
-
-        # Create start/stop button
-        self.btn_start_stop = ctk.CTkButton(
-            master=self.frm_home,
-            text="⏵ Start Commentary",
-            width=300,
-            height=50,
-            font=ctk.CTkFont(size=18, weight="bold"),
-            command=self.start_stop
-        )
-        self.btn_start_stop.pack(padx=20, pady=20)
     
     def create_settings(self):
         """Create the settings frame and its components.
@@ -353,20 +366,38 @@ class App(ctk.CTk):
         )
         self.lbl_settings_saved.grid_remove()
         row += 1
+    
+    def save_settings(self, event=None):
+        """Save settings from entry boxes to a settings.ini file.
 
-    def add_message(self, message):
-        """Add a new message to the messages text box widget.
-    
-        Appends the given message at the top of the text box and disables 
-        editing afterward.
-        
+        This method gathers the settings from various entry boxes, updates the
+        settings dictionary, and then saves these settings to a 'settings.ini'
+        file. A message is also added to indicate that the settings have been
+        saved. Additionally, a label saying 'Settings saved!' is shown for 3
+        seconds.
+
         Args:
-            message (str): The message to append to the text box.
+            event: Not used, but included for compatibility with button clicks.
         """
-        self.txt_messages.configure(state="normal")
-        self.txt_messages.insert("0.0", message + "\n")
-        self.txt_messages.configure(state="disabled")
-    
+        # Update settings with values from entry boxes
+        self.settings["keys"]["openai_api_key"] = self.ent_openai_key.get()
+        self.settings["keys"]["elevenlabs_api_key"] = self.ent_elevenlabs_key.get()
+        self.settings["director"]["update_frequency"] = self.ent_update_frequency.get()
+        self.settings["commentary"]["memory_limit"] = self.ent_memory_limit.get()
+
+        # Save settings to file
+        with open("settings.ini", "w") as f:
+            self.settings.write(f)
+
+        # Add message
+        self.add_message("Settings saved!")
+
+        # Show settings saved label
+        self.lbl_settings_saved.grid()
+
+        # Hide settings saved label after 3 seconds
+        self.after(3000, self.lbl_settings_saved.grid_remove)
+
     def show_frame(self, event=None, frame="home"):
         """Switch between 'Home' and 'Settings' frames and update button colors.
 
@@ -427,34 +458,3 @@ class App(ctk.CTk):
 
             # Add message
             self.add_message("Commentary stopped!")
-
-    def save_settings(self, event=None):
-        """Save settings from entry boxes to a settings.ini file.
-
-        This method gathers the settings from various entry boxes, updates the
-        settings dictionary, and then saves these settings to a 'settings.ini'
-        file. A message is also added to indicate that the settings have been
-        saved. Additionally, a label saying 'Settings saved!' is shown for 3
-        seconds.
-
-        Args:
-            event: Not used, but included for compatibility with button clicks.
-        """
-        # Update settings with values from entry boxes
-        self.settings["keys"]["openai_api_key"] = self.ent_openai_key.get()
-        self.settings["keys"]["elevenlabs_api_key"] = self.ent_elevenlabs_key.get()
-        self.settings["director"]["update_frequency"] = self.ent_update_frequency.get()
-        self.settings["commentary"]["memory_limit"] = self.ent_memory_limit.get()
-
-        # Save settings to file
-        with open("settings.ini", "w") as f:
-            self.settings.write(f)
-
-        # Add message
-        self.add_message("Settings saved!")
-
-        # Show settings saved label
-        self.lbl_settings_saved.grid()
-
-        # Hide settings saved label after 3 seconds
-        self.after(3000, self.lbl_settings_saved.grid_remove)
