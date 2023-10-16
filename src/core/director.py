@@ -124,7 +124,7 @@ class Director:
                 self.add_message(commentary)
 
                 # Generate the voice commentary
-                # self.voice_generator.generate(commentary)
+                self.voice_generator.generate(commentary)
 
                 # End this iteration of the loop
                 break
