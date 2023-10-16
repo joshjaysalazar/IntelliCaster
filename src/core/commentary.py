@@ -10,7 +10,7 @@ class TextGenerator:
     tones, and additional information. Maintains a list of previous responses
     to use as context for future commentary.
     """
-    
+
     def __init__(self, settings):
         """Initialize the TextGenerator class.
     
@@ -89,7 +89,7 @@ class VoiceGenerator:
     """
     Handles text-to-speech functionality for race commentary.
 
-    Utilizes the Eleven Labs API to convert text into audio. Streams the
+    Utilizes the ElevenLabs API to convert text into audio. Streams the
     generated audio to provide real-time commentary.
     """
 
@@ -111,13 +111,13 @@ class VoiceGenerator:
     def generate(self, text, voice="Harry"):
         """Generate and play audio for the provided text.
 
-        Calls the Eleven Labs API to create audio from the text using the
+        Calls the ElevenLabs API to create audio from the text using the
         specified voice, then streams the audio.
 
         Args:
             text (str): The text to be converted to audio.
-            voice (str, optional): The voice to use for text-to-speech.
-                Defaults to "Harry".
+            voice (str, optional): The voice to use for text-to-speech. Defaults
+                to "Harry".
         """
         # Generate and play audio
         audio = elevenlabs.generate(

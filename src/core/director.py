@@ -5,32 +5,31 @@ from core import commentary
 
 class Director:
     """
-    Manages the overall direction of race simulations.
+    Manages the overall direction of race broadcast.
     
-    The Director class orchestrates the simulation by monitoring the state of 
+    The Director class orchestrates the broadcast by monitoring the state of 
     the race and generating commentary. It interfaces with the iRacing SDK to 
     collect real-time data, maintains the state of drivers, detects overtakes, 
     and coordinates with the TextGenerator and VoiceGenerator classes for 
     real-time commentary.
     """
-    
+
     def __init__(self, settings, add_message):
         """Initialize the Director class with necessary settings and utilities.
 
         Args:
-            settings (dict): A dictionary containing various configuration
-                settings.
+            settings (ConfigParser): Settings parsed from an INI file.
             add_message (callable): A function to append messages to the
                 application's message box.
 
         Attributes:
-            settings (dict): Stores configuration settings.
+            settings (ConfigParser): Stores settings from the INI file.
             add_message (callable): Method to append messages.
             ir (IRSDK object): Instance for iRacing SDK.
-            drivers (list): List to track drivers in the race.
+            drivers (list): List of dictionaries to track drivers in the race.
             race_started (bool): Flag to indicate if the race has started.
-            race_start_time (NoneType): Stores the time the race starts.
-            race_time (int): Stores the elapsed time since the race started.
+            race_start_time (float): Stores the time the race starts.
+            race_time (float): Stores the elapsed time since the race started.
             all_cars_started (bool): Flag to indicate if all cars have started.
             text_generator (TextGenerator object): Text-based commentary
                 generator.
