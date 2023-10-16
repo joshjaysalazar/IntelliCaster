@@ -12,11 +12,11 @@ class App(ctk.CTk):
     starting and stopping the race commentary, navigating through different
     frames such as 'Home' and 'Settings', and adjusting various settings.
     """
-    
+
     def __init__(self, settings):
         """Initialize the App class.
 
-        Initializes the application window and its various components such as 
+        Initializes the application window and its various components such as
         navigation and settings. Also creates an instance of the Director class.
 
         Args:
