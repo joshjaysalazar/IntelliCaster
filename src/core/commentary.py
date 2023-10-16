@@ -4,6 +4,15 @@ import elevenlabs
 
 class TextGenerator:
     def __init__(self, settings):
+        """Initialize the TextGenerator class.
+    
+        Initializes the OpenAI API key and sets up an empty list to hold
+        previous responses generated for commentary.
+
+        Args:
+            settings (ConfigParser): The settings containing API keys and
+            other configurations.
+        """
         # Member variables
         self.settings = settings
 
@@ -13,7 +22,24 @@ class TextGenerator:
         # Create an empty list to hold previous responses
         self.previous_responses = []
     
-    def generate(self, event, role, tone, limit, info):        
+    def generate(self, event, role, tone, limit, info):
+        """Generate race commentary text based on the given event and role.
+
+        Constructs a prompt that includes behavioral instructions, role,
+        tone, and any additional information. Sends the prompt to the OpenAI
+        API to generate a response. Adds this response to a list of 
+        previous responses for context in future calls.
+
+        Args:
+            event (str): The event to generate commentary for.
+            role (str): The role of the commentary, e.g., "play-by-play".
+            tone (str): The tone to use, e.g., "excited".
+            limit (int): The word limit for the generated text.
+            info (str): Any additional information to be included.
+
+        Returns:
+            str: The generated commentary text.
+        """
         # Create an empty prompt
         prompt = ""
 
@@ -53,6 +79,14 @@ class TextGenerator:
 
 class VoiceGenerator:
     def __init__(self, settings):
+        """Initialize the VoiceGenerator class with the given settings.
+
+        Sets up the API key for the ElevenLabs service, enabling text-to-speech
+        capabilities for the application.
+
+        Args:
+            settings (ConfigParser): Settings parsed from an INI file.
+        """
         # Member variables
         self.settings = settings
 
@@ -60,6 +94,16 @@ class VoiceGenerator:
         elevenlabs.set_api_key(self.settings["keys"]["elevenlabs_api_key"])
 
     def generate(self, text, voice="Harry"):
+        """Generate and play audio for the provided text.
+
+        Calls the Eleven Labs API to create audio from the text using the
+        specified voice, then streams the audio.
+
+        Args:
+            text (str): The text to be converted to audio.
+            voice (str, optional): The voice to use for text-to-speech.
+                Defaults to "Harry".
+        """
         # Generate and play audio
         audio = elevenlabs.generate(
             text=text,

@@ -5,6 +5,29 @@ from core import commentary
 
 class Director:
     def __init__(self, settings, add_message):
+        """Initialize the Director class with necessary settings and utilities.
+
+        Args:
+            settings (dict): A dictionary containing various configuration
+                settings.
+            add_message (callable): A function to append messages to the
+                application's message box.
+
+        Attributes:
+            settings (dict): Stores configuration settings.
+            add_message (callable): Method to append messages.
+            ir (IRSDK object): Instance for iRacing SDK.
+            drivers (list): List to track drivers in the race.
+            race_started (bool): Flag to indicate if the race has started.
+            race_start_time (NoneType): Stores the time the race starts.
+            race_time (int): Stores the elapsed time since the race started.
+            all_cars_started (bool): Flag to indicate if all cars have started.
+            text_generator (TextGenerator object): Text-based commentary
+                generator.
+            voice_generator (VoiceGenerator object): Voice-based commentary
+                generator.
+            running (bool): Flag to control the run loop for the director.
+        """
         # Member variables
         self.settings = settings
         self.add_message = add_message
@@ -30,6 +53,16 @@ class Director:
         self.running = False
 
     def update_drivers(self):
+        """Update and sort the list of drivers in the race.
+
+        This method clears the existing list of drivers and repopulates it with
+        current details from the iRacing SDK. It then sorts the drivers based on
+        laps completed and track position.
+        
+        The resulting list of drivers will contain dictionaries with details
+        like name, car number, position, gap to leader, and other race-specific
+        info.
+        """
         # Clear the drivers list
         self.drivers = []
 
@@ -69,6 +102,23 @@ class Director:
             driver["position"] = i + 1
 
     def detect_overtakes(self, prev_drivers):
+        """Detect and report overtakes during the race.
+
+        This method iterates through the current list of drivers and compares
+        their positions with their positions from a previous snapshot
+        (prev_drivers). If a driver has moved up in position, an overtake is
+        detected and appropriate commentary is generated. The camera will also
+        focus on the overtaking driver.
+
+        Args:
+            prev_drivers (list): A list of dictionaries containing the previous
+                state of each driver.
+                
+        Note:
+            Overtakes are not reported under specific conditions, like if a
+            driver is in the pits, has a DNF status, or if the overtaken driver
+            is not found in the current list.
+        """
         # Go through all the drivers
         for driver in self.drivers:
             # Get this driver's previous information
@@ -130,6 +180,17 @@ class Director:
                 break
 
     def remove_numbers(self, name):
+        """Remove digits from a driver's name string.
+
+        This method takes a name string that may contain digits and removes
+        those digits.
+
+        Args:
+            name (str): The driver's name possibly containing digits.
+
+        Returns:
+            str: The driver's name without any digits.
+        """
         # Create a list of digits
         digits = [str(i) for i in range(10)]
 
@@ -141,6 +202,15 @@ class Director:
         return name
 
     def check_all_cars_started(self):
+        """Check if all cars in the race have started.
+
+        This method checks if all cars have crossed the starting line and 
+        started racing. It considers the race time, drivers' laps completed, and
+        lap percentages.
+
+        Returns:
+            bool: True if all cars have started, False otherwise.
+        """
         # If drivers list is empty, return False
         if self.drivers == []:
             return False
@@ -158,6 +228,12 @@ class Director:
         return True
 
     def run(self):
+        """The main loop for the Director class.
+
+        This method keeps running as long as the director is set to run. It
+        checks for race start, updates driver positions, detects overtakes,
+        and then sleeps for the specified update frequency.
+        """
         while self.running:
             # Detect if the race has started
             if self.ir["RaceLaps"] > 0 and not self.race_started:
@@ -185,5 +261,3 @@ class Director:
             
             # Wait the amount of time specified in the settings
             time.sleep(float(self.settings["director"]["update_frequency"]))
-
-            

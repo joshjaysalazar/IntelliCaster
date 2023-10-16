@@ -5,6 +5,19 @@ from core import director
 
 class App(ctk.CTk):
     def __init__(self, settings):
+        """Initialize the App class.
+
+        Initializes the application window and its various components such as 
+        navigation and settings. Also creates an instance of the Director class.
+
+        Args:
+            settings (ConfigParser): Settings parsed from an INI file.
+
+        Attributes:
+            settings (ConfigParser): Stores settings from the INI file.
+            director (Director object): Instance of the Director class to manage
+                race commentary.
+        """
         super().__init__()
         
         # Member variables
@@ -35,6 +48,12 @@ class App(ctk.CTk):
         self.add_message("Ready to start commentary...")
     
     def create_navigation(self):
+        """Create the navigation frame and its components.
+    
+        Creates a frame that holds the navigation buttons and title label.
+        Initializes and grids buttons for 'Home' and 'Settings', as well as a
+        title label for the application.
+        """
         # Create navigation frame
         self.frm_navigation = ctk.CTkFrame(master=self, corner_radius=0)
         self.frm_navigation.grid(row=0, column=0, sticky="nsew")
@@ -82,6 +101,11 @@ class App(ctk.CTk):
         self.btn_settings.grid(row=2, column=0, sticky="ew")
 
     def create_home(self):
+        """Create the home frame and its components.
+    
+        Initializes a frame designated for the 'Home' tab. The frame contains
+        a text box for messages and a button to start or stop the commentary.
+        """
         # Create content frame
         self.frm_home = ctk.CTkFrame(
             master=self,
@@ -112,6 +136,12 @@ class App(ctk.CTk):
         self.btn_start_stop.pack(padx=20, pady=20)
     
     def create_settings(self):
+        """Create the settings frame and its components.
+    
+        Sets up a frame for the 'Settings' tab that allows users to input API
+        keys, set update frequency, and define memory limits for commentary. It
+        also includes a 'Save Settings' button to preserve these settings.
+        """
         row = 0
 
         # Create content frame
@@ -316,11 +346,28 @@ class App(ctk.CTk):
         row += 1
 
     def add_message(self, message):
+        """Add a new message to the messages text box widget.
+    
+        Appends the given message at the top of the text box and disables 
+        editing afterward.
+        
+        Args:
+            message (str): The message to append to the text box.
+        """
         self.txt_messages.configure(state="normal")
         self.txt_messages.insert("0.0", message + "\n")
         self.txt_messages.configure(state="disabled")
     
     def show_frame(self, event=None, frame="home"):
+        """Switch between 'Home' and 'Settings' frames and update button colors.
+
+        Hides the current frame and shows the selected frame. Also updates the
+        button colors to indicate the currently active frame.
+
+        Args:
+            event: Not used, but included for compatibility with button clicks.
+            frame (str): The name of the frame to show ('home' or 'settings').
+        """
         # set button color for selected button
         selected = ("gray75", "gray25")
         self.btn_home.configure(
@@ -341,6 +388,16 @@ class App(ctk.CTk):
             self.frm_settings.grid_forget()
 
     def start_stop(self, event=None):
+        """Toggle between starting and stopping the commentary.
+
+        If the commentary is currently off, this method will change the button
+        text to "Stop Commentary" and start the director in a separate thread.
+        If the commentary is currently running, this method will change the
+        button text back to "Start Commentary" and stop the director.
+
+        Args:
+            event: Not used, but included for compatibility with button clicks.
+        """
         if self.btn_start_stop.cget("text") == "⏵ Start Commentary":
             # Change button text
             self.btn_start_stop.configure(text="⏹ Stop Commentary")
@@ -363,6 +420,17 @@ class App(ctk.CTk):
             self.add_message("Commentary stopped!")
 
     def save_settings(self, event=None):
+        """Save settings from entry boxes to a settings.ini file.
+
+        This method gathers the settings from various entry boxes, updates the
+        settings dictionary, and then saves these settings to a 'settings.ini'
+        file. A message is also added to indicate that the settings have been
+        saved. Additionally, a label saying 'Settings saved!' is shown for 3
+        seconds.
+
+        Args:
+            event: Not used, but included for compatibility with button clicks.
+        """
         # Update settings with values from entry boxes
         self.settings["keys"]["openai_api_key"] = self.ent_openai_key.get()
         self.settings["keys"]["elevenlabs_api_key"] = self.ent_elevenlabs_key.get()
