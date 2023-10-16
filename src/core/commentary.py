@@ -30,7 +30,7 @@ class TextGenerator:
         # Create an empty list to hold previous responses
         self.previous_responses = []
     
-    def generate(self, event, role, tone, limit, info):
+    def generate(self, event, role, tone, limit, ir_info, other_info):
         """Generate race commentary text based on the given event and role.
 
         Constructs a prompt that includes behavioral instructions, role,
@@ -43,7 +43,8 @@ class TextGenerator:
             role (str): The role of the commentary, e.g., "play-by-play".
             tone (str): The tone to use, e.g., "excited".
             limit (int): The word limit for the generated text.
-            info (str): Any additional information to be included.
+            weekend_info (dict): Information about the race weekend.
+            other_info (str): Any additional information to be included.
 
         Returns:
             str: The generated commentary text.
@@ -60,7 +61,10 @@ class TextGenerator:
         # Build the prompt
         prompt += f"Role: {role}\n"
         prompt += f"Tone: {tone}\n"
-        prompt += f"Additional Info: {info}\n"
+        prompt += f"Track: {ir_info['WeekendInfo']['TrackDisplayName']}\n"
+        prompt += f"City: {ir_info['WeekendInfo']['TrackCity']}\n"
+        prompt += f"Country: {ir_info['WeekendInfo']['TrackCountry']}\n"
+        prompt += f"Additional Info: {other_info}\n"
         
         # Add the previous responses (limited by settings) if there are any
         limit = int(self.settings["commentary"]["memory_limit"])

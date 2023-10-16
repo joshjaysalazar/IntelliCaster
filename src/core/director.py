@@ -155,6 +155,7 @@ class Director:
                     "play-by-play",
                     "excited",
                     10,
+                    self.ir,
                     "Be sure to include the position of the overtaking driver."
                 )
                 self.add_message(commentary)
