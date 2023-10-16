@@ -141,8 +141,12 @@ class Director:
         return name
 
     def check_all_cars_started(self):
+        # If drivers list is empty, return False
+        if self.drivers == []:
+            return False
+
         # Check if race recently started
-        if self.race_started and self.race_time <= 20:
+        if self.race_time <= 20:
             # Check if each car has crossed the line
             for driver in self.drivers:           
                 d = driver["laps_completed"] + driver["lap_percent"]
@@ -164,18 +168,18 @@ class Director:
             elif self.race_started:
                 self.race_time = self.ir["SessionTime"] - self.race_start_time
 
+            # Store the previous state of the drivers
+            prev_drivers = self.drivers.copy()
+
+            # Update the drivers list
+            self.update_drivers()
+
             # Check if all cars have crossed the start line if needed
             if not self.all_cars_started:
                 self.all_cars_started = self.check_all_cars_started()
 
             # If the race has started, generate commentary
             if self.race_started and self.all_cars_started:
-                # Store the previous state of the drivers
-                prev_drivers = self.drivers.copy()
-
-                # Update the drivers list
-                self.update_drivers()
-
                 # Check for overtakes
                 self.detect_overtakes(prev_drivers)
             
