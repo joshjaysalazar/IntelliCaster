@@ -1,5 +1,9 @@
-# Ignore keys.py files for security purposes
+# VSCode
+.vscode/
+
+# Ignore certain files for security purposes
 keys.py
+settings.ini
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
