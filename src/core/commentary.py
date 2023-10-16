@@ -10,6 +10,7 @@ class TextGenerator:
     tones, and additional information. Maintains a list of previous responses
     to use as context for future commentary.
     """
+    
     def __init__(self, settings):
         """Initialize the TextGenerator class.
     
@@ -91,6 +92,7 @@ class VoiceGenerator:
     Utilizes the Eleven Labs API to convert text into audio. Streams the
     generated audio to provide real-time commentary.
     """
+
     def __init__(self, settings):
         """Initialize the VoiceGenerator class with the given settings.
 

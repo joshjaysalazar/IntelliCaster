@@ -13,6 +13,7 @@ class Director:
     and coordinates with the TextGenerator and VoiceGenerator classes for 
     real-time commentary.
     """
+    
     def __init__(self, settings, add_message):
         """Initialize the Director class with necessary settings and utilities.
 
