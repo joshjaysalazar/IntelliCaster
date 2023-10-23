@@ -223,7 +223,7 @@ class App(ctk.CTk):
                 default (str): The default value to insert into the entry box.
                 browse (bool): Whether or not to create a 'Browse' button.
             """
-            def browse():
+            def browse_dir():
                 """Open a file dialog to browse for a directory."""
                 # Get directory
                 directory = filedialog.askdirectory()
@@ -277,7 +277,7 @@ class App(ctk.CTk):
                     text="Browse",
                     width=100,
                     font=ctk.CTkFont(size=14),
-                    command=browse
+                    command=browse_dir
                 )
 
                 # Grid browse button
