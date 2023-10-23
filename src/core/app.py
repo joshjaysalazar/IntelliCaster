@@ -254,7 +254,8 @@ class App(ctk.CTk):
                 column=1,
                 sticky="ew",
                 padx=(0, 20),
-                pady=(0, 20)
+                pady=(0, 20),
+                columnspan=2 if not browse else 1
             )
 
             # If browse button is requested, create it
@@ -262,6 +263,7 @@ class App(ctk.CTk):
                 btn = ctk.CTkButton(
                     master=self.frm_settings,
                     text="Browse",
+                    width=100,
                     font=ctk.CTkFont(size=14),
                     command=lambda: print('Yup')
                 )
