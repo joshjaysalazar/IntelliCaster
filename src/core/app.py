@@ -213,12 +213,16 @@ class App(ctk.CTk):
             
             Creates an entry box for the settings frame that is used to input
             various settings. The entry box is a label with a bold font and a
-            20 pixel bottom padding.
+            20 pixel bottom padding. If a default value is provided, it is
+            inserted into the entry box. If the browse flag is set to True, a
+            'Browse' button is created next to the entry box that allows users
+            to browse for a directory.
             
             Args:
                 name (str): The name of the entry box to create.
                 text (str): The text to display next to the entry box.
                 default (str): The default value to insert into the entry box.
+                browse (bool): Whether or not to create a 'Browse' button.
             """
             def browse():
                 """Open a file dialog to browse for a directory."""
