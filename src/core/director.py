@@ -217,27 +217,35 @@ class Director:
             if not self.race_started:
                 # Get all the current positions
                 positions = self.ir["CarIdxLapDistPct"]
-                print(positions)
 
                 # Find the max position under 0.5
                 focus = 0
                 max_pos = 0
                 for i, pos in enumerate(positions):
+                    # Skip the first position (pace car)
                     if i == 0:
                         continue
+                    # If car is in pits, skip
+                    if self.ir["CarIdxOnPitRoad"][i] == True:
+                        continue
+                    # If car is under 0.5 and greater than max, focus on it
                     if pos < 0.5 and pos > max_pos:
                         focus = i
                         max_pos = pos
                 
-                # If no cars are under 0.5, all cars are behind line, find min
+                # If no cars were under 0.5, all cars are behind line, find max
                 if focus == 0:
-                    min_pos = 1
                     for i, pos in enumerate(positions):
+                        # Skip the first position (pace car)
                         if i == 0:
                             continue
-                        if pos < min_pos:
+                        # If car is in pits, skip
+                        if self.ir["CarIdxOnPitRoad"][i] == True:
+                            continue
+                        # If car is closest to line, focus on it
+                        if pos > max_pos:
                             focus = i
-                            min_pos = pos
+                            max_pos = pos
 
                 self.ir.cam_switch_num(focus, 11)
 
