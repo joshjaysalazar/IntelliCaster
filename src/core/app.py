@@ -169,44 +169,63 @@ class App(ctk.CTk):
         current_section = ""
         self.current_settings = {}
 
-        def create_section(name, text):
-            """Create a section header for the settings frame.
+        def create_dropdown(name, text, options, default=None):
+            """Create a dropdown for the settings frame.
             
-            Creates a section header for the settings frame that is used to
-            separate different sections of the settings frame. The section
-            header is a label with a bold font and a large font size.
+            Creates a dropdown for the settings frame that is used to select
+            from a list of options. If a default value is provided, it is
+            selected in the dropdown.
             
             Args:
-                name (str): The name of the section to create.
-                text (str): The text to display in the section header.
+                name (str): The name of the dropdown to create.
+                text (str): The text to display next to the dropdown.
+                options (list): A list of options to select from.
+                default (str): The default value to select in the dropdown.
             """
             nonlocal row
-            nonlocal current_section
 
             # Create label
             lbl = ctk.CTkLabel(
                 master=self.frm_settings,
                 text=text,
-                font=ctk.CTkFont(size=18, weight="bold")
+                font=ctk.CTkFont(size=14)
             )
 
             # Grid label
             lbl.grid(
                 row=row,
                 column=0,
-                columnspan=2,
+                sticky="e",
+                padx=20,
+                pady=(0, 20)
+            )
+
+            # Create dropdown
+            drp = ctk.CTkOptionMenu(
+                master=self.frm_settings,
+                values=options,
+                font=ctk.CTkFont(size=14)
+            )
+
+            # If default value is provided, select it in the dropdown
+            if default:
+                drp.set(default)
+
+            # Grid dropdown
+            drp.grid(
+                row=row,
+                column=1,
                 sticky="ew",
-                pady=20
+                padx=(0, 20),
+                pady=(0, 20),
+                columnspan=2
             )
 
             # Increment row
             row += 1
 
-            # Add section to current settings
-            self.current_settings[name] = {}
-
-            # Update current section
-            current_section = name
+            # Add dropdown to current settings
+            self.current_settings[current_section][name] = drp
 
         def create_entry(name, text, default=None, browse=False):
             """Create an entry box for the settings frame.
@@ -295,63 +314,44 @@ class App(ctk.CTk):
             # Add entry box to current settings
             self.current_settings[current_section][name] = ent
 
-        def create_dropdown(name, text, options, default=None):
-            """Create a dropdown for the settings frame.
+        def create_section(name, text):
+            """Create a section header for the settings frame.
             
-            Creates a dropdown for the settings frame that is used to select
-            from a list of options. If a default value is provided, it is
-            selected in the dropdown.
+            Creates a section header for the settings frame that is used to
+            separate different sections of the settings frame. The section
+            header is a label with a bold font and a large font size.
             
             Args:
-                name (str): The name of the dropdown to create.
-                text (str): The text to display next to the dropdown.
-                options (list): A list of options to select from.
-                default (str): The default value to select in the dropdown.
+                name (str): The name of the section to create.
+                text (str): The text to display in the section header.
             """
             nonlocal row
+            nonlocal current_section
 
             # Create label
             lbl = ctk.CTkLabel(
                 master=self.frm_settings,
                 text=text,
-                font=ctk.CTkFont(size=14)
+                font=ctk.CTkFont(size=18, weight="bold")
             )
 
             # Grid label
             lbl.grid(
                 row=row,
                 column=0,
-                sticky="e",
-                padx=20,
-                pady=(0, 20)
-            )
-
-            # Create dropdown
-            drp = ctk.CTkOptionMenu(
-                master=self.frm_settings,
-                values=options,
-                font=ctk.CTkFont(size=14)
-            )
-
-            # If default value is provided, select it in the dropdown
-            if default:
-                drp.set(default)
-
-            # Grid dropdown
-            drp.grid(
-                row=row,
-                column=1,
+                columnspan=2,
                 sticky="ew",
-                padx=(0, 20),
-                pady=(0, 20),
-                columnspan=2
+                pady=20
             )
 
             # Increment row
             row += 1
 
-            # Add dropdown to current settings
-            self.current_settings[current_section][name] = drp
+            # Add section to current settings
+            self.current_settings[name] = {}
+
+            # Update current section
+            current_section = name
 
         # Create content frame
         self.frm_settings = ctk.CTkScrollableFrame(
