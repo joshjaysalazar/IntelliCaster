@@ -294,6 +294,7 @@ class Director:
                 try:
                     if not self.ir["DriverInfo"]["Drivers"][i]["UserName"]:
                         continue
+                # If i is out of range, continue
                 except:
                     continue
 
