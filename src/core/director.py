@@ -226,6 +226,13 @@ class Director:
             time.sleep(float(self.settings["director"]["update_frequency"]))
 
     def start(self):
+        """Start the director.
+
+        This method starts the director by updating iRacing settings, jumping
+        to the beginning of the current session, hiding the UI, starting the
+        replay, and starting iRacing video capture. It then sets the running
+        flag to True and starts the director thread.
+        """
         # Update iRacing settings
         self.update_iracing_settings()
 
@@ -249,6 +256,11 @@ class Director:
         threading.Thread(target=self.run).start()
 
     def stop(self):
+        """Stop the director.
+
+        This method stops the director by setting the running flag to False,
+        stopping iRacing video capture, and stopping the replay.
+        """
         # Set running to False
         self.running = False
 
