@@ -220,6 +220,15 @@ class App(ctk.CTk):
                 text (str): The text to display next to the entry box.
                 default (str): The default value to insert into the entry box.
             """
+            def browse():
+                """Open a file dialog to browse for a directory."""
+                # Get directory
+                directory = filedialog.askdirectory()
+
+                # Insert directory into entry box
+                ent.delete(0, "end")
+                ent.insert(0, directory)
+
             nonlocal row
 
             # Create label
@@ -265,7 +274,7 @@ class App(ctk.CTk):
                     text="Browse",
                     width=100,
                     font=ctk.CTkFont(size=14),
-                    command=lambda: print('Yup')
+                    command=browse
                 )
 
                 # Grid browse button
