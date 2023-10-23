@@ -213,16 +213,32 @@ class Director:
             # Update the drivers list
             self.update_drivers()
 
-            print(self.race_started)
-
             # If the race hasn't started yet, focus on the front of the grid
             if not self.race_started:
-                print("here")
-                # Get index of the frontmost car
-                focus = self.ir["CarIdxPosition"].index(
-                    min(self.ir["CarIdxPosition"])
-                )
-                print(focus)
+                # Get all the current positions
+                positions = self.ir["CarIdxLapDistPct"]
+                print(positions)
+
+                # Find the max position under 0.5
+                focus = 0
+                max_pos = 0
+                for i, pos in enumerate(positions):
+                    if i == 0:
+                        continue
+                    if pos < 0.5 and pos > max_pos:
+                        focus = i
+                        max_pos = pos
+                
+                # If no cars are under 0.5, all cars are behind line, find min
+                if focus == 0:
+                    min_pos = 1
+                    for i, pos in enumerate(positions):
+                        if i == 0:
+                            continue
+                        if pos < min_pos:
+                            focus = i
+                            min_pos = pos
+
                 self.ir.cam_switch_num(focus, 11)
 
             # Check if all cars have crossed the start line if needed
@@ -260,6 +276,9 @@ class Director:
 
         # Start iRacing video capture
         self.ir.video_capture(1)
+
+        # Wait for iRacing to catch up
+        time.sleep(1)
 
         # Set running to True
         self.running = True
