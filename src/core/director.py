@@ -229,6 +229,19 @@ class Director:
         # Update iRacing settings
         self.update_iracing_settings()
 
+        # Jump the beginning of current session, wait for iRacing to catch up
+        self.ir.replay_search(2)
+        time.sleep(1)
+
+        # Hide UI
+        self.ir.cam_set_state(8)
+
+        # Start replay
+        self.ir.replay_set_play_speed(1)
+
+        # Start iRacing video capture
+        self.ir.video_capture(1)
+
         # Set running to True
         self.running = True
 
@@ -238,6 +251,12 @@ class Director:
     def stop(self):
         # Set running to False
         self.running = False
+
+        # Stop iRacing video capture
+        self.ir.video_capture(2)
+
+        # Stop replay
+        self.ir.replay_set_play_speed(0)
 
     def update_drivers(self):
         """Update and sort the list of drivers in the race.
