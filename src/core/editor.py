@@ -4,7 +4,6 @@ from moviepy.audio.AudioClip import CompositeAudioClip
 from moviepy.audio.fx.audio_normalize import audio_normalize
 from moviepy.audio.fx.volumex import volumex
 import os
-from proglog import ProgressBarLogger
 
 
 class Editor:
