@@ -342,7 +342,7 @@ class App(ctk.CTk):
             lbl.grid(
                 row=row,
                 column=0,
-                columnspan=2,
+                columnspan=3,
                 sticky="ew",
                 pady=20
             )
