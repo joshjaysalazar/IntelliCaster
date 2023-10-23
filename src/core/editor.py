@@ -13,17 +13,25 @@ class Editor:
         self.settings = settings
 
     def create_video(self):
-        pass
+        # Load the video clip
+        video = VideoFileClip(self.get_latest_video())
+
+        # Normalize the original video audio
+        normalized_audio = audio_normalize(video.audio)
+
+        # Adjust the volume
+        normalized_audio = normalized_audio.fx(volumex, 0.5)
 
     def get_latest_video(self):
         # Get the iRacing videos folder
         path = os.path.join(self.settings["iracing"]["iracing_path"], "videos")
 
-        # Find the most recent video in that folder
-        latest_file = max(
-            [os.path.join(path, f) for f in os.listdir(path)],
-            key=os.path.getctime
-        )
+        # Find the most recent .mp4 video in that folder
+        files = []
+        for file in os.listdir(path):
+            if file.endswith(".mp4"):
+                files.append(os.path.join(path, file))
+        latest_file = max(files, key=os.path.getctime)
 
         # Return the file name
         return latest_file
