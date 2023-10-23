@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from tkinter import filedialog
 import threading
 from core import director
 
@@ -177,6 +178,7 @@ class App(ctk.CTk):
             
             Args:
                 name (str): The name of the section to create.
+                text (str): The text to display in the section header.
             """
             nonlocal row
             nonlocal current_section
@@ -215,6 +217,7 @@ class App(ctk.CTk):
             
             Args:
                 name (str): The name of the entry box to create.
+                text (str): The text to display next to the entry box.
                 default (str): The default value to insert into the entry box.
             """
             nonlocal row
