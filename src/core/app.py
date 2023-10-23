@@ -1,6 +1,5 @@
 import customtkinter as ctk
 from tkinter import filedialog
-import threading
 from core import director
 
 
@@ -529,8 +528,7 @@ class App(ctk.CTk):
             self.btn_start_stop.configure(text="⏹ Stop Commentary")
 
             # Run the director in a separate thread
-            self.director.running = True
-            threading.Thread(target=self.director.run).start()
+            self.director.start()
 
             # Add message
             self.add_message("Commentary started!")
@@ -540,7 +538,7 @@ class App(ctk.CTk):
             self.btn_start_stop.configure(text="⏵ Start Commentary")
 
             # Stop the director
-            self.director.running = False
+            self.director.stop()
 
             # Add message
             self.add_message("Commentary stopped!")

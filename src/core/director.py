@@ -1,4 +1,6 @@
 import irsdk
+import os
+import threading
 import time
 from core import commentary
 
@@ -222,6 +224,17 @@ class Director:
             
             # Wait the amount of time specified in the settings
             time.sleep(float(self.settings["director"]["update_frequency"]))
+
+    def start(self):
+        # Set running to True
+        self.running = True
+
+        # Start the director thread
+        threading.Thread(target=self.run).start()
+
+    def stop(self):
+        # Set running to False
+        self.running = False
 
     def update_drivers(self):
         """Update and sort the list of drivers in the race.
