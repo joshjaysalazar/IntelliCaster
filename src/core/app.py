@@ -423,7 +423,7 @@ class App(ctk.CTk):
 
         # Create memory limit entry box
         default = self.settings["commentary"]["memory_limit"]
-        create_entry("memory_limit", "Memory Limit (seconds)", default)
+        create_entry("memory_limit", "Memory Limit (messages)", default)
 
         # Create save settings button
         self.btn_save_settings = ctk.CTkButton(
