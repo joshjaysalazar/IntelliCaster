@@ -368,10 +368,10 @@ class Director:
         and set the video format, framerate, and resolution.
         """
         # Get the iRacing directory
-        directory = self.settings["iracing"]["iracing_path"]
+        path = self.settings["iracing"]["iracing_path"]
 
         # Read app.ini
-        with open(os.path.join(directory, "app.ini"), "r") as f:
+        with open(os.path.join(path, "app.ini"), "r") as f:
             app_ini = f.read()
 
         # Enable video capture if it's not already enabled
@@ -420,5 +420,5 @@ class Director:
             )
 
         # Write the new app.ini
-        with open(os.path.join(directory, "app.ini"), "w") as f:
+        with open(os.path.join(path, "app.ini"), "w") as f:
             f.write(app_ini)
