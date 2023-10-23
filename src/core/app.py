@@ -323,9 +323,6 @@ class App(ctk.CTk):
         default = self.settings["commentary"]["memory_limit"]
         create_entry("memory_limit", "Memory Limit (seconds)", default)
 
-        from pprint import pprint
-        pprint(self.current_settings)
-
         # Create save settings button
         self.btn_save_settings = ctk.CTkButton(
             master=self.frm_settings,
