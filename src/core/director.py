@@ -291,7 +291,10 @@ class Director:
                 if pos == 0: 
                     continue
                 # Exclude disconnected drivers
-                if not self.ir["DriverInfo"]["Drivers"][i]["UserName"]:
+                try:
+                    if not self.ir["DriverInfo"]["Drivers"][i]["UserName"]:
+                        continue
+                except:
                     continue
 
                 # Add the driver to the list
