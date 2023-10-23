@@ -7,7 +7,7 @@ settings.ini
 
 # Video and audio files
 *.mp4
-*.mp3
+*.wav
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
