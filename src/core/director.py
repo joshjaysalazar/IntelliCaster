@@ -213,6 +213,18 @@ class Director:
             # Update the drivers list
             self.update_drivers()
 
+            print(self.race_started)
+
+            # If the race hasn't started yet, focus on the front of the grid
+            if not self.race_started:
+                print("here")
+                # Get index of the frontmost car
+                focus = self.ir["CarIdxPosition"].index(
+                    min(self.ir["CarIdxPosition"])
+                )
+                print(focus)
+                self.ir.cam_switch_num(focus, 11)
+
             # Check if all cars have crossed the start line if needed
             if not self.all_cars_started:
                 self.all_cars_started = self.check_all_cars_started()
