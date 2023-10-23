@@ -226,6 +226,9 @@ class Director:
             time.sleep(float(self.settings["director"]["update_frequency"]))
 
     def start(self):
+        # Update iRacing settings
+        self.update_iracing_settings()
+
         # Set running to True
         self.running = True
 
@@ -284,3 +287,65 @@ class Director:
         # Update positions based on the sorted list
         for i, driver in enumerate(self.drivers):
             driver["position"] = i + 1
+
+    def update_iracing_settings(self):
+        """Update iRacing settings to enable video capture.
+
+        This method updates the iRacing app.ini file to enable video capture
+        and set the video format, framerate, and resolution.
+        """
+        # Get the iRacing directory
+        directory = self.settings["iracing"]["iracing_path"]
+
+        # Read app.ini
+        with open(os.path.join(directory, "app.ini"), "r") as f:
+            app_ini = f.read()
+
+        # Enable video capture if it's not already enabled
+        app_ini = app_ini.replace("vidCaptureEnable=0", "vidCaptureEnable=1")
+
+        # Disable microphone capture if it's not already disabled
+        app_ini = app_ini.replace("videoCaptureMic=1", "videoCaptureMic=0")
+
+        # Set the video file format
+        if self.settings["iracing"]["video_format"] == "mp4":
+            format = 0
+        elif self.settings["iracing"]["video_format"] == "wmv":
+            format = 1
+        elif self.settings["iracing"]["video_format"] == "avi2":
+            format = 2
+        elif self.settings["iracing"]["video_format"] == "avi":
+            format = 3
+        for i in range(4):
+            app_ini = app_ini.replace(
+                f"videoFileFrmt={i}",
+                f"videoFileFrmt={format}"
+            )
+
+        # Set the video framerate
+        if self.settings["iracing"]["video_framerate"] == "60":
+            framerate = 0
+        elif self.settings["iracing"]["video_framerate"] == "30":
+            framerate = 1
+        for i in range(2):
+            app_ini = app_ini.replace(
+                f"videoFramerate={i}",
+                f"videoFramerate={framerate}"
+            )
+
+        # Set the video resolution
+        if self.settings["iracing"]["video_resolution"] == "1920x1080":
+            resolution = 1
+        elif self.settings["iracing"]["video_resolution"] == "1280x720":
+            resolution = 2
+        elif self.settings["iracing"]["video_resolution"] == "854x480":
+            resolution = 3
+        for i in range(4):
+            app_ini = app_ini.replace(
+                f"videoImgSize={i}",
+                f"videoImgSize={resolution}"
+            )
+
+        # Write the new app.ini
+        with open(os.path.join(directory, "app.ini"), "w") as f:
+            f.write(app_ini)
