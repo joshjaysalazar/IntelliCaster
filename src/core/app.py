@@ -351,22 +351,6 @@ class App(ctk.CTk):
             pady=20
         )
         row += 1
-
-        # Create settings saved label and hide it
-        self.lbl_settings_saved = ctk.CTkLabel(
-            master=self.frm_settings,
-            text="Settings saved!",
-            font=ctk.CTkFont(size=14)
-        )
-        self.lbl_settings_saved.grid(
-            row=row,
-            column=0,
-            columnspan=2,
-            sticky="ew",
-            padx=20
-        )
-        self.lbl_settings_saved.grid_remove()
-        row += 1
     
     def save_settings(self, event=None):
         """Save settings from entry boxes to a settings.ini file.
@@ -393,11 +377,24 @@ class App(ctk.CTk):
         # Add message
         self.add_message("Settings saved!")
 
-        # Show settings saved label
-        self.lbl_settings_saved.grid()
+        # Change save settings button text and color
+        original_fg_color = self.btn_save_settings.cget("fg_color")
+        original_hover_color = self.btn_save_settings.cget("hover_color")
+        self.btn_save_settings.configure(
+            text="Settings Saved!",
+            fg_color="green",
+            hover_color="green"
+        )
 
-        # Hide settings saved label after 3 seconds
-        self.after(3000, self.lbl_settings_saved.grid_remove)
+        # Change it back after 3 seconds
+        self.after(
+            3000,
+            lambda: self.btn_save_settings.configure(
+                text="Save Settings",
+                fg_color=original_fg_color,
+                hover_color=original_hover_color
+            )
+        )
 
     def show_frame(self, event=None, frame="home"):
         """Switch between 'Home' and 'Settings' frames and update button colors.
