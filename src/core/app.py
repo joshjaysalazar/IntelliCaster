@@ -174,7 +174,7 @@ class App(ctk.CTk):
             
             Creates a section header for the settings frame that is used to
             separate different sections of the settings frame. The section
-            header is a label with a bold font and a 20 pixel bottom padding.
+            header is a label with a bold font and a large font size.
             
             Args:
                 name (str): The name of the section to create.
@@ -212,8 +212,7 @@ class App(ctk.CTk):
             """Create an entry box for the settings frame.
             
             Creates an entry box for the settings frame that is used to input
-            various settings. The entry box is a label with a bold font and a
-            20 pixel bottom padding. If a default value is provided, it is
+            various settings. If a default value is provided, it is
             inserted into the entry box. If the browse flag is set to True, a
             'Browse' button is created next to the entry box that allows users
             to browse for a directory.
