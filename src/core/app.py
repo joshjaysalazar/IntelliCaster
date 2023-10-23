@@ -247,7 +247,7 @@ class App(ctk.CTk):
         default = self.settings["keys"]["openai_api_key"]
         create_entry("OpenAI API Key", default)
 
-        # Create API key entry boxe for ElevenLabs
+        # Create API key entry box for ElevenLabs
         default = self.settings["keys"]["elevenlabs_api_key"]
         create_entry("ElevenLabs API Key", default)
 
@@ -315,10 +315,10 @@ class App(ctk.CTk):
             event: Not used, but included for compatibility with button clicks.
         """
         # Update settings with values from entry boxes
-        self.settings["keys"]["openai_api_key"] = self.ent_openai_key.get()
-        self.settings["keys"]["elevenlabs_api_key"] = self.ent_elevenlabs_key.get()
-        self.settings["director"]["update_frequency"] = self.ent_update_frequency.get()
-        self.settings["commentary"]["memory_limit"] = self.ent_memory_limit.get()
+        self.settings["keys"]["openai_api_key"] = self.setting_widgets["OpenAI API Key"].get()
+        self.settings["keys"]["elevenlabs_api_key"] = self.setting_widgets["ElevenLabs API Key"].get()
+        self.settings["director"]["update_frequency"] = self.setting_widgets["Update Frequency (seconds)"].get()
+        self.settings["commentary"]["memory_limit"] = self.setting_widgets["Memory Limit (seconds)"].get()
 
         # Save settings to file
         with open("settings.ini", "w") as f:
