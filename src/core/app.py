@@ -295,6 +295,64 @@ class App(ctk.CTk):
             # Add entry box to current settings
             self.current_settings[current_section][name] = ent
 
+        def create_dropdown(name, text, options, default=None):
+            """Create a dropdown for the settings frame.
+            
+            Creates a dropdown for the settings frame that is used to select
+            from a list of options. If a default value is provided, it is
+            selected in the dropdown.
+            
+            Args:
+                name (str): The name of the dropdown to create.
+                text (str): The text to display next to the dropdown.
+                options (list): A list of options to select from.
+                default (str): The default value to select in the dropdown.
+            """
+            nonlocal row
+
+            # Create label
+            lbl = ctk.CTkLabel(
+                master=self.frm_settings,
+                text=text,
+                font=ctk.CTkFont(size=14)
+            )
+
+            # Grid label
+            lbl.grid(
+                row=row,
+                column=0,
+                sticky="e",
+                padx=20,
+                pady=(0, 20)
+            )
+
+            # Create dropdown
+            drp = ctk.CTkOptionMenu(
+                master=self.frm_settings,
+                values=options,
+                font=ctk.CTkFont(size=14)
+            )
+
+            # If default value is provided, select it in the dropdown
+            if default:
+                drp.set(default)
+
+            # Grid dropdown
+            drp.grid(
+                row=row,
+                column=1,
+                sticky="ew",
+                padx=(0, 20),
+                pady=(0, 20),
+                columnspan=2
+            )
+
+            # Increment row
+            row += 1
+
+            # Add dropdown to current settings
+            self.current_settings[current_section][name] = drp
+
         # Create content frame
         self.frm_settings = ctk.CTkScrollableFrame(
             master=self,
@@ -321,6 +379,33 @@ class App(ctk.CTk):
         default = self.settings["iracing"]["iracing_path"]
         create_entry(
             "iracing_path", "iRacing Documents Directory", default, True
+        )
+
+        # Create the video format dropdown
+        default = self.settings["iracing"]["video_format"]
+        create_dropdown(
+            "video_format",
+            "Video Format",
+            ["mp4", "wmv", "avi2", "avi"],
+            default
+        )
+
+        # Create the video framerate dropdown
+        default = self.settings["iracing"]["video_framerate"]
+        create_dropdown(
+            "video_framerate",
+            "Video Framerate",
+            ["30", "60"],
+            default
+        )
+
+        # Create the video resolution dropdown
+        default = self.settings["iracing"]["video_resolution"]
+        create_dropdown(
+            "video_resolution",
+            "Video Resolution",
+            ["1920x1080", "1280x720", "854x480"],
+            default
         )
 
         # Create Director section
