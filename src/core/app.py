@@ -208,7 +208,7 @@ class App(ctk.CTk):
             # Update current section
             current_section = name
 
-        def create_entry(name, text, default=None):
+        def create_entry(name, text, default=None, browse=False):
             """Create an entry box for the settings frame.
             
             Creates an entry box for the settings frame that is used to input
@@ -257,78 +257,23 @@ class App(ctk.CTk):
                 pady=(0, 20)
             )
 
-            # Increment row
-            row += 1
+            # If browse button is requested, create it
+            if browse:
+                btn = ctk.CTkButton(
+                    master=self.frm_settings,
+                    text="Browse",
+                    font=ctk.CTkFont(size=14),
+                    command=lambda: print('Yup')
+                )
 
-            # Add entry box to current settings
-            self.current_settings[current_section][name] = ent
-
-        def create_browsable_entry(name, text, default=None):
-            """Create an entry box for the settings frame with a browse button.
-            
-            Creates an entry box for the settings frame that is used to input
-            various settings. The entry box is a label with a bold font and a
-            20 pixel bottom padding. It also includes a browse button that
-            allows the user to select a file or directory.
-            
-            Args:
-                name (str): The name of the entry box to create.
-                text (str): The text to display next to the entry box.
-                default (str): The default value to insert into the entry box.
-            """
-            nonlocal row
-
-            # Create label
-            lbl = ctk.CTkLabel(
-                master=self.frm_settings,
-                text=text,
-                font=ctk.CTkFont(size=14)
-            )
-
-            # Grid label
-            lbl.grid(
-                row=row,
-                column=0,
-                sticky="e",
-                padx=20,
-                pady=(0, 20)
-            )
-
-            # Create entry box
-            ent = ctk.CTkEntry(
-                master=self.frm_settings,
-                font=ctk.CTkFont(size=14)
-            )
-
-            # If default value is provided, insert it into the entry box
-            if default:
-                ent.insert(0, default)
-
-            # Grid entry box
-            ent.grid(
-                row=row,
-                column=1,
-                sticky="ew",
-                padx=(0, 20),
-                pady=(0, 20)
-            )
-
-            # Create browse button
-            btn = ctk.CTkButton(
-                master=self.frm_settings,
-                text="Browse",
-                font=ctk.CTkFont(size=14),
-                command=lambda: self.browse_file(ent)
-            )
-
-            # Grid browse button
-            btn.grid(
-                row=row,
-                column=2,
-                sticky="ew",
-                padx=(0, 20),
-                pady=(0, 20)
-            )
+                # Grid browse button
+                btn.grid(
+                    row=row,
+                    column=2,
+                    sticky="ew",
+                    padx=(0, 20),
+                    pady=(0, 20)
+                )
 
             # Increment row
             row += 1
@@ -360,8 +305,8 @@ class App(ctk.CTk):
 
         # Create iRacing directory entry box
         default = self.settings["iracing"]["iracing_path"]
-        create_browsable_entry(
-            "iracing_path", "iRacing Documents Directory", default
+        create_entry(
+            "iracing_path", "iRacing Documents Directory", default, True
         )
 
         # Create Director section
