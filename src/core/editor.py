@@ -16,6 +16,14 @@ class Editor:
         pass
 
     def get_latest_video(self):
-        # Look in the iRacing directory/videos directory for the latest video file
-        pass
+        # Get the iRacing videos folder
+        path = os.path.join(self.settings["iracing"]["iracing_path"], "videos")
+
+        # Find the most recent video in that folder
+        latest_file = max(
+            [os.path.join(path, f) for f in os.listdir(path)],
+            key=os.path.getctime
+        )
+
         # Return the file name
+        return latest_file
