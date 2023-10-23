@@ -24,6 +24,9 @@ def create_settings_file(file_name):
         config.set(
             "iracing", "iracing_path", "path/to/your/iRacing/folder"
         )
+        config.set("iracing", "video_format", "mp4")
+        config.set("iracing", "video_framerate", "60")
+        config.set("iracing", "video_resolution", "1920x1080")
 
         # Set up director section
         config.add_section("director")
