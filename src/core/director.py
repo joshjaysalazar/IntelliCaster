@@ -194,8 +194,7 @@ class Director:
         """The main loop for the Director class.
 
         This method keeps running as long as the director is set to run. It
-        checks for race start, updates driver positions, detects overtakes,
-        and then sleeps for the specified update frequency.
+        handles all of the logic for generating commentary.
         """
         while self.running:
             # Detect if the race has started
