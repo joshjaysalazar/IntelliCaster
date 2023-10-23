@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkinter import filedialog
 from core import director
+from core import editor
 
 
 class App(ctk.CTk):
@@ -52,6 +53,9 @@ class App(ctk.CTk):
 
         # Create the director
         self.director = director.Director(self.settings, self.add_message)
+
+        # Create the editor
+        self.editor = editor.Editor(self.settings)
 
         # Add ready message
         self.add_message("Ready to start commentary...")
@@ -540,5 +544,12 @@ class App(ctk.CTk):
             # Stop the director
             self.director.stop()
 
-            # Add message
+            # Add messages
             self.add_message("Commentary stopped!")
+            self.add_message("Generating video...")
+
+            # Create the video
+            self.editor.create_video()
+
+            # Add message
+            self.add_message("Video generated!")

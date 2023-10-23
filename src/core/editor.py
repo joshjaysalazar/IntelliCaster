@@ -52,7 +52,7 @@ class Editor:
             # Extract the timestamp from the file name
             timestamp = file_name.replace("commentary_", "")
             timestamp = timestamp.replace(".wav", "")
-            timestamp = float(timestamp / 1000)
+            timestamp = float(timestamp) / 1000
 
             # Create the audio clip
             audio = AudioFileClip(file).set_start(timestamp)
