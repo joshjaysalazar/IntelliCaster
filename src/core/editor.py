@@ -34,6 +34,38 @@ class Editor:
         # Write the result to a file
         video.write_videofile("output_video.mp4", codec="libx264")
 
+        # Clean up videos directory
+        self.delete_commentary_audio()
+        self.delete_latest_video()
+
+    def delete_commentary_audio(self):
+        # Get the iRacing videos folder
+        path = os.path.join(self.settings["iracing"]["iracing_path"], "videos")
+
+        # Get a list of all of the .wav files in that folder
+        files = []
+        for file in os.listdir(path):
+            if file.endswith(".wav"):
+                files.append(os.path.join(path, file))
+
+        # Delete all of the .wav files
+        for file in files:
+            os.remove(file)
+
+    def delete_latest_video(self):
+        # Get the iRacing videos folder
+        path = os.path.join(self.settings["iracing"]["iracing_path"], "videos")
+
+        # Find the most recent .mp4 video in that folder
+        files = []
+        for file in os.listdir(path):
+            if file.endswith(".mp4"):
+                files.append(os.path.join(path, file))
+        latest_file = max(files, key=os.path.getctime)
+
+        # Delete the file
+        os.remove(latest_file)
+
     def get_commentary_audio(self):
         # Get the iRacing videos folder
         path = os.path.join(self.settings["iracing"]["iracing_path"], "videos")
