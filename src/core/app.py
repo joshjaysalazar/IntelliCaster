@@ -255,7 +255,7 @@ class App(ctk.CTk):
                 sticky="ew",
                 padx=(0, 20),
                 pady=(0, 20),
-                columnspan=2 if not browse else 1
+                columnspan=1 if browse else 2
             )
 
             # If browse button is requested, create it
