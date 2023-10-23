@@ -345,7 +345,7 @@ class App(ctk.CTk):
         self.btn_save_settings.grid(
             row=row,
             column=0,
-            columnspan=2,
+            columnspan=3,
             sticky="ew",
             padx=20,
             pady=20
