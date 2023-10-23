@@ -161,9 +161,9 @@ class App(ctk.CTk):
     def create_settings(self):
         """Create the settings frame and its components.
     
-        Sets up a frame for the 'Settings' tab that allows users to input API
-        keys, set update frequency, and define memory limits for commentary. It
-        also includes a 'Save Settings' button to preserve these settings.
+        Sets up a frame for the 'Settings' tab that allows users to input
+        settings. It also includes a 'Save Settings' button to preserve these
+        settings.
         """
         row = 0
         current_section = ""
