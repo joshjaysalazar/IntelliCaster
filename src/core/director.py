@@ -56,6 +56,9 @@ class Director:
         self.race_time = 0
         self.all_cars_started = False
 
+        # Track recording start time
+        self.recording_start_time = None
+
         # Create the commentary generators
         self.text_generator = commentary.TextGenerator(self.settings)
         self.voice_generator = commentary.VoiceGenerator(self.settings)
@@ -162,8 +165,14 @@ class Director:
                 )
                 self.add_message(commentary)
 
+                # Get the timestamp
+                timestamp = time.time() - self.recording_start_time
+
+                # Convert the timestamp to milliseconds
+                timestamp = int(timestamp * 1000)
+
                 # Generate the voice commentary
-                self.voice_generator.generate(commentary)
+                self.voice_generator.generate(commentary, timestamp)
 
                 # End this iteration of the loop
                 break
@@ -283,6 +292,9 @@ class Director:
 
         # Start iRacing video capture
         self.ir.video_capture(1)
+
+        # Set recording start time
+        self.recording_start_time = time.time()
 
         # Wait for iRacing to catch up
         time.sleep(1)
