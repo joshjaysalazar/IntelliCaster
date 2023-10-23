@@ -165,6 +165,72 @@ class App(ctk.CTk):
         also includes a 'Save Settings' button to preserve these settings.
         """
         row = 0
+        self.setting_widgets = {}
+
+        def create_section(name):
+            """Create a section header for the settings frame.
+            
+            Creates a section header for the settings frame that is used to
+            separate different sections of the settings frame. The section
+            header is a label with a bold font and a 20 pixel bottom padding.
+            
+            Args:
+                name (str): The name of the section to create.
+            """
+            nonlocal row
+            lbl = ctk.CTkLabel(
+                master=self.frm_settings,
+                text=name,
+                font=ctk.CTkFont(size=18, weight="bold")
+            )
+            lbl.grid(
+                row=row,
+                column=0,
+                columnspan=2,
+                sticky="ew",
+                pady=20
+            )
+            row += 1
+
+        def create_entry(name, default=None):
+            """Create an entry box for the settings frame.
+            
+            Creates an entry box for the settings frame that is used to input
+            various settings. The entry box is a label with a bold font and a
+            20 pixel bottom padding.
+            
+            Args:
+                name (str): The name of the entry box to create.
+                default (str): The default value to insert into the entry box.
+            """
+            nonlocal row
+            lbl = ctk.CTkLabel(
+                master=self.frm_settings,
+                text=name,
+                font=ctk.CTkFont(size=14)
+            )
+            lbl.grid(
+                row=row,
+                column=0,
+                sticky="e",
+                padx=20,
+                pady=(0, 20)
+            )
+            ent = ctk.CTkEntry(
+                master=self.frm_settings,
+                font=ctk.CTkFont(size=14)
+            )
+            if default:
+                ent.insert(0, default)
+            ent.grid(
+                row=row,
+                column=1,
+                sticky="ew",
+                padx=(0, 20),
+                pady=(0, 20)
+            )
+            row += 1
+            self.setting_widgets[name] = ent
 
         # Create content frame
         self.frm_settings = ctk.CTkScrollableFrame(
@@ -175,163 +241,32 @@ class App(ctk.CTk):
         self.frm_settings.grid_columnconfigure(1, weight=1)
 
         # Create API keys section
-        self.lbl_api_keys = ctk.CTkLabel(
-            master=self.frm_settings,
-            text="API Keys",
-            font=ctk.CTkFont(size=18, weight="bold")
-        )
-        self.lbl_api_keys.grid(
-            row=row,
-            column=0,
-            columnspan=2,
-            sticky="ew",
-            pady=20
-        )
-        row += 1
+        create_section("API Keys")
 
-        # Create API key entry boxe for OpenAI
-        self.lbl_openai_key = ctk.CTkLabel(
-            master=self.frm_settings,
-            text="OpenAI API Key",
-            font=ctk.CTkFont(size=14)
-        )
-        self.lbl_openai_key.grid(
-            row=row,
-            column=0,
-            sticky="e",
-            padx=20,
-            pady=(0, 20)
-        )
-        self.ent_openai_key = ctk.CTkEntry(
-            master=self.frm_settings,
-            font=ctk.CTkFont(size=14)
-        )
-        text = self.settings["keys"]["openai_api_key"]
-        self.ent_openai_key.insert(0, text)
-        self.ent_openai_key.grid(
-            row=row,
-            column=1,
-            sticky="ew",
-            padx=(0, 20),
-            pady=(0, 20)
-        )
-        row += 1
+        # Create API key entry box for OpenAI
+        default = self.settings["keys"]["openai_api_key"]
+        create_entry("OpenAI API Key", default)
 
         # Create API key entry boxe for ElevenLabs
-        self.lbl_elevenlabs_key = ctk.CTkLabel(
-            master=self.frm_settings,
-            text="ElevenLabs API Key",
-            font=ctk.CTkFont(size=14)
-        )
-        self.lbl_elevenlabs_key.grid(
-            row=row,
-            column=0,
-            sticky="e",
-            padx=20,
-            pady=(0, 20)
-        )
-        self.ent_elevenlabs_key = ctk.CTkEntry(
-            master=self.frm_settings,
-            font=ctk.CTkFont(size=14)
-        )
-        text = self.settings["keys"]["elevenlabs_api_key"]
-        self.ent_elevenlabs_key.insert(0, text)
-        self.ent_elevenlabs_key.grid(
-            row=row,
-            column=1,
-            sticky="ew",
-            padx=(0, 20),
-            pady=(0, 20)
-        )
-        row += 1
+        default = self.settings["keys"]["elevenlabs_api_key"]
+        create_entry("ElevenLabs API Key", default)
+
+        # Create iRacing section
+        create_section("iRacing")
 
         # Create Director section
-        self.lbl_director = ctk.CTkLabel(
-            master=self.frm_settings,
-            text="Director",
-            font=ctk.CTkFont(size=18, weight="bold")
-        )
-        self.lbl_director.grid(
-            row=row,
-            column=0,
-            columnspan=2,
-            sticky="ew",
-            pady=20
-        )
-        row += 1
+        create_section("Director")
 
         # Create update frequency entry box
-        self.lbl_update_frequency = ctk.CTkLabel(
-            master=self.frm_settings,
-            text="Update Frequency (seconds)",
-            font=ctk.CTkFont(size=14)
-        )
-        self.lbl_update_frequency.grid(
-            row=row,
-            column=0,
-            sticky="e",
-            padx=20,
-            pady=(0, 20)
-        )
-        self.ent_update_frequency = ctk.CTkEntry(
-            master=self.frm_settings,
-            font=ctk.CTkFont(size=14),
-            width=50
-        )
-        text = self.settings["director"]["update_frequency"]
-        self.ent_update_frequency.insert(0, text)
-        self.ent_update_frequency.grid(
-            row=row,
-            column=1,
-            sticky="w",
-            padx=(0, 20),
-            pady=(0, 20)
-        )
-        row += 1
+        default = self.settings["director"]["update_frequency"]
+        create_entry("Update Frequency (seconds)", default)
 
         # Create commentary section
-        self.lbl_commentary = ctk.CTkLabel(
-            master=self.frm_settings,
-            text="Commentary",
-            font=ctk.CTkFont(size=18, weight="bold")
-        )
-        self.lbl_commentary.grid(
-            row=row,
-            column=0,
-            columnspan=2,
-            sticky="ew",
-            pady=20
-        )
-        row += 1
+        create_section("Commentary")
 
         # Create memory limit entry box
-        self.lbl_memory_limit = ctk.CTkLabel(
-            master=self.frm_settings,
-            text="Memory Limit (messages)",
-            font=ctk.CTkFont(size=14)
-        )
-        self.lbl_memory_limit.grid(
-            row=row,
-            column=0,
-            sticky="e",
-            padx=20,
-            pady=(0, 20)
-        )
-        self.ent_memory_limit = ctk.CTkEntry(
-            master=self.frm_settings,
-            font=ctk.CTkFont(size=14),
-            width=50
-        )
-        text = self.settings["commentary"]["memory_limit"]
-        self.ent_memory_limit.insert(0, text)
-        self.ent_memory_limit.grid(
-            row=row,
-            column=1,
-            sticky="w",
-            padx=(0, 20),
-            pady=(0, 20)
-        )
-        row += 1
+        default = self.settings["commentary"]["memory_limit"]
+        create_entry("Memory Limit (seconds)", default)
 
         # Create save settings button
         self.btn_save_settings = ctk.CTkButton(
