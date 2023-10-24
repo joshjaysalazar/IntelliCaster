@@ -31,7 +31,10 @@ class Editor:
         video = video.set_audio(new_audio)
 
         # Write the result to a file
-        video.write_videofile("output_video.mp4", codec="libx264")
+        video.write_videofile(
+            f"output_video.{self.settings['iracing']['video_format']}",
+            fps=int(self.settings["iracing"]["video_framerate"])
+        )
 
         # Clean up videos directory
         self.delete_commentary_audio()
