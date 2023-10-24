@@ -85,13 +85,8 @@ class TextGenerator:
         
         # Build the prompt
         prompt += "The following is additional information you can include, " \
-<<<<<<< HEAD
             "but is not required. If any of this information appears in the " \
             "previous commentary below, DO NOT repeat it.\n"
-=======
-            "but is not required. Make sure you are no repeating information " \
-            "you have already said in recent commentary.\n"
->>>>>>> bfe1b90a4ce6637a629f2c5fd9f7404dcc784ae5
         prompt += f"Track: {ir_info['WeekendInfo']['TrackDisplayName']}\n"
         prompt += f"City: {ir_info['WeekendInfo']['TrackCity']}\n"
         prompt += f"Country: {ir_info['WeekendInfo']['TrackCountry']}\n"
