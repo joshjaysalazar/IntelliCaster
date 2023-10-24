@@ -58,8 +58,6 @@ class TextGenerator:
         prompt += "Make sure you follow all of the following instructions " \
             "exactly.\n"
         prompt += "DO NOT repeat previously-used phrases.\n"
-        prompt += "If you have to say something similar to the most recent " \
-            "commentary, rephrase it.\n"
         prompt += "Do not, under any circumstances, invent details. Only " \
             "comment on the information you have.\n"
         prompt += "Use ONLY drivers' last names. NEVER use first names.\n"
@@ -101,6 +99,8 @@ class TextGenerator:
             for message in self.previous_responses:
                 prompt += f"{message}\n"
 
+        prompt += "Note: If you have to say something similar to the most " \
+            "recent commentary, rephrase it.\n"
         prompt += f"Event: {event}\nAI:\n"
         
         # Call the API
