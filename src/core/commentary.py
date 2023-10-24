@@ -57,12 +57,12 @@ class TextGenerator:
         prompt += "You are providing commentary to a race.\n"
         prompt += "Make sure you follow all of the following instructions " \
             "exactly.\n"
-        prompt += "Use previous events as context, but DO NOT repeat " \
-            "previously-used phrases.\n"
+        prompt += "DO NOT repeat previously-used phrases.\n"
         prompt += "Do not, under any circumstances, invent details. Only " \
             "comment on the information you have.\n"
         prompt += "Use ONLY drivers' last names. NEVER use first names.\n"
         prompt += f"Your responses MUST NOT exceed {limit} words.\n"
+        prompt += f"Use a {tone} tone.\n"
 
         # Set role
         if role == "play-by-play":
@@ -84,7 +84,9 @@ class TextGenerator:
             prompt += "Do not invent details.\n"
         
         # Build the prompt
-        prompt += f"Tone: {tone}\n"
+        prompt += "The following is additional information you can include, " \
+            "but is not required. Make sure you are no repeating information " \
+            "you have already said in recent commentary.\n"
         prompt += f"Track: {ir_info['WeekendInfo']['TrackDisplayName']}\n"
         prompt += f"City: {ir_info['WeekendInfo']['TrackCity']}\n"
         prompt += f"Country: {ir_info['WeekendInfo']['TrackCountry']}\n"
