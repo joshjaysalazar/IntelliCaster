@@ -104,6 +104,10 @@ class TextGenerator:
         # Extract the response
         answer = response.choices[0].text.strip()
 
+        # Remove quotes the AI sometimes likes to add
+        if answer[0] == "\"" and answer[-1] == "\"":
+            answer = answer[1:-1]
+
         # Add the response to the list of previous responses
         self.previous_responses.append(answer)
 
