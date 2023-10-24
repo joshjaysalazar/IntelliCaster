@@ -58,7 +58,7 @@ class TextGenerator:
         prompt += "Use previous events as context, but don't be repetitive.\n"
         prompt += "Do not, under any circumstances, invent details. Only " \
             "comment on the information you have.\n"
-        prompt += "Use drivers' last names.\n"
+        prompt += "Use ONLY drivers' last names.\n"
         prompt += f"Your responses MUST NOT exceed {limit} words.\n"
 
         # Set role
