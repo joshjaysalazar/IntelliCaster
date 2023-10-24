@@ -171,6 +171,9 @@ class Director:
                 # Convert the timestamp to milliseconds
                 timestamp = int(timestamp * 1000)
 
+                # Convert to all caps for voice commentary
+                commentary = commentary.upper()
+
                 # Generate the voice commentary
                 self.voice_generator.generate(commentary, timestamp)
 
