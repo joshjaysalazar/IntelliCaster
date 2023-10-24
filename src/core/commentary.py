@@ -65,14 +65,15 @@ class TextGenerator:
         if role == "play-by-play":
             prompt += "You are the play-by-play commentator.\n"
             prompt += "Do not provide too much detail. Focus on the action.\n"
+            prompt += "Limit your response to a single sentence."
             prompt += "Do not provide color commentary.\n"
-            prompt += "Don't use unnecessary exclamations or filler phrases.\n"
+            prompt += "DO NOT use unnecessary exclamations or filler " \
+                "phrases. Your job is only to report the action.\n"
             prompt +=  "Do not call out turn numbers if you don't have them.\n"
         elif role == "color":
             prompt += "You are the color commentator.\n"
             prompt += "Stick to providing insight or context that enhances " \
                 "the viewer's understanding.\n"
-            prompt += "Avoid calling immediate race actions."
             prompt += "Do not provide play-by-play commentary.\n"
             prompt += "Do not invent details.\n"
         
