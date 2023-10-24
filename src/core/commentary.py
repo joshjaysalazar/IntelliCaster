@@ -58,6 +58,8 @@ class TextGenerator:
         prompt += "Make sure you follow all of the following instructions " \
             "exactly.\n"
         prompt += "DO NOT repeat previously-used phrases.\n"
+        prompt += "If you have to say something similar to the most recent " \
+            "commentary, rephrase it.\n"
         prompt += "Do not, under any circumstances, invent details. Only " \
             "comment on the information you have.\n"
         prompt += "Use ONLY drivers' last names. NEVER use first names.\n"
