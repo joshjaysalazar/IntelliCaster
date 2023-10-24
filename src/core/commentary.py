@@ -101,7 +101,7 @@ class TextGenerator:
             engine="gpt-3.5-turbo-instruct",
             prompt=prompt,
             max_tokens=1024,
-            temperature=0.6
+            temperature=0.9
         )
         
         # Extract the response
