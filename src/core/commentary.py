@@ -84,16 +84,16 @@ class TextGenerator:
         prompt += f"Country: {ir_info['WeekendInfo']['TrackCountry']}\n"
         prompt += f"Additional Info: {other_info}\n"
         
-        # Add the previous responses (limited by settings) if there are any
-        limit = int(self.settings["commentary"]["memory_limit"])
-        if len(self.previous_responses) > limit:
-            for e, a in self.previous_responses[-limit:]:
-                prompt += f"Human: {e}\nAI: {a}\n"
-        elif len(self.previous_responses) > 0:
-            for e, a in self.previous_responses:
-                prompt += f"Human: {e}\nAI: {a}\n"
+        # Add the previous responses if there are any
+        if len(self.previous_responses) > 0:
+            prompt += "Previous Commentary (oldest to latest):\n"
+            limit = int(self.settings["commentary"]["memory_limit"])
+            for message in self.previous_responses:
+                prompt += f"- {message}\n"
 
         prompt += f"Human: {event}\nAI:\n"
+
+        print(prompt)
         
         # Call the API
         response = openai.Completion.create(
@@ -103,8 +103,15 @@ class TextGenerator:
             temperature=0.6
         )
         
+        # Extract the response
         answer = response.choices[0].text.strip()
-        self.previous_responses.append((event, answer))
+
+        # Add the response to the list of previous responses
+        self.previous_responses.append(answer)
+
+        # If the list is too long, remove the oldest response
+        if len(self.previous_responses) > limit:
+            self.previous_responses.pop(0)
         
         return answer
 
