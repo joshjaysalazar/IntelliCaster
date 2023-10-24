@@ -60,7 +60,8 @@ class TextGenerator:
         prompt += "DO NOT repeat previously-used phrases.\n"
         prompt += "Do not, under any circumstances, invent details. Only " \
             "comment on the information you have.\n"
-        prompt += "Use ONLY drivers' last names. NEVER use first names.\n"
+        prompt += "ONLY use a driver's last name. Do not use their first " \
+            "name or their full name.\n"
         prompt += f"Your responses MUST NOT exceed {limit} words.\n"
         prompt += f"Use a {tone} tone.\n"
 
