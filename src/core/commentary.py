@@ -97,7 +97,7 @@ class TextGenerator:
             prompt += "Previous Commentary (oldest to latest):\n"
             limit = int(self.settings["commentary"]["memory_limit"])
             for message in self.previous_responses:
-                prompt += f"- {message}\n"
+                prompt += f"{message}\n"
 
         prompt += f"Event: {event}\nAI:\n"
         
