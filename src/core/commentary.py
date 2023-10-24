@@ -140,7 +140,7 @@ class VoiceGenerator:
         # Set the API key
         elevenlabs.set_api_key(self.settings["keys"]["elevenlabs_api_key"])
 
-    def generate(self, text, timestamp, voice="Arnold"):
+    def generate(self, text, timestamp, yelling=False, voice="Arnold"):
         """Generate and play audio for the provided text.
 
         Calls the ElevenLabs API to create audio from the text using the
@@ -151,6 +151,12 @@ class VoiceGenerator:
             voice (str, optional): The voice to use for text-to-speech. Defaults
                 to "Harry".
         """
+        # Convert to yelling for voice commentary if requested
+        if yelling:
+            text = text.upper()
+            if text[-1] == ".":
+                text = text[:-1] + "!!!"
+
         # Generate and play audio
         audio = elevenlabs.generate(
             text=text,
