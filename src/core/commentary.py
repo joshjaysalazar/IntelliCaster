@@ -55,7 +55,7 @@ class TextGenerator:
 
         # Add behavioral instructions
         prompt += "You are providing commentary to a race.\n"
-        prompt += "Make sure you follow all of the following instructions " \
+        prompt += "Make sure you follow ALL of the following instructions " \
             "exactly.\n"
         prompt += "DO NOT repeat previously-used phrases.\n"
         prompt += "Do not, under any circumstances, invent details. Only " \
@@ -84,7 +84,7 @@ class TextGenerator:
             prompt += "Do not invent details.\n"
         
         # Build the prompt
-        prompt += "The following is additional information you can include, " \
+        prompt += "\nThe following is additional information you can include, " \
             "but is not required. If any of this information appears in the " \
             "previous commentary below, DO NOT repeat it.\n"
         prompt += f"Track: {ir_info['WeekendInfo']['TrackDisplayName']}\n"
@@ -94,12 +94,12 @@ class TextGenerator:
         
         # Add the previous responses if there are any
         if len(self.previous_responses) > 0:
-            prompt += "Previous Commentary (oldest to latest):\n"
+            prompt += "\nPrevious Commentary (oldest to latest):\n"
             limit = int(self.settings["commentary"]["memory_limit"])
             for message in self.previous_responses:
                 prompt += f"{message}\n"
 
-        prompt += "Note: If you have to say something similar to the most " \
+        prompt += "\nNote: If you have to say something similar to the most " \
             "recent commentary, rephrase it without changing the tone.\n"
         prompt += f"Event: {event}\nAI:\n"
         
