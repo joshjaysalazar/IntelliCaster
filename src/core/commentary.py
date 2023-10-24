@@ -91,9 +91,7 @@ class TextGenerator:
             for message in self.previous_responses:
                 prompt += f"- {message}\n"
 
-        prompt += f"Human: {event}\nAI:\n"
-
-        print(prompt)
+        prompt += f"Event: {event}\nAI:\n"
         
         # Call the API
         response = openai.Completion.create(
