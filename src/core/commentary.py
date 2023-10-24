@@ -65,11 +65,14 @@ class TextGenerator:
             prompt += "Do not provide too much detail. Focus on the action.\n"
             prompt += "Do not provide color commentary.\n"
             prompt += "Don't use unnecessary exclamations or filler phrases.\n"
+            prompt += "Do not invent details.\n"
         elif role == "color":
             prompt += "You are the color commentator.\n"
             prompt += "Stick to providing insight or context that enhances " \
                 "the viewer's understanding.\n"
             prompt += "Avoid calling immediate race actions."
+            prompt += "Do not provide play-by-play commentary.\n"
+            prompt += "Do not invent details.\n"
         
         # Build the prompt
         prompt += f"Tone: {tone}\n"
