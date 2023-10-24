@@ -23,7 +23,7 @@ class Editor:
         original_audio = audio_normalize(video.audio)
 
         # Adjust the volume
-        original_audio = original_audio.fx(volumex, 0.5)
+        original_audio = original_audio.fx(volumex, 0.3)
 
         # Get all of the commentary audio
         commentary_audio = self.get_commentary_audio()
