@@ -380,7 +380,7 @@ class Director:
         and set the video format, framerate, and resolution.
         """
         # Get the iRacing directory
-        path = self.settings["iracing"]["iracing_path"]
+        path = self.settings["general"]["iracing_path"]
 
         # Read app.ini
         with open(os.path.join(path, "app.ini"), "r") as f:
@@ -393,13 +393,13 @@ class Director:
         app_ini = app_ini.replace("videoCaptureMic=1", "videoCaptureMic=0")
 
         # Set the video file format
-        if self.settings["iracing"]["video_format"] == "mp4":
+        if self.settings["general"]["video_format"] == "mp4":
             format = 0
-        elif self.settings["iracing"]["video_format"] == "wmv":
+        elif self.settings["general"]["video_format"] == "wmv":
             format = 1
-        elif self.settings["iracing"]["video_format"] == "avi2":
+        elif self.settings["general"]["video_format"] == "avi2":
             format = 2
-        elif self.settings["iracing"]["video_format"] == "avi":
+        elif self.settings["general"]["video_format"] == "avi":
             format = 3
         for i in range(4):
             app_ini = app_ini.replace(
@@ -408,9 +408,9 @@ class Director:
             )
 
         # Set the video framerate
-        if self.settings["iracing"]["video_framerate"] == "60":
+        if self.settings["general"]["video_framerate"] == "60":
             framerate = 0
-        elif self.settings["iracing"]["video_framerate"] == "30":
+        elif self.settings["general"]["video_framerate"] == "30":
             framerate = 1
         for i in range(2):
             app_ini = app_ini.replace(
@@ -419,11 +419,11 @@ class Director:
             )
 
         # Set the video resolution
-        if self.settings["iracing"]["video_resolution"] == "1920x1080":
+        if self.settings["general"]["video_resolution"] == "1920x1080":
             resolution = 1
-        elif self.settings["iracing"]["video_resolution"] == "1280x720":
+        elif self.settings["general"]["video_resolution"] == "1280x720":
             resolution = 2
-        elif self.settings["iracing"]["video_resolution"] == "854x480":
+        elif self.settings["general"]["video_resolution"] == "854x480":
             resolution = 3
         for i in range(4):
             app_ini = app_ini.replace(

@@ -32,8 +32,8 @@ class Editor:
 
         # Write the result to a file
         video.write_videofile(
-            f"output_video.{self.settings['iracing']['video_format']}",
-            fps=int(self.settings["iracing"]["video_framerate"])
+            f"output_video.{self.settings['general']['video_format']}",
+            fps=int(self.settings["general"]["video_framerate"])
         )
 
         # Clean up videos directory
@@ -42,7 +42,7 @@ class Editor:
 
     def delete_commentary_audio(self):
         # Get the iRacing videos folder
-        path = os.path.join(self.settings["iracing"]["iracing_path"], "videos")
+        path = os.path.join(self.settings["general"]["iracing_path"], "videos")
 
         # Get a list of all of the .wav files in that folder
         files = []
@@ -56,7 +56,7 @@ class Editor:
 
     def delete_latest_video(self):
         # Get the iRacing videos folder
-        path = os.path.join(self.settings["iracing"]["iracing_path"], "videos")
+        path = os.path.join(self.settings["general"]["iracing_path"], "videos")
 
         # Find the most recent .mp4 video in that folder
         files = []
@@ -70,7 +70,7 @@ class Editor:
 
     def get_commentary_audio(self):
         # Get the iRacing videos folder
-        path = os.path.join(self.settings["iracing"]["iracing_path"], "videos")
+        path = os.path.join(self.settings["general"]["iracing_path"], "videos")
 
         # Get a list of all of the .wav files in that folder
         files = []
@@ -99,7 +99,7 @@ class Editor:
 
     def get_latest_video(self):
         # Get the iRacing videos folder
-        path = os.path.join(self.settings["iracing"]["iracing_path"], "videos")
+        path = os.path.join(self.settings["general"]["iracing_path"], "videos")
 
         # Find the most recent .mp4 video in that folder
         files = []

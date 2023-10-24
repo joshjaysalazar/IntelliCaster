@@ -376,16 +376,16 @@ class App(ctk.CTk):
         create_entry("elevenlabs_api_key", "ElevenLabs API Key", default)
 
         # Create iRacing section
-        create_section("iracing", "iRacing")
+        create_section("general", "General")
 
         # Create iRacing directory entry box
-        default = self.settings["iracing"]["iracing_path"]
+        default = self.settings["general"]["iracing_path"]
         create_entry(
             "iracing_path", "iRacing Documents Directory", default, True
         )
 
         # Create the video format dropdown
-        default = self.settings["iracing"]["video_format"]
+        default = self.settings["general"]["video_format"]
         create_dropdown(
             "video_format",
             "Video Format",
@@ -394,7 +394,7 @@ class App(ctk.CTk):
         )
 
         # Create the video framerate dropdown
-        default = self.settings["iracing"]["video_framerate"]
+        default = self.settings["general"]["video_framerate"]
         create_dropdown(
             "video_framerate",
             "Video Framerate",
@@ -403,7 +403,7 @@ class App(ctk.CTk):
         )
 
         # Create the video resolution dropdown
-        default = self.settings["iracing"]["video_resolution"]
+        default = self.settings["general"]["video_resolution"]
         create_dropdown(
             "video_resolution",
             "Video Resolution",

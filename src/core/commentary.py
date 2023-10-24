@@ -132,7 +132,7 @@ class VoiceGenerator:
         )
 
         # Get the iRacing videos folder
-        path = os.path.join(self.settings["iracing"]["iracing_path"], "videos")
+        path = os.path.join(self.settings["general"]["iracing_path"], "videos")
 
         # Create the file name
         file_name = f"commentary_{timestamp}.wav"
