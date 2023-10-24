@@ -96,7 +96,7 @@ class TextGenerator:
         response = openai.Completion.create(
             engine="gpt-3.5-turbo-instruct",
             prompt=prompt,
-            max_tokens=256,
+            max_tokens=1024,
             temperature=0.6
         )
         
