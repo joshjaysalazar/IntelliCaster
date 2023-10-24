@@ -75,8 +75,7 @@ class TextGenerator:
                 "phrases. Your job is only to report the action.\n"
             prompt += "Do not call out turn numbers if you don't have them.\n"
             prompt += "Do not add subjective descriptors like 'impressive' " \
-                "or 'amazing' unless specifically mentioned in the input. " \
-                "Stick to factual reporting of events.\n"
+                "or 'amazing'.\n"
         elif role == "color":
             prompt += "You are the color commentator.\n"
             prompt += "Stick to providing insight or context that enhances " \
@@ -101,7 +100,8 @@ class TextGenerator:
                 prompt += f"{message}\n"
 
         prompt += "Note: If you have to say something similar to the most " \
-            "recent commentary, rephrase it.\n"
+            "recent commentary, rephrase it, but do not add any new " \
+            "information or subjective descriptors.\n"
         prompt += f"Event: {event}\nAI:\n"
         
         # Call the API
