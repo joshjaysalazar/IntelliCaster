@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import filedialog
+import threading
 from core import director
 from core import editor
 
@@ -549,7 +550,11 @@ class App(ctk.CTk):
             self.add_message("Generating video...")
 
             # Create the video
-            self.editor.create_video()
+            threading.Thread(
+                target=self.editor.create_video,
+                args=(self,)
+            ).start()
+            # self.editor.create_video(self)
 
             # Add message
             self.add_message("Video generated!")

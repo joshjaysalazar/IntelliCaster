@@ -4,6 +4,7 @@ from moviepy.audio.AudioClip import CompositeAudioClip
 from moviepy.audio.fx.audio_normalize import audio_normalize
 from moviepy.audio.fx.volumex import volumex
 import os
+from core import export
 
 
 class Editor:
@@ -11,7 +12,10 @@ class Editor:
         # Member variables
         self.settings = settings
 
-    def create_video(self):
+    def create_video(self, root_window):
+        # Create export window
+        export_window = export.Export(root_window)
+
         # Load the video clip
         video = self.get_latest_video()
 
@@ -33,7 +37,8 @@ class Editor:
         # Write the result to a file
         video.write_videofile(
             f"output_video.{self.settings['general']['video_format']}",
-            fps=int(self.settings["general"]["video_framerate"])
+            fps=int(self.settings["general"]["video_framerate"]),
+            logger=export_window.progress_tracker
         )
 
         # Clean up videos directory
