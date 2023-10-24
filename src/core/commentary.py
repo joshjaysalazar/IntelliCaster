@@ -55,7 +55,7 @@ class TextGenerator:
 
         # Add behavioral instructions
         prompt += "You are providing commentary to a race.\n"
-        prompt += "Use previous events as context, but don't be repetitive.\n"
+        prompt += "Use previous events as context, but DO NOT be repetitive.\n"
         prompt += "Do not, under any circumstances, invent details. Only " \
             "comment on the information you have.\n"
         prompt += "Use ONLY drivers' last names.\n"
