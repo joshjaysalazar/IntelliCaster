@@ -158,7 +158,7 @@ class Director:
                 commentary = self.text_generator.generate(
                     output,
                     "play-by-play",
-                    "excited",
+                    "neutral",
                     10,
                     self.ir,
                     "Be sure to include the position of the overtaking driver."
