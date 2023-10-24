@@ -56,6 +56,8 @@ class TextGenerator:
         # Add behavioral instructions
         prompt += "You are providing commentary to a race.\n"
         prompt += "Use previous events as context, but don't be repetitive.\n"
+        prompt += "Do not, under any circumstances, invent details. Only " \
+            "comment on the information you have.\n"
         prompt += "Prefer to use drivers' last names.\n"
         prompt += f"Your responses MUST NOT exceed {limit} words.\n"
 
@@ -65,9 +67,7 @@ class TextGenerator:
             prompt += "Do not provide too much detail. Focus on the action.\n"
             prompt += "Do not provide color commentary.\n"
             prompt += "Don't use unnecessary exclamations or filler phrases.\n"
-            prompt += "Do not, under any circumstances, invent details. Only " \
-                "comment on the information you have. Do not call out turn " \
-                "numbers if you don't have them.\n"
+            prompt +=  "Do not call out turn numbers if you don't have them.\n"
         elif role == "color":
             prompt += "You are the color commentator.\n"
             prompt += "Stick to providing insight or context that enhances " \
