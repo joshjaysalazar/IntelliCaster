@@ -31,6 +31,9 @@ class Editor:
         # Create a composite audio clip
         new_audio = CompositeAudioClip([original_audio] + commentary_audio)
 
+        # Set the new audio's fps to 44.1kHz (workaround MoviePy issue #863)
+        new_audio = new_audio.set_fps(44100)
+
         # Normalize the new audio
         new_audio = audio_normalize(new_audio)
 
