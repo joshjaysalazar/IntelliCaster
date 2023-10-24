@@ -1,5 +1,6 @@
 import openai
 import elevenlabs
+import os
 
 
 class TextGenerator:
@@ -112,7 +113,7 @@ class VoiceGenerator:
         # Set the API key
         elevenlabs.set_api_key(self.settings["keys"]["elevenlabs_api_key"])
 
-    def generate(self, text, voice="Harry"):
+    def generate(self, text, timestamp, voice="Harry"):
         """Generate and play audio for the provided text.
 
         Calls the ElevenLabs API to create audio from the text using the
@@ -127,8 +128,14 @@ class VoiceGenerator:
         audio = elevenlabs.generate(
             text=text,
             voice=voice,
-            model="eleven_monolingual_v1",
-            stream=True
+            model="eleven_multilingual_v2"
         )
 
-        elevenlabs.stream(audio)
+        # Get the iRacing videos folder
+        path = os.path.join(self.settings["general"]["iracing_path"], "videos")
+
+        # Create the file name
+        file_name = f"commentary_{timestamp}.wav"
+
+        # Save the audio to a file
+        elevenlabs.save(audio, os.path.join(path, file_name))

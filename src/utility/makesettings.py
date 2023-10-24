@@ -19,6 +19,15 @@ def create_settings_file(file_name):
         config.set("keys", "openai_api_key", "YOUR_API_KEY")
         config.set("keys", "elevenlabs_api_key", "YOUR_API_KEY")
 
+        # Set up iRacing section
+        config.add_section("iracing")
+        config.set(
+            "iracing", "iracing_path", "path/to/your/iRacing/folder"
+        )
+        config.set("iracing", "video_format", "mp4")
+        config.set("iracing", "video_framerate", "60")
+        config.set("iracing", "video_resolution", "1920x1080")
+
         # Set up director section
         config.add_section("director")
         config.set("director", "update_frequency", "1")
