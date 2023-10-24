@@ -44,7 +44,7 @@ class TextGenerator:
             role (str): The role of the commentary, e.g., "play-by-play".
             tone (str): The tone to use, e.g., "excited".
             limit (int): The word limit for the generated text.
-            weekend_info (dict): Information about the race weekend.
+            ir_info (dict): Information from iRacing.
             other_info (str): Any additional information to be included.
 
         Returns:
