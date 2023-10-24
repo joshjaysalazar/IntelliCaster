@@ -31,6 +31,9 @@ class Editor:
         # Create a composite audio clip
         new_audio = CompositeAudioClip([original_audio] + commentary_audio)
 
+        # Normalize the new audio
+        new_audio = audio_normalize(new_audio)
+
         # Set the new audio to the video
         video = video.set_audio(new_audio)
 
