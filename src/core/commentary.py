@@ -55,12 +55,24 @@ class TextGenerator:
 
         # Add behavioral instructions
         prompt += "You are providing commentary to a race.\n"
-        prompt += "Use previous events as context.\n"
+        prompt += "Use previous events as context, but don't be repetitive.\n"
         prompt += "Prefer to use drivers' last names, rarely use full names.\n"
         prompt += f"Your responses MUST NOT exceed {limit} words.\n"
+
+        # Set role
+        if role == "play-by-play":
+            prompt += "You are the play-by-play commentator.\n"
+            prompt += "Be succinct. Focus on critical race actions and " \
+                "positions only.\n"
+            prompt += "Avoid adding speculative or rhetorical questions.\n"
+            prompt += "Do not provide color commentary."
+        elif role == "color":
+            prompt += "You are the color commentator.\n"
+            prompt += "Stick to providing insight or context that enhances " \
+                "the viewer's understanding.\n"
+            prompt += "Avoid calling immediate race actions."
         
         # Build the prompt
-        prompt += f"Role: {role}\n"
         prompt += f"Tone: {tone}\n"
         prompt += f"Track: {ir_info['WeekendInfo']['TrackDisplayName']}\n"
         prompt += f"City: {ir_info['WeekendInfo']['TrackCity']}\n"
