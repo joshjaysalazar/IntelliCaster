@@ -130,7 +130,7 @@ class VoiceGenerator:
         # Set the API key
         elevenlabs.set_api_key(self.settings["keys"]["elevenlabs_api_key"])
 
-    def generate(self, text, timestamp, voice="Harry"):
+    def generate(self, text, timestamp, voice="Arnold"):
         """Generate and play audio for the provided text.
 
         Calls the ElevenLabs API to create audio from the text using the
