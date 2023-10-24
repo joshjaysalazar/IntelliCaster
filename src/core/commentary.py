@@ -58,7 +58,7 @@ class TextGenerator:
         prompt += "Use previous events as context, but don't be repetitive.\n"
         prompt += "Do not, under any circumstances, invent details. Only " \
             "comment on the information you have.\n"
-        prompt += "Prefer to use drivers' last names.\n"
+        prompt += "Use drivers' last names.\n"
         prompt += f"Your responses MUST NOT exceed {limit} words.\n"
 
         # Set role
@@ -69,7 +69,10 @@ class TextGenerator:
             prompt += "Do not provide color commentary.\n"
             prompt += "DO NOT use unnecessary exclamations or filler " \
                 "phrases. Your job is only to report the action.\n"
-            prompt +=  "Do not call out turn numbers if you don't have them.\n"
+            prompt += "Do not call out turn numbers if you don't have them.\n"
+            prompt += "Do not add subjective descriptors like 'impressive' " \
+                "or 'amazing' unless specifically mentioned in the input. " \
+                "Stick to factual reporting of events.\n"
         elif role == "color":
             prompt += "You are the color commentator.\n"
             prompt += "Stick to providing insight or context that enhances " \
