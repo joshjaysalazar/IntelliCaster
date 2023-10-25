@@ -158,7 +158,7 @@ class VoiceGenerator:
         Args:
             text (str): The text to be converted to audio.
             voice (str, optional): The voice to use for text-to-speech. Defaults
-                to "Harry".
+                to "Arnold".
         """
         # Convert to yelling for voice commentary if requested
         if yelling:
