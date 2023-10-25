@@ -158,7 +158,7 @@ class Director:
                 commentary = self.text_generator.generate(
                     output,
                     "play-by-play",
-                    "excited",
+                    "neutral",
                     10,
                     self.ir,
                     "Be sure to include the position of the overtaking driver."
@@ -172,7 +172,11 @@ class Director:
                 timestamp = int(timestamp * 1000)
 
                 # Generate the voice commentary
-                self.voice_generator.generate(commentary, timestamp)
+                self.voice_generator.generate(
+                    commentary,
+                    timestamp,
+                    yelling=True
+                )
 
                 # End this iteration of the loop
                 break

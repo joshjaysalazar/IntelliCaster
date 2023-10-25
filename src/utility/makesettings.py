@@ -34,7 +34,7 @@ def create_settings_file(file_name):
 
         # Set up commentary section
         config.add_section("commentary")
-        config.set("commentary", "memory_limit", "5")
+        config.set("commentary", "memory_limit", "10")
 
         # Write to file
         with open(file_name, "w") as config_file:

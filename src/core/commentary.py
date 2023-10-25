@@ -44,7 +44,7 @@ class TextGenerator:
             role (str): The role of the commentary, e.g., "play-by-play".
             tone (str): The tone to use, e.g., "excited".
             limit (int): The word limit for the generated text.
-            weekend_info (dict): Information about the race weekend.
+            ir_info (dict): Information from iRacing.
             other_info (str): Any additional information to be included.
 
         Returns:
@@ -55,28 +55,53 @@ class TextGenerator:
 
         # Add behavioral instructions
         prompt += "You are providing commentary to a race.\n"
-        prompt += "Use previous events as context.\n"
-        prompt += "Prefer to use drivers' last names, rarely use full names.\n"
+        prompt += "Make sure you follow ALL of the following instructions " \
+            "exactly.\n"
+        prompt += "DO NOT repeat previously-used phrases.\n"
+        prompt += "Do not, under any circumstances, invent details. Only " \
+            "comment on the information you have.\n"
+        prompt += "ONLY use a driver's last name. Do not use their first " \
+            "name or their full name.\n"
         prompt += f"Your responses MUST NOT exceed {limit} words.\n"
+        prompt += f"Use a {tone} tone.\n"
+
+        # Set role
+        if role == "play-by-play":
+            prompt += "You are the play-by-play commentator.\n"
+            prompt += "Do not provide too much detail. Focus on the action.\n"
+            prompt += "Limit your response to a single sentence."
+            prompt += "Do not provide color commentary.\n"
+            prompt += "DO NOT use unnecessary exclamations or filler " \
+                "phrases. Your job is only to report the action.\n"
+            prompt += "Do not call out turn numbers if you don't have them.\n"
+            prompt += "NEVER add subjective descriptors like 'impressive' " \
+                "or 'amazing'.\n"
+        elif role == "color":
+            prompt += "You are the color commentator.\n"
+            prompt += "Stick to providing insight or context that enhances " \
+                "the viewer's understanding.\n"
+            prompt += "Do not provide play-by-play commentary.\n"
+            prompt += "Do not invent details.\n"
         
         # Build the prompt
-        prompt += f"Role: {role}\n"
-        prompt += f"Tone: {tone}\n"
+        prompt += "\nThe following is additional information you can include, " \
+            "but is not required. If any of this information appears in the " \
+            "previous commentary below, DO NOT repeat it.\n"
         prompt += f"Track: {ir_info['WeekendInfo']['TrackDisplayName']}\n"
         prompt += f"City: {ir_info['WeekendInfo']['TrackCity']}\n"
         prompt += f"Country: {ir_info['WeekendInfo']['TrackCountry']}\n"
         prompt += f"Additional Info: {other_info}\n"
         
-        # Add the previous responses (limited by settings) if there are any
-        limit = int(self.settings["commentary"]["memory_limit"])
-        if len(self.previous_responses) > limit:
-            for e, a in self.previous_responses[-limit:]:
-                prompt += f"Human: {e}\nAI: {a}\n"
-        elif len(self.previous_responses) > 0:
-            for e, a in self.previous_responses:
-                prompt += f"Human: {e}\nAI: {a}\n"
+        # Add the previous responses if there are any
+        if len(self.previous_responses) > 0:
+            prompt += "\nPrevious Commentary (oldest to latest):\n"
+            limit = int(self.settings["commentary"]["memory_limit"])
+            for message in self.previous_responses:
+                prompt += f"{message}\n"
 
-        prompt += f"Human: {event}\nAI:\n"
+        prompt += "\nNote: If you have to say something similar to the most " \
+            "recent commentary, rephrase it without changing the tone.\n"
+        prompt += f"Event: {event}\nAI:\n"
         
         # Call the API
         response = openai.Completion.create(
@@ -85,8 +110,19 @@ class TextGenerator:
             max_tokens=256
         )
         
+        # Extract the response
         answer = response.choices[0].text.strip()
-        self.previous_responses.append((event, answer))
+
+        # Remove quotes the AI sometimes likes to add
+        if answer[0] == "\"" and answer[-1] == "\"":
+            answer = answer[1:-1]
+
+        # Add the response to the list of previous responses
+        self.previous_responses.append(answer)
+
+        # If the list is too long, remove the oldest response
+        if len(self.previous_responses) > limit:
+            self.previous_responses.pop(0)
         
         return answer
 
@@ -113,7 +149,7 @@ class VoiceGenerator:
         # Set the API key
         elevenlabs.set_api_key(self.settings["keys"]["elevenlabs_api_key"])
 
-    def generate(self, text, timestamp, voice="Harry"):
+    def generate(self, text, timestamp, yelling=False, voice="Arnold"):
         """Generate and play audio for the provided text.
 
         Calls the ElevenLabs API to create audio from the text using the
@@ -122,8 +158,22 @@ class VoiceGenerator:
         Args:
             text (str): The text to be converted to audio.
             voice (str, optional): The voice to use for text-to-speech. Defaults
-                to "Harry".
+                to "Arnold".
         """
+        # Convert to yelling for voice commentary if requested
+        if yelling:
+            text = text.upper()
+            if text[-1] == ".":
+                text = text[:-1] + "!!!"
+
+        # Replace "P" with "P-" to avoid issues with the API
+        for i in range(len(text)):
+            if text[i] == "P" and text[i + 1].isdigit():
+                # Replace the P with "P-"
+                text = text[:i] + "P-" + text[i + 1:]
+        
+        print(text)
+
         # Generate and play audio
         audio = elevenlabs.generate(
             text=text,
