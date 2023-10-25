@@ -166,6 +166,14 @@ class VoiceGenerator:
             if text[-1] == ".":
                 text = text[:-1] + "!!!"
 
+        # Replace "P" with "P-" to avoid issues with the API
+        for i in range(len(text)):
+            if text[i] == "P" and text[i + 1].isdigit():
+                # Replace the P with "P-"
+                text = text[:i] + "P-" + text[i + 1:]
+        
+        print(text)
+
         # Generate and play audio
         audio = elevenlabs.generate(
             text=text,
