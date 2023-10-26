@@ -171,8 +171,6 @@ class VoiceGenerator:
             if text[i] == "P" and text[i + 1].isdigit():
                 # Replace the P with "P-"
                 text = text[:i] + "P-" + text[i + 1:]
-        
-        print(text)
 
         # Generate and play audio
         audio = elevenlabs.generate(
