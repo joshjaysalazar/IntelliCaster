@@ -231,57 +231,41 @@ class Director:
 
             # If the race hasn't started yet, focus on the front of the grid
             if not self.race_started:
-                # Get the pit road status of each driver
-                pit_road = self.ir["CarIdxOnPitRoad"]
+                # Get all the current track positions
+                positions = self.ir["CarIdxLapDistPct"]
 
                 # Get the quali results
                 for session in self.ir["SessionInfo"]["Sessions"]:
                     if session["SessionName"] == "QUALIFY":
                         quali = session["ResultsPositions"]
+                
+                # Get driver numbers and add them to quali results
+                for driver in self.ir["DriverInfo"]["Drivers"]:
+                    for car in quali:
+                        if car["CarIdx"] == driver["CarIdx"]:
+                            car["Number"] = int(driver["CarNumber"])
+
+                focus = 999
+                driver = 0
+                for i, pos in enumerate(positions):
+                    # Skip the first position (pace car)
+                    if i == 0:
+                        continue
+                    # If car is in pits, skip
+                    if self.ir["CarIdxOnPitRoad"][i] == True:
+                        continue
+                    # If position is less than 0 (haven't gridded yet), skip
+                    if pos < 0:
+                        continue
+                    # Find the gridded car with the best qualifying position
+                    for car in quali:
+                        if car["CarIdx"] == i:
+                            if car["Position"] < focus:
+                                focus = car["Position"]
+                                driver = car["Number"]
 
                 # Switch to the first car that's not in the pits
-                for car in quali:
-                    if not pit_road[car["CarIdx"]]:
-                        self.camera.change_camera(car["CarIdx"], "TV1")
-
-                # for car in quali["ResultsPositions"]:
-                #     if car["CarIdx"] == i:
-                #         self.drivers[-1]["grid_position"] = car["Position"]
-
-                # # Get all the current positions
-                # positions = self.ir["CarIdxLapDistPct"]
-
-                # # Find the max position under 0.5
-                # focus = 0
-                # max_pos = 0
-                # for i, pos in enumerate(positions):
-                #     # Skip the first position (pace car)
-                #     if i == 0:
-                #         continue
-                #     # If car is in pits, skip
-                #     if self.ir["CarIdxOnPitRoad"][i] == True:
-                #         continue
-                #     # If car is under 0.5 and greater than max, focus on it
-                #     if pos < 0.5 and pos > max_pos:
-                #         focus = i
-                #         max_pos = pos
-                
-                # # If no cars were under 0.5, all cars are behind line, find max
-                # if focus == 0:
-                #     for i, pos in enumerate(positions):
-                #         # Skip the first position (pace car)
-                #         if i == 0:
-                #             continue
-                #         # If car is in pits, skip
-                #         if self.ir["CarIdxOnPitRoad"][i] == True:
-                #             continue
-                #         # If car is closest to line, focus on it
-                #         if pos > max_pos:
-                #             focus = i
-                #             max_pos = pos
-
-                # Focus on the car with the max position
-                # self.camera.change_camera(focus, "TV1")
+                self.camera.change_camera(driver, "TV1")
 
             # Check if all cars have crossed the start line if needed
             if not self.all_cars_started:
