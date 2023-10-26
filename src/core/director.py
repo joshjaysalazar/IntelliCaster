@@ -371,7 +371,15 @@ class Director:
                     "last_lap": self.ir["CarIdxLastLapTime"][i],
                     }
                 )
-        
+
+                # Add grid position
+                for session in self.ir["SessionInfo"]["Sessions"]:
+                    if session["SessionName"] == "QUALIFY":
+                        quali = session
+                for car in quali["ResultsPositions"]:
+                    if car["CarIdx"] == i:
+                        self.drivers[-1]["grid_position"] = car["Position"]
+            
         # Sort the list by laps completed + track position
         self.drivers.sort(
             key=lambda x: x["laps_completed"] + x["lap_percent"],
