@@ -3,6 +3,7 @@ import os
 import threading
 import time
 from core import commentary
+from core import camera
 
 
 class Director:
@@ -62,6 +63,9 @@ class Director:
         # Create the commentary generators
         self.text_generator = commentary.TextGenerator(self.settings)
         self.voice_generator = commentary.VoiceGenerator(self.settings)
+
+        # Create the camera manager
+        self.camera = camera.Camera(self.ir)
 
         # Set running to False
         self.running = False
@@ -152,7 +156,7 @@ class Director:
                 )
         
                 # Move the camera to focus on the overtaking driver
-                self.ir.cam_switch_num(driver["number"], 11)
+                self.camera.change_camera(driver["number"], "TV1")
 
                 # Generate the text commentary
                 commentary = self.text_generator.generate(
@@ -259,7 +263,8 @@ class Director:
                             focus = i
                             max_pos = pos
 
-                self.ir.cam_switch_num(focus, 11)
+                # Focus on the car with the max position
+                self.camera.change_camera(focus, "TV1")
 
             # Check if all cars have crossed the start line if needed
             if not self.all_cars_started:
