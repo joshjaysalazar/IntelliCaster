@@ -103,15 +103,25 @@ class Director:
         # Get driver data from iRacing SDK
         driver_data = self.ir["DriverInfo"]["Drivers"]
 
+        # Get quali results
+        for session in self.ir["SessionInfo"]["Sessions"]:
+            if session["SessionName"] == "QUALIFY":
+                quali = session["ResultsPositions"]
+
         # Create a dictionary for each driver
         for driver in driver_data:
+            # Get the driver's quali position
+            for car in quali:
+                if car["CarIdx"] == driver["CarIdx"]:
+                    quali_pos = car["Position"]
+
             # Add the driver to the list
             self.drivers.append(
                 {
                     "car_name": driver["CarScreenNameShort"],
                     "fastest_lap": None,
                     "gap_to_leader": None,
-                    "grid_position": None,
+                    "grid_position": quali_pos,
                     "idx": driver["CarIdx"],
                     "in_pits": False,
                     "incidents": driver["CurDriverIncidentCount"],
@@ -124,7 +134,7 @@ class Director:
                     "name": driver["UserName"],
                     "number": driver["CarNumberRaw"],
                     "on_track": False,
-                    "position": None
+                    "position": quali_pos
                 }
             )
 
