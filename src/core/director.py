@@ -405,44 +405,47 @@ class Director:
                     continue
 
                 # Find the driver in the drivers list at this index
-                for driver in self.drivers:
+                for i, driver in enumerate(self.drivers):
                     if driver["idx"] == i:
                         # Get the driver's last lap time
                         last_lap = self.ir["CarIdxLastLapTime"][i]
-                        driver["last_lap"] = last_lap
+                        self.drivers[i]["last_lap"] = last_lap
 
                         # If there's no fastest lap, set it to the last lap
                         if driver["fastest_lap"] == None:
-                            driver["fastest_lap"] = last_lap
+                            self.drivers[i]["fastest_lap"] = last_lap
                         
                         # If the last lap is faster than the fastest lap, update
                         elif last_lap < driver["fastest_lap"]:
-                            driver["fastest_lap"] = last_lap
+                            self.drivers[i]["fastest_lap"] = last_lap
 
                         # Update percentage of lap completed
-                        driver["lap_percent"] = self.ir["CarIdxLapDistPct"][i]
+                        lap_percent = self.ir["CarIdxLapDistPct"][i]
+                        self.drivers[i]["lap_percent"] = lap_percent
 
                         # Update laps started and completed
                         started = self.ir["CarIdxLap"][i]
                         completed = self.ir["CarIdxLapCompleted"][i]
-                        driver["laps_started"] = started
-                        driver["laps_completed"] = completed
+                        self.drivers[i]["laps_started"] = started
+                        self.drivers[i]["laps_completed"] = completed
 
                         # Update gap to leader
-                        driver["gap_to_leader"] = self.ir["CarIdxF2Time"][i]
+                        gap_to_leader = self.ir["CarIdxF2Time"][i]
+                        self.drivers[i]["gap_to_leader"] = gap_to_leader
 
                         # Update pits status
-                        driver["in_pits"] = self.ir["CarIdxOnPitRoad"][i]
+                        in_pits = self.ir["CarIdxOnPitRoad"][i]
+                        self.drivers[i]["in_pits"] = in_pits
 
                         # Update on track status
                         if self.ir["CarIdxLapDistPct"][i] > 0:
-                            driver["on_track"] = True
+                            self.drivers[i]["on_track"] = True
                         else:
-                            driver["on_track"] = False
+                            self.drivers[i]["on_track"] = False
 
                         # Update incidents
                         incidents = driver_data[i]["CurDriverIncidentCount"]
-                        driver["incidents"] = incidents
+                        self.drivers[i]["incidents"] = incidents
             
         # Sort the list by current position if race has started
         if self.race_started:
@@ -453,7 +456,7 @@ class Director:
 
             # Update the positions
             for i, driver in enumerate(self.drivers):
-                driver["position"] = i + 1
+                self.drivers[i]["position"] = i + 1
                 
         # Otherwise, sort by grid position
         else:
