@@ -100,8 +100,33 @@ class Director:
         # Create an empty list to track drivers
         self.drivers = []
 
-        # Get drivers from iRacing SDK
-        
+        # Get driver data from iRacing SDK
+        driver_data = self.ir["DriverInfo"]["Drivers"]
+
+        # Create a dictionary for each driver
+        for driver in driver_data:
+            # Add the driver to the list
+            self.drivers.append(
+                {
+                    "car_name": driver["CarScreenNameShort"],
+                    "fastest_lap": None,
+                    "gap_to_leader": None,
+                    "grid_position": None,
+                    "idx": driver["CarIdx"],
+                    "in_pits": False,
+                    "incidents": driver["CurDriverIncidentCount"],
+                    "irating": driver["IRating"],
+                    "lap_percent": None,
+                    "laps_completed": None,
+                    "laps_started": None,
+                    "last_lap": None,
+                    "license": driver["LicString"],
+                    "name": driver["UserName"],
+                    "number": driver["CarNumberRaw"],
+                    "on_track": False,
+                    "position": None
+                }
+            )
 
     def detect_overtakes(self, prev_drivers):
         """Detect and report overtakes during the race.
