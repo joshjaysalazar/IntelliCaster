@@ -92,6 +92,10 @@ class Director:
                 # If between 0.8 and 1, car hasn't started first lap
                 if 0.8 < d < 1:
                     return False
+                
+                # If 0, car hasn't started
+                elif d == 0:
+                    return False
 
         # If all cars have started, return True
         return True
@@ -322,6 +326,8 @@ class Director:
             # Check if all cars have crossed the start line if needed
             if not self.all_cars_started:
                 self.all_cars_started = self.check_all_cars_started()
+
+            print(self.all_cars_started)
 
             # If the race has started, generate commentary
             if self.race_started and self.all_cars_started:
