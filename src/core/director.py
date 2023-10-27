@@ -409,6 +409,7 @@ class Director:
                     if driver["idx"] == i:
                         # Get the driver's last lap time
                         last_lap = self.ir["CarIdxLastLapTime"][i]
+                        driver["last_lap"] = last_lap
 
                         # If there's no fastest lap, set it to the last lap
                         if driver["fastest_lap"] == None:
@@ -453,7 +454,7 @@ class Director:
             # Update the positions
             for i, driver in enumerate(self.drivers):
                 driver["position"] = i + 1
-
+                
         # Otherwise, sort by grid position
         else:
             self.drivers.sort(key=lambda x: x["grid_position"])
