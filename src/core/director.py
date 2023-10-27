@@ -379,9 +379,6 @@ class Director:
         self.ir.replay_set_play_speed(0)
 
     def update_drivers(self):
-        # Clear the drivers list
-        self.drivers = []
-
         # Update the drivers list
         if self.ir["CarIdxPosition"] != []:
             for i, pos in enumerate(self.ir["CarIdxPosition"]):
@@ -396,29 +393,10 @@ class Director:
                 except:
                     continue
 
-                # Add the driver to the list
-                self.drivers.append(
-                    {
-                    "name": self.ir["DriverInfo"]["Drivers"][i]["UserName"],
-                    "number": self.ir["DriverInfo"]["Drivers"][i]["CarNumber"],
-                    "idx": i,
-                    "position": pos,
-                    "gap_to_leader": self.ir["CarIdxF2Time"][i],
-                    "laps_started": self.ir["CarIdxLap"][i],
-                    "laps_completed": self.ir["CarIdxLapCompleted"][i],
-                    "lap_percent": self.ir["CarIdxLapDistPct"][i],
-                    "in_pits": self.ir["CarIdxOnPitRoad"][i],
-                    "last_lap": self.ir["CarIdxLastLapTime"][i],
-                    }
-                )
-
-                # Add grid position
-                for session in self.ir["SessionInfo"]["Sessions"]:
-                    if session["SessionName"] == "QUALIFY":
-                        quali = session["ResultsPositions"]
-                for car in quali:
-                    if car["CarIdx"] == i:
-                        self.drivers[-1]["grid_position"] = car["Position"]
+                # Find the driver in the drivers list at this index
+                for driver in self.drivers:
+                    if driver["idx"] == i:
+                        pass
             
         # Sort the list by laps completed + track position
         self.drivers.sort(
