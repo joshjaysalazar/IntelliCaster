@@ -110,6 +110,10 @@ class Director:
 
         # Create a dictionary for each driver
         for driver in driver_data:
+            # Skip the pace car
+            if driver["CarIdx"] == 0:
+                continue
+
             # Get the driver's quali position
             for car in quali:
                 if car["CarIdx"] == driver["CarIdx"]:
