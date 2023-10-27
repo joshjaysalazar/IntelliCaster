@@ -1,4 +1,5 @@
 import configparser
+
 from core.app import App
 from utility.makesettings import create_settings_file
 
