@@ -439,16 +439,21 @@ class Director:
                         incidents = driver_data[i]["CurDriverIncidentCount"]
                         driver["incidents"] = incidents
             
-        # Sort the list by laps completed + track position
-        self.drivers.sort(
-            key=lambda x: x["laps_completed"] + x["lap_percent"],
-            reverse=True
-        )
+        # Sort the list by current position if race has started
+        if self.race_started:
+            self.drivers.sort(
+                key=lambda x: x["laps_completed"] + x["lap_percent"],
+                reverse=True
+            )
 
-        # Update positions based on the sorted list
-        for i, driver in enumerate(self.drivers):
-            driver["position"] = i + 1
+            # Update the positions
+            for i, driver in enumerate(self.drivers):
+                driver["position"] = i + 1
 
+        # Otherwise, sort by grid position
+        else:
+            self.drivers.sort(key=lambda x: x["grid_position"])
+            
     def update_iracing_settings(self):
         """Update iRacing settings to enable video capture.
 
