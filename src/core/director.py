@@ -2,6 +2,8 @@ import irsdk
 import os
 import threading
 import time
+from copy import deepcopy
+
 from core import commentary
 from core import camera
 
@@ -280,7 +282,7 @@ class Director:
                 self.race_time = self.ir["SessionTime"] - self.race_start_time
 
             # Store the previous state of the drivers
-            prev_drivers = self.drivers.copy()
+            prev_drivers = deepcopy(self.drivers)
 
             # Update the drivers list
             self.update_drivers()
