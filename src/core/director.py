@@ -48,8 +48,8 @@ class Director:
         self.ir = irsdk.IRSDK()
         self.ir.startup()
 
-        # Create an empty list to track drivers
-        self.drivers = []
+        # Create the drivers dict
+        self.drivers = self.create_drivers()
 
         # Track race start status
         self.race_started = False
@@ -98,7 +98,7 @@ class Director:
 
     def create_drivers(self):
         # Create an empty list to track drivers
-        self.drivers = []
+        driver_dict = []
 
         # Get driver data from iRacing SDK
         driver_data = self.ir["DriverInfo"]["Drivers"]
@@ -116,7 +116,7 @@ class Director:
                     quali_pos = car["Position"]
 
             # Add the driver to the list
-            self.drivers.append(
+            driver_dict.append(
                 {
                     "car_name": driver["CarScreenNameShort"],
                     "fastest_lap": None,
@@ -137,6 +137,12 @@ class Director:
                     "position": quali_pos
                 }
             )
+
+        # Sort the list by grid position
+        driver_dict.sort(key=lambda x: x["grid_position"])
+
+        # Return the list of drivers
+        return driver_dict
 
     def detect_overtakes(self, prev_drivers):
         """Detect and report overtakes during the race.
