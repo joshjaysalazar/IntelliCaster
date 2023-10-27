@@ -379,16 +379,6 @@ class Director:
         self.ir.replay_set_play_speed(0)
 
     def update_drivers(self):
-        """Update and sort the list of drivers in the race.
-
-        This method clears the existing list of drivers and repopulates it with
-        current details from the iRacing SDK. It then sorts the drivers based on
-        laps completed and track position.
-        
-        The resulting list of drivers will contain dictionaries with details
-        like name, car number, position, gap to leader, and other race-specific
-        info.
-        """
         # Clear the drivers list
         self.drivers = []
 
