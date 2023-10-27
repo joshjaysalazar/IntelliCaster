@@ -96,6 +96,13 @@ class Director:
         # If all cars have started, return True
         return True
 
+    def create_drivers(self):
+        # Create an empty list to track drivers
+        self.drivers = []
+
+        # Get drivers from iRacing SDK
+        
+
     def detect_overtakes(self, prev_drivers):
         """Detect and report overtakes during the race.
 
