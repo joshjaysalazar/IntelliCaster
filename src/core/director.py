@@ -327,8 +327,6 @@ class Director:
             if not self.all_cars_started:
                 self.all_cars_started = self.check_all_cars_started()
 
-            print(self.all_cars_started)
-
             # If the race has started, generate commentary
             if self.race_started and self.all_cars_started:
                 # Check for overtakes
