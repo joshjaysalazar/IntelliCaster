@@ -379,6 +379,9 @@ class Director:
         self.ir.replay_set_play_speed(0)
 
     def update_drivers(self):
+        # Get driver data from iRacing SDK
+        driver_data = self.ir["DriverInfo"]["Drivers"]
+
         # Update the drivers list
         if self.ir["CarIdxPosition"] != []:
             for i, pos in enumerate(self.ir["CarIdxPosition"]):
@@ -387,7 +390,7 @@ class Director:
                     continue
                 # Exclude disconnected drivers
                 try:
-                    if not self.ir["DriverInfo"]["Drivers"][i]["UserName"]:
+                    if not driver_data[i]["UserName"]:
                         continue
                 # If i is out of range, continue
                 except:
@@ -396,7 +399,41 @@ class Director:
                 # Find the driver in the drivers list at this index
                 for driver in self.drivers:
                     if driver["idx"] == i:
-                        pass
+                        # Get the driver's last lap time
+                        last_lap = self.ir["CarIdxLastLapTime"][i]
+
+                        # If there's no fastest lap, set it to the last lap
+                        if driver["fastest_lap"] == None:
+                            driver["fastest_lap"] = last_lap
+                        
+                        # If the last lap is faster than the fastest lap, update
+                        elif last_lap < driver["fastest_lap"]:
+                            driver["fastest_lap"] = last_lap
+
+                        # Update percentage of lap completed
+                        driver["lap_percent"] = self.ir["CarIdxLapDistPct"][i]
+
+                        # Update laps started and completed
+                        started = self.ir["CarIdxLap"][i]
+                        completed = self.ir["CarIdxLapCompleted"][i]
+                        driver["laps_started"] = started
+                        driver["laps_completed"] = completed
+
+                        # Update gap to leader
+                        driver["gap_to_leader"] = self.ir["CarIdxF2Time"][i]
+
+                        # Update pits status
+                        driver["in_pits"] = self.ir["CarIdxOnPitRoad"][i]
+
+                        # Update on track status
+                        if self.ir["CarIdxLapDistPct"][i] > 0:
+                            driver["on_track"] = True
+                        else:
+                            driver["on_track"] = False
+
+                        # Update incidents
+                        incidents = driver_data[i]["CurDriverIncidentCount"]
+                        driver["incidents"] = incidents
             
         # Sort the list by laps completed + track position
         self.drivers.sort(
