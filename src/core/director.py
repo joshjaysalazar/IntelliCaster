@@ -2,6 +2,8 @@ import irsdk
 import os
 import threading
 import time
+from copy import deepcopy
+
 from core import commentary
 from core import camera
 
@@ -48,8 +50,8 @@ class Director:
         self.ir = irsdk.IRSDK()
         self.ir.startup()
 
-        # Create an empty list to track drivers
-        self.drivers = []
+        # Create the drivers dict
+        self.drivers = self.create_drivers()
 
         # Track race start status
         self.race_started = False
@@ -92,9 +94,65 @@ class Director:
                 # If between 0.8 and 1, car hasn't started first lap
                 if 0.8 < d < 1:
                     return False
+                
+                # If 0, car hasn't started
+                elif d == 0:
+                    return False
 
         # If all cars have started, return True
         return True
+
+    def create_drivers(self):
+        # Create an empty list to track drivers
+        driver_dict = []
+
+        # Get driver data from iRacing SDK
+        driver_data = self.ir["DriverInfo"]["Drivers"]
+
+        # Get quali results
+        for session in self.ir["SessionInfo"]["Sessions"]:
+            if session["SessionName"] == "QUALIFY":
+                quali = session["ResultsPositions"]
+
+        # Create a dictionary for each driver
+        for driver in driver_data:
+            # Skip the pace car
+            if driver["CarIdx"] == 0:
+                continue
+
+            # Get the driver's quali position
+            for car in quali:
+                if car["CarIdx"] == driver["CarIdx"]:
+                    quali_pos = car["Position"]
+
+            # Add the driver to the list
+            driver_dict.append(
+                {
+                    "car_name": driver["CarScreenNameShort"],
+                    "fastest_lap": None,
+                    "gap_to_leader": None,
+                    "grid_position": quali_pos,
+                    "idx": driver["CarIdx"],
+                    "in_pits": False,
+                    "incidents": driver["CurDriverIncidentCount"],
+                    "irating": driver["IRating"],
+                    "lap_percent": 0,
+                    "laps_completed": 0,
+                    "laps_started": 0,
+                    "last_lap": None,
+                    "license": driver["LicString"],
+                    "name": driver["UserName"],
+                    "number": driver["CarNumberRaw"],
+                    "on_track": False,
+                    "position": quali_pos
+                }
+            )
+
+        # Sort the list by grid position
+        driver_dict.sort(key=lambda x: x["grid_position"])
+
+        # Return the list of drivers
+        return driver_dict
 
     def detect_overtakes(self, prev_drivers):
         """Detect and report overtakes during the race.
@@ -224,7 +282,7 @@ class Director:
                 self.race_time = self.ir["SessionTime"] - self.race_start_time
 
             # Store the previous state of the drivers
-            prev_drivers = self.drivers.copy()
+            prev_drivers = deepcopy(self.drivers)
 
             # Update the drivers list
             self.update_drivers()
@@ -331,18 +389,8 @@ class Director:
         self.ir.replay_set_play_speed(0)
 
     def update_drivers(self):
-        """Update and sort the list of drivers in the race.
-
-        This method clears the existing list of drivers and repopulates it with
-        current details from the iRacing SDK. It then sorts the drivers based on
-        laps completed and track position.
-        
-        The resulting list of drivers will contain dictionaries with details
-        like name, car number, position, gap to leader, and other race-specific
-        info.
-        """
-        # Clear the drivers list
-        self.drivers = []
+        # Get driver data from iRacing SDK
+        driver_data = self.ir["DriverInfo"]["Drivers"]
 
         # Update the drivers list
         if self.ir["CarIdxPosition"] != []:
@@ -352,46 +400,70 @@ class Director:
                     continue
                 # Exclude disconnected drivers
                 try:
-                    if not self.ir["DriverInfo"]["Drivers"][i]["UserName"]:
+                    if not driver_data[i]["UserName"]:
                         continue
                 # If i is out of range, continue
                 except:
                     continue
 
-                # Add the driver to the list
-                self.drivers.append(
-                    {
-                    "name": self.ir["DriverInfo"]["Drivers"][i]["UserName"],
-                    "number": self.ir["DriverInfo"]["Drivers"][i]["CarNumber"],
-                    "idx": i,
-                    "position": pos,
-                    "gap_to_leader": self.ir["CarIdxF2Time"][i],
-                    "laps_started": self.ir["CarIdxLap"][i],
-                    "laps_completed": self.ir["CarIdxLapCompleted"][i],
-                    "lap_percent": self.ir["CarIdxLapDistPct"][i],
-                    "in_pits": self.ir["CarIdxOnPitRoad"][i],
-                    "last_lap": self.ir["CarIdxLastLapTime"][i],
-                    }
-                )
+                # Find the driver in the drivers list at this index
+                for j, driver in enumerate(self.drivers):
+                    if driver["idx"] == i:
+                        # Get the driver's last lap time
+                        last_lap = self.ir["CarIdxLastLapTime"][i]
+                        self.drivers[j]["last_lap"] = last_lap
 
-                # Add grid position
-                for session in self.ir["SessionInfo"]["Sessions"]:
-                    if session["SessionName"] == "QUALIFY":
-                        quali = session["ResultsPositions"]
-                for car in quali:
-                    if car["CarIdx"] == i:
-                        self.drivers[-1]["grid_position"] = car["Position"]
+                        # If there's no fastest lap, set it to the last lap
+                        if driver["fastest_lap"] == None:
+                            self.drivers[j]["fastest_lap"] = last_lap
+                        
+                        # If the last lap is faster than the fastest lap, update
+                        elif last_lap < driver["fastest_lap"]:
+                            self.drivers[j]["fastest_lap"] = last_lap
+
+                        # Update percentage of lap completed
+                        lap_percent = self.ir["CarIdxLapDistPct"][i]
+                        self.drivers[j]["lap_percent"] = lap_percent
+
+                        # Update laps started and completed
+                        started = self.ir["CarIdxLap"][i]
+                        completed = self.ir["CarIdxLapCompleted"][i]
+                        self.drivers[j]["laps_started"] = started
+                        self.drivers[j]["laps_completed"] = completed
+
+                        # Update gap to leader
+                        gap_to_leader = self.ir["CarIdxF2Time"][i]
+                        self.drivers[j]["gap_to_leader"] = gap_to_leader
+
+                        # Update pits status
+                        in_pits = self.ir["CarIdxOnPitRoad"][i]
+                        self.drivers[j]["in_pits"] = in_pits
+
+                        # Update on track status
+                        if self.ir["CarIdxLapDistPct"][i] > 0:
+                            self.drivers[j]["on_track"] = True
+                        else:
+                            self.drivers[j]["on_track"] = False
+
+                        # Update incidents
+                        incidents = driver_data[i]["CurDriverIncidentCount"]
+                        self.drivers[j]["incidents"] = incidents
+
+        # Sort the list by current position if race has started
+        if self.race_started:
+            self.drivers.sort(
+                key=lambda x: x["laps_completed"] + x["lap_percent"],
+                reverse=True
+            )
+
+            # Update the positions
+            for i, driver in enumerate(self.drivers):
+                self.drivers[i]["position"] = i + 1
+                
+        # Otherwise, sort by grid position
+        else:
+            self.drivers.sort(key=lambda x: x["grid_position"])
             
-        # Sort the list by laps completed + track position
-        self.drivers.sort(
-            key=lambda x: x["laps_completed"] + x["lap_percent"],
-            reverse=True
-        )
-
-        # Update positions based on the sorted list
-        for i, driver in enumerate(self.drivers):
-            driver["position"] = i + 1
-
     def update_iracing_settings(self):
         """Update iRacing settings to enable video capture.
 

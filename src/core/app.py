@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkinter import filedialog
 import threading
+
 from core import director
 from core import editor
 
