@@ -34,6 +34,8 @@ def create_settings_file(file_name):
 
         # Set up commentary section
         config.add_section("commentary")
+        config.set("commentary", "pbp_voice", "Harry")
+        config.set("commentary", "color_voice", "Jessie")
         config.set("commentary", "color_chance", "0.25")
         config.set("commentary", "memory_limit", "10")
 

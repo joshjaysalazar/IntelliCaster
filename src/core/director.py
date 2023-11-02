@@ -238,7 +238,8 @@ class Director:
                 self.voice_generator.generate(
                     commentary,
                     timestamp,
-                    yelling=True
+                    yelling=True,
+                    voice=self.settings["commentary"]["pbp_voice"]
                 )
 
                 # Occassionally, generate color commentary
@@ -273,7 +274,7 @@ class Director:
                         commentary,
                         timestamp,
                         yelling=True,
-                        voice="Jessie"
+                        voice=self.settings["commentary"]["color_voice"]
                     )
 
                 # End this iteration of the loop
