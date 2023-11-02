@@ -71,13 +71,14 @@ class TextGenerator:
                 "Brian O'Toole.\n"
             prompt += "You are the play-by-play commentator.\n"
             prompt += "Do not provide too much detail. Focus on the action.\n"
-            prompt += "Limit your response to a single sentence."
-            prompt += "Do not provide color commentary.\n"
+            prompt += "Limit your response to a single sentence ONLY."
+            prompt += "DO NOT provide color commentary.\n"
             prompt += "DO NOT use unnecessary exclamations or filler " \
                 "phrases. Your job is only to report the action.\n"
             prompt += "Do not call out turn numbers if you don't have them.\n"
             prompt += "NEVER add subjective descriptors like 'impressive' " \
                 "or 'amazing'.\n"
+            prompt += "NEVER add extra filler sentences.\n"
         elif role == "color":
             prompt += "You are Brian O'Toole, alongside your co-commentator " \
                 "Al Ingram.\n"
