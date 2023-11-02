@@ -67,9 +67,11 @@ class TextGenerator:
         prompt += f"Use a {tone} tone.\n"
 
         # Set role
+        pbp_voice = self.settings["commentary"]["pbp_voice"]
+        color_voice = self.settings["commentary"]["color_voice"]
         if role == "play-by-play":
-            prompt += "You are Al Ingram, alongside your co-commentator " \
-                "Brian O'Toole.\n"
+            prompt += f"You are {pbp_voice}\n"
+            prompt += f"Your co-commentator is {color_voice}\n"
             prompt += "You are the play-by-play commentator.\n"
             prompt += "Do not provide too much detail. Focus on the action.\n"
             prompt += "Limit your response to a single sentence ONLY."
@@ -81,8 +83,8 @@ class TextGenerator:
                 "or 'amazing'.\n"
             prompt += "NEVER add extra filler sentences.\n"
         elif role == "color":
-            prompt += "You are Brian O'Toole, alongside your co-commentator " \
-                "Al Ingram.\n"
+            prompt += f"You are {color_voice}\n"
+            prompt += f"Your co-commentator is {pbp_voice}\n"
             prompt += "You are the color commentator.\n"
             prompt += "Stick to providing insight or context that enhances " \
                 "the viewer's understanding.\n"
