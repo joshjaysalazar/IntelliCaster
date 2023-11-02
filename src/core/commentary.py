@@ -87,6 +87,7 @@ class TextGenerator:
                 "the viewer's understanding.\n"
             prompt += "Do not provide play-by-play commentary.\n"
             prompt += "Do not invent details.\n"
+            prompt += "DO NOT repeat anything your co-commentator has said.\n"
         
         # Build the prompt
         prompt += "\nThe following is additional information you can include, " \
@@ -95,6 +96,10 @@ class TextGenerator:
         prompt += f"Track: {ir_info['WeekendInfo']['TrackDisplayName']}\n"
         prompt += f"City: {ir_info['WeekendInfo']['TrackCity']}\n"
         prompt += f"Country: {ir_info['WeekendInfo']['TrackCountry']}\n"
+        prompt += f"Air Temp: {ir_info['WeekendInfo']['TrackAirTemp']}\n"
+        prompt += f"Track Temp: {ir_info['WeekendInfo']['TrackSurfaceTemp']}\n"
+        prompt += f"Skies: {ir_info['WeekendInfo']['TrackSkies']}\n"
+        prompt += f"Fog: {ir_info['WeekendInfo']['TrackFogLevel']}\n"
         prompt += f"Additional Info: {other_info}\n"
         
         # Add the previous responses if there are any
