@@ -272,7 +272,7 @@ class Director:
                         commentary,
                         timestamp,
                         yelling=True,
-                        voice="Fin"
+                        voice="Jessie"
                     )
 
                 # End this iteration of the loop
