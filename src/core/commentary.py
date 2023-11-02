@@ -67,6 +67,8 @@ class TextGenerator:
 
         # Set role
         if role == "play-by-play":
+            prompt += "You are Al Ingram, alongside your co-commentator " \
+                "Brian O'Toole.\n"
             prompt += "You are the play-by-play commentator.\n"
             prompt += "Do not provide too much detail. Focus on the action.\n"
             prompt += "Limit your response to a single sentence."
@@ -77,6 +79,8 @@ class TextGenerator:
             prompt += "NEVER add subjective descriptors like 'impressive' " \
                 "or 'amazing'.\n"
         elif role == "color":
+            prompt += "You are Brian O'Toole, alongside your co-commentator " \
+                "Al Ingram.\n"
             prompt += "You are the color commentator.\n"
             prompt += "Stick to providing insight or context that enhances " \
                 "the viewer's understanding.\n"
