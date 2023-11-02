@@ -242,7 +242,8 @@ class Director:
                 )
 
                 # Occassionally, generate color commentary
-                if random.random() < 0.9:
+                chance = float(self.settings["commentary"]["color_chance"])
+                if random.random() < chance:
                     # Generate the instruction
                     instruction = (
                         f"It was just announced that {driver_name} "

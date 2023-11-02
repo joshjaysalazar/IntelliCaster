@@ -423,6 +423,14 @@ class App(ctk.CTk):
         # Create commentary section
         create_section("commentary", "Commentary")
 
+        # Create color commentary chance entry box
+        default = self.settings["commentary"]["color_chance"]
+        create_entry(
+            "color_commentary_chance",
+            "Color Commentary Chance (%)",
+            default
+        )
+
         # Create memory limit entry box
         default = self.settings["commentary"]["memory_limit"]
         create_entry("memory_limit", "Memory Limit (messages)", default)
