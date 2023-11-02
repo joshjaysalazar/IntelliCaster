@@ -36,15 +36,14 @@ class TextGenerator:
         """Generate text commentary for the given event.
         
         Generates text commentary for the given event based on the provided
-        role, tone, and word limit. Uses the provided iRacing information to
-        provide context for the commentary. Adds the generated commentary to
-        the list of previous responses.
+        role and tone. Uses the provided iRacing information to provide context
+        for the commentary. Adds the generated commentary to the list of
+        previous responses.
         
         Args:
             event (str): The event that occurred.
             role (str): The role of the commentator.
             tone (str): The tone of the commentary.
-            limit (int): The word limit for the commentary.
             ir_info (dict): The information from iRacing.
             other_info (str): Additional information to be included in the
                 system message.
