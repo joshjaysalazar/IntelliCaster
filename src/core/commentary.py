@@ -71,9 +71,9 @@ class TextGenerator:
 
             # Add play-by-play instructions
             new_msg += "Do not provide too much detail. Focus on the action. "
-            new_msg += "DO NOT provide color commentary. "
-            new_msg += "DO NOT use unnecessary exclamations or filler. "
-            new_msg += "DO NOT repeat previous messages. "
+            new_msg += "Do not provide color commentary. "
+            new_msg += "Do not use unnecessary exclamations or filler. "
+            new_msg += "Do not repeat previous messages. "
             new_msg += "Prefer to use a driver's last name. "
             new_msg += f"Use a {tone} tone. "
             new_msg += "Limit your response to a single sentence, "
@@ -90,10 +90,11 @@ class TextGenerator:
             new_msg += "the viewer's understanding. "
             new_msg += "Do not provide play-by-play commentary. "
             new_msg += "Do not invent details. "
-            new_msg += "DO NOT repeat anything your co-commentator has said. "
+            new_msg += "Do not repeat anything your co-commentator has said. "
             new_msg += "Prefer to use a driver's last name. "
             new_msg += f"Use a {tone} tone. "
-            new_msg += f"Limit your responses to {limit} words. "
+            new_msg += "Limit your response to no more than two sentences, "
+            new_msg += f"using no more than {limit} words. "
 
         # Add additional info to the end of the system message
         new_msg += other_info
