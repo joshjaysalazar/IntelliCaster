@@ -180,7 +180,7 @@ class VoiceGenerator:
         audio = elevenlabs.generate(
             text=text,
             voice=voice,
-            model="eleven_multilingual_v2"
+            model="eleven_monolingual_v1"
         )
 
         # Get the iRacing videos folder
