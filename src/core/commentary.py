@@ -143,8 +143,7 @@ class TextGenerator:
         # Call the API
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=messages,
-            max_tokens=256
+            messages=messages
         )
 
         # Extract the response
