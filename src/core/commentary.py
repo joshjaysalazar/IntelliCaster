@@ -69,7 +69,7 @@ class TextGenerator:
             new_msg += f"Your co-commentator is {color_name}. "
 
             # Add play-by-play instructions
-            new_msg += "Limit your response to a single short sentence. "
+            new_msg += "You will respond with a single short sentence. "
             new_msg += "Do not provide too much detail. Focus on the action. "
             new_msg += "Almost always refer to drivers by only their surname. "
             new_msg += f"Use a {tone} tone. "
@@ -81,7 +81,7 @@ class TextGenerator:
             new_msg += f"Your co-commentator is {pbp_name}. "
 
             # Add color instructions
-            new_msg += "Limit your response to two short sentences. "
+            new_msg += "You will respond with one to two short sentences. "
             new_msg += "Stick to providing insight or context that enhances "
             new_msg += "the viewer's understanding. "
             new_msg += "Usually refer to drivers by only their surname. "
