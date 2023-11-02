@@ -1,7 +1,6 @@
 import openai
 import elevenlabs
 import os
-from scipy.io import wavfile
 import time
 
 
@@ -201,8 +200,7 @@ class VoiceGenerator:
         elevenlabs.save(audio, os.path.join(path, file_name))
 
         # Get the length of the audio file
-        sample_rate, data = wavfile.read(os.path.join(path, file_name))
-        length = len(data) / sample_rate
+        length = len(audio) / 44100
 
         # Wait for the length of the audio
         time.sleep(length)

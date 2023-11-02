@@ -3,4 +3,3 @@ pyirsdk
 elevenlabs
 customtkinter
 moviepy
-scipy
