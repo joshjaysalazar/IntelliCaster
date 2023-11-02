@@ -71,9 +71,6 @@ class TextGenerator:
 
             # Add play-by-play instructions
             new_msg += "Do not provide too much detail. Focus on the action. "
-            new_msg += "Do not provide color commentary. "
-            new_msg += "Do not use unnecessary exclamations or filler. "
-            new_msg += "Do not repeat previous messages. "
             new_msg += "Almost always refer to drivers by only their surname. "
             new_msg += f"Use a {tone} tone. "
             new_msg += "Limit your response to a single sentence. "
@@ -88,9 +85,6 @@ class TextGenerator:
             # Add color instructions
             new_msg += "Stick to providing insight or context that enhances "
             new_msg += "the viewer's understanding. "
-            new_msg += "Do not provide play-by-play commentary. "
-            new_msg += "Do not invent details. "
-            new_msg += "Do not repeat anything your co-commentator has said. "
             new_msg += "Usually refer to drivers by only their surname. "
             new_msg += f"Use a {tone} tone. "
             new_msg += "Limit your response to two sentences. "
