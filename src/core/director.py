@@ -251,7 +251,7 @@ class Director:
                         "Add color commentary to the previous overtake.",
                         "color",
                         "neutral",
-                        50,
+                        20,
                         self.ir
                     )
                     self.add_message(commentary)
