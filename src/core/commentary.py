@@ -1,6 +1,7 @@
 import openai
 import elevenlabs
 import os
+import time
 
 
 class TextGenerator:
@@ -66,22 +67,30 @@ class TextGenerator:
         prompt += f"Use a {tone} tone.\n"
 
         # Set role
+        pbp_voice = self.settings["commentary"]["pbp_voice"]
+        color_voice = self.settings["commentary"]["color_voice"]
         if role == "play-by-play":
+            prompt += f"You are {pbp_voice}\n"
+            prompt += f"Your co-commentator is {color_voice}\n"
             prompt += "You are the play-by-play commentator.\n"
             prompt += "Do not provide too much detail. Focus on the action.\n"
-            prompt += "Limit your response to a single sentence."
-            prompt += "Do not provide color commentary.\n"
+            prompt += "Limit your response to a single sentence ONLY."
+            prompt += "DO NOT provide color commentary.\n"
             prompt += "DO NOT use unnecessary exclamations or filler " \
                 "phrases. Your job is only to report the action.\n"
             prompt += "Do not call out turn numbers if you don't have them.\n"
             prompt += "NEVER add subjective descriptors like 'impressive' " \
                 "or 'amazing'.\n"
+            prompt += "NEVER add extra filler sentences.\n"
         elif role == "color":
+            prompt += f"You are {color_voice}\n"
+            prompt += f"Your co-commentator is {pbp_voice}\n"
             prompt += "You are the color commentator.\n"
             prompt += "Stick to providing insight or context that enhances " \
                 "the viewer's understanding.\n"
             prompt += "Do not provide play-by-play commentary.\n"
             prompt += "Do not invent details.\n"
+            prompt += "DO NOT repeat anything your co-commentator has said.\n"
         
         # Build the prompt
         prompt += "\nThe following is additional information you can include, " \
@@ -90,6 +99,10 @@ class TextGenerator:
         prompt += f"Track: {ir_info['WeekendInfo']['TrackDisplayName']}\n"
         prompt += f"City: {ir_info['WeekendInfo']['TrackCity']}\n"
         prompt += f"Country: {ir_info['WeekendInfo']['TrackCountry']}\n"
+        prompt += f"Air Temp: {ir_info['WeekendInfo']['TrackAirTemp']}\n"
+        prompt += f"Track Temp: {ir_info['WeekendInfo']['TrackSurfaceTemp']}\n"
+        prompt += f"Skies: {ir_info['WeekendInfo']['TrackSkies']}\n"
+        prompt += f"Fog: {ir_info['WeekendInfo']['TrackFogLevel']}\n"
         prompt += f"Additional Info: {other_info}\n"
         
         # Add the previous responses if there are any
@@ -149,7 +162,21 @@ class VoiceGenerator:
         # Set the API key
         elevenlabs.set_api_key(self.settings["keys"]["elevenlabs_api_key"])
 
-    def generate(self, text, timestamp, yelling=False, voice="Arnold"):
+        # Get the user's subscription tier
+        user = elevenlabs.api.User.from_api()
+        self.tier = user.subscription.tier
+
+        # Set sample rate based on tier (used for time calculations)
+        if self.tier == "free":
+            self.sample_rate = 16000
+        elif self.tier == "starter":
+            self.sample_rate = 22050
+        elif self.tier == "creator":
+            self.sample_rate = 24000
+        else:
+            self.sample_rate = 44100
+
+    def generate(self, text, timestamp, yelling=False, voice="Harry"):
         """Generate and play audio for the provided text.
 
         Calls the ElevenLabs API to create audio from the text using the
@@ -176,7 +203,7 @@ class VoiceGenerator:
         audio = elevenlabs.generate(
             text=text,
             voice=voice,
-            model="eleven_multilingual_v2"
+            model="eleven_monolingual_v1"
         )
 
         # Get the iRacing videos folder
@@ -187,3 +214,9 @@ class VoiceGenerator:
 
         # Save the audio to a file
         elevenlabs.save(audio, os.path.join(path, file_name))
+
+        # Get the length of the audio file
+        length = len(audio) / self.sample_rate
+
+        # Wait for the length of the audio
+        time.sleep(length)

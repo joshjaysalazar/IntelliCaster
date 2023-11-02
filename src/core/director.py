@@ -1,5 +1,6 @@
 import irsdk
 import os
+import random
 import threading
 import time
 from copy import deepcopy
@@ -237,8 +238,44 @@ class Director:
                 self.voice_generator.generate(
                     commentary,
                     timestamp,
-                    yelling=True
+                    yelling=True,
+                    voice=self.settings["commentary"]["pbp_voice"]
                 )
+
+                # Occassionally, generate color commentary
+                chance = float(self.settings["commentary"]["color_chance"])
+                if random.random() < chance:
+                    # Generate the instruction
+                    instruction = (
+                        f"It was just announced that {driver_name} "
+                        f"just overtook {overtaken_name} for "
+                        f"P{driver['position']}. Add some color commentary."
+                    )
+
+                    # Generate the text commentary
+                    commentary = self.text_generator.generate(
+                        instruction,
+                        "color",
+                        "neutral",
+                        10,
+                        self.ir,
+                        "Don't repeat the overtake. Add some color commentary."
+                    )
+                    self.add_message(commentary)
+
+                    # Get the timestamp
+                    timestamp = time.time() - self.recording_start_time
+
+                    # Convert the timestamp to milliseconds
+                    timestamp = int(timestamp * 1000)
+
+                    # Generate the voice commentary
+                    self.voice_generator.generate(
+                        commentary,
+                        timestamp,
+                        yelling=True,
+                        voice=self.settings["commentary"]["color_voice"]
+                    )
 
                 # End this iteration of the loop
                 break

@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from elevenlabs import voices
 from tkinter import filedialog
 import threading
 
@@ -422,6 +423,31 @@ class App(ctk.CTk):
 
         # Create commentary section
         create_section("commentary", "Commentary")
+        
+        # Get list of voices
+        voice_list = [voice.name for voice in voices()]
+
+        # Create play-by-play voice dropdown
+        default = self.settings["commentary"]["pbp_voice"]
+        create_dropdown(
+            "pbp_voice",
+            "Play-by-Play Voice",
+            voice_list,
+            default
+        )
+
+        # Create color commentary voice dropdown
+        default = self.settings["commentary"]["color_voice"]
+        create_dropdown(
+            "color_voice",
+            "Color Commentary Voice",
+            voice_list,
+            default
+        )
+
+        # Create color commentary chance entry box
+        default = self.settings["commentary"]["color_chance"]
+        create_entry("color_chance", "Color Commentary Chance (%)", default)
 
         # Create memory limit entry box
         default = self.settings["commentary"]["memory_limit"]
