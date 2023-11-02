@@ -1,7 +1,7 @@
 import openai
 import elevenlabs
 import os
-from scipy import wavfile
+from scipy.io import wavfile
 import time
 
 
