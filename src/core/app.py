@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from elevenlabs import voices
 from tkinter import filedialog
 import threading
 
@@ -425,11 +426,7 @@ class App(ctk.CTk):
 
         # Create color commentary chance entry box
         default = self.settings["commentary"]["color_chance"]
-        create_entry(
-            "color_commentary_chance",
-            "Color Commentary Chance (%)",
-            default
-        )
+        create_entry("color_chance", "Color Commentary Chance (%)", default)
 
         # Create memory limit entry box
         default = self.settings["commentary"]["memory_limit"]
