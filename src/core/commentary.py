@@ -32,7 +32,7 @@ class TextGenerator:
         # Create an empty list to hold previous responses
         self.previous_responses = []
     
-    def generate(self, event, role, tone, limit, ir_info, other_info):
+    def generate(self, event, role, tone, limit, ir_info, other_info=""):
         """Generate text commentary for the given event.
         
         Generates text commentary for the given event based on the provided
