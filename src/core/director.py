@@ -222,7 +222,6 @@ class Director:
                     output,
                     "play-by-play",
                     "neutral",
-                    10,
                     self.ir,
                     "Be sure to include the position of the overtaking driver."
                 )
@@ -245,21 +244,13 @@ class Director:
                 # Occassionally, generate color commentary
                 chance = float(self.settings["commentary"]["color_chance"])
                 if random.random() < chance:
-                    # Generate the instruction
-                    instruction = (
-                        f"It was just announced that {driver_name} "
-                        f"just overtook {overtaken_name} for "
-                        f"P{driver['position']}. Add some color commentary."
-                    )
 
                     # Generate the text commentary
                     commentary = self.text_generator.generate(
-                        instruction,
+                        "Add color commentary to the previous overtake.",
                         "color",
                         "neutral",
-                        10,
-                        self.ir,
-                        "Don't repeat the overtake. Add some color commentary."
+                        self.ir
                     )
                     self.add_message(commentary)
 
