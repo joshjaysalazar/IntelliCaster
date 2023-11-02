@@ -33,112 +33,145 @@ class TextGenerator:
         self.previous_responses = []
     
     def generate(self, event, role, tone, limit, ir_info, other_info):
-        """Generate race commentary text based on the given event and role.
-
-        Constructs a prompt that includes behavioral instructions, role,
-        tone, and any additional information. Sends the prompt to the OpenAI
-        API to generate a response. Adds this response to a list of 
-        previous responses for context in future calls.
-
+        """Generate text commentary for the given event.
+        
+        Generates text commentary for the given event based on the provided
+        role, tone, and word limit. Uses the provided iRacing information to
+        provide context for the commentary. Adds the generated commentary to
+        the list of previous responses.
+        
         Args:
-            event (str): The event to generate commentary for.
-            role (str): The role of the commentary, e.g., "play-by-play".
-            tone (str): The tone to use, e.g., "excited".
-            limit (int): The word limit for the generated text.
-            ir_info (dict): Information from iRacing.
-            other_info (str): Any additional information to be included.
-
+            event (str): The event that occurred.
+            role (str): The role of the commentator.
+            tone (str): The tone of the commentary.
+            limit (int): The word limit for the commentary.
+            ir_info (dict): The information from iRacing.
+            other_info (str): Additional information to be included in the
+                system message.
+        
         Returns:
-            str: The generated commentary text.
+            str: The generated commentary.
         """
-        # Create an empty prompt
-        prompt = ""
+        # Create an empty list to hold the messages
+        messages = []
 
-        # Add behavioral instructions
-        prompt += "You are providing commentary to a race.\n"
-        prompt += "Make sure you follow ALL of the following instructions " \
-            "exactly.\n"
-        prompt += "DO NOT repeat previously-used phrases.\n"
-        prompt += "Do not, under any circumstances, invent details. Only " \
-            "comment on the information you have.\n"
-        prompt += "ONLY use a driver's last name. Do not use their first " \
-            "name or their full name.\n"
-        prompt += f"Your responses MUST NOT exceed {limit} words.\n"
-        prompt += f"Use a {tone} tone.\n"
+        # Start building the system message
+        new_msg = ""
 
-        # Set role
-        pbp_voice = self.settings["commentary"]["pbp_voice"]
-        color_voice = self.settings["commentary"]["color_voice"]
+        # Get the names of the commentators
+        pbp_name = self.settings["commentary"]["pbp_voice"]
+        color_name = self.settings["commentary"]["color_voice"]
+
+        # Add messages based on role
         if role == "play-by-play":
-            prompt += f"You are {pbp_voice}\n"
-            prompt += f"Your co-commentator is {color_voice}\n"
-            prompt += "You are the play-by-play commentator.\n"
-            prompt += "Do not provide too much detail. Focus on the action.\n"
-            prompt += "Limit your response to a single sentence ONLY."
-            prompt += "DO NOT provide color commentary.\n"
-            prompt += "DO NOT use unnecessary exclamations or filler " \
-                "phrases. Your job is only to report the action.\n"
-            prompt += "Do not call out turn numbers if you don't have them.\n"
-            prompt += "NEVER add subjective descriptors like 'impressive' " \
-                "or 'amazing'.\n"
-            prompt += "NEVER add extra filler sentences.\n"
-        elif role == "color":
-            prompt += f"You are {color_voice}\n"
-            prompt += f"Your co-commentator is {pbp_voice}\n"
-            prompt += "You are the color commentator.\n"
-            prompt += "Stick to providing insight or context that enhances " \
-                "the viewer's understanding.\n"
-            prompt += "Do not provide play-by-play commentary.\n"
-            prompt += "Do not invent details.\n"
-            prompt += "DO NOT repeat anything your co-commentator has said.\n"
-        
-        # Build the prompt
-        prompt += "\nThe following is additional information you can include, " \
-            "but is not required. If any of this information appears in the " \
-            "previous commentary below, DO NOT repeat it.\n"
-        prompt += f"Track: {ir_info['WeekendInfo']['TrackDisplayName']}\n"
-        prompt += f"City: {ir_info['WeekendInfo']['TrackCity']}\n"
-        prompt += f"Country: {ir_info['WeekendInfo']['TrackCountry']}\n"
-        prompt += f"Air Temp: {ir_info['WeekendInfo']['TrackAirTemp']}\n"
-        prompt += f"Track Temp: {ir_info['WeekendInfo']['TrackSurfaceTemp']}\n"
-        prompt += f"Skies: {ir_info['WeekendInfo']['TrackSkies']}\n"
-        prompt += f"Fog: {ir_info['WeekendInfo']['TrackFogLevel']}\n"
-        prompt += f"Additional Info: {other_info}\n"
-        
-        # Add the previous responses if there are any
-        if len(self.previous_responses) > 0:
-            prompt += "\nPrevious Commentary (oldest to latest):\n"
-            limit = int(self.settings["commentary"]["memory_limit"])
-            for message in self.previous_responses:
-                prompt += f"{message}\n"
+            # Add the name to the system message
+            new_msg += "You are a motorsport play-by-play commentator named "
+            new_msg += f"{pbp_name}. "
+            new_msg += f"Your co-commentator is {color_name}. "
 
-        prompt += "\nNote: If you have to say something similar to the most " \
-            "recent commentary, rephrase it without changing the tone.\n"
-        prompt += f"Event: {event}\nAI:\n"
-        
+            # Add play-by-play instructions
+            new_msg += "Do not provide too much detail. Focus on the action. "
+            new_msg += "DO NOT provide color commentary. "
+            new_msg += "DO NOT use unnecessary exclamations or filler. "
+            new_msg += "DO NOT repeat previous messages. "
+            new_msg += "Prefer to use a driver's last name. "
+            new_msg += f"Use a {tone} tone. "
+            new_msg += "Limit your response to a single sentence, "
+            new_msg += f"using no more than {limit} words. "
+
+        elif role == "color":
+            # Add the name to the system message
+            new_msg += "You are a motorsport color commentator named "
+            new_msg += f"{color_name}. "
+            new_msg += f"Your co-commentator is {pbp_name}. "
+
+            # Add color instructions
+            new_msg += "Stick to providing insight or context that enhances "
+            new_msg += "the viewer's understanding. "
+            new_msg += "Do not provide play-by-play commentary. "
+            new_msg += "Do not invent details. "
+            new_msg += "DO NOT repeat anything your co-commentator has said. "
+            new_msg += "Prefer to use a driver's last name. "
+            new_msg += f"Use a {tone} tone. "
+            new_msg += f"Limit your responses to {limit} words. "
+
+        # Add additional info to the end of the system message
+        new_msg += other_info
+
+        # Add the initial system message
+        sys_init = {
+            "role": "system",
+            "name": "instructions",
+            "content": new_msg
+        }
+        messages.append(sys_init)
+
+        # Start building the event info system message
+        new_msg = ""
+
+        # Gather the information from iRacing
+        track = ir_info["WeekendInfo"]["TrackDisplayName"]
+        city = ir_info["WeekendInfo"]["TrackCity"]
+        country = ir_info["WeekendInfo"]["TrackCountry"]
+        air_temp = ir_info["WeekendInfo"]["TrackAirTemp"]
+        track_temp = ir_info["WeekendInfo"]["TrackSurfaceTemp"]
+        skies = ir_info["WeekendInfo"]["TrackSkies"]
+
+        # Compile that information into a message
+        new_msg += f"The race is at {track} in {city}, {country}. "
+        new_msg += f"The air temperature is {air_temp}., and "
+        new_msg += f"the track temperature is {track_temp}. "
+        new_msg += f"The skies are {skies.lower()}. "
+
+        # Add the event info system message
+        sys_event = {
+            "role": "system",
+            "name": "event_info",
+            "content": new_msg
+        }
+        messages.append(sys_event)
+
+        # Add all previous messages to the list
+        for msg in self.previous_responses:
+            messages.append(msg)
+
+        # Add the event message
+        event_msg = {
+            "role": "user",
+            "content": event
+        }
+        messages.append(event_msg)
+
+        # Add the event message to previous messages
+        self.previous_responses.append(event_msg)
+
         # Call the API
-        response = openai.Completion.create(
-            engine="gpt-3.5-turbo-instruct",
-            prompt=prompt,
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=messages,
             max_tokens=256
         )
-        
-        # Extract the response
-        answer = response.choices[0].text.strip()
 
-        # Remove quotes the AI sometimes likes to add
-        if answer[0] == "\"" and answer[-1] == "\"":
-            answer = answer[1:-1]
+        # Extract the response
+        answer = response["choices"][0]["message"]["content"]   
 
         # Add the response to the list of previous responses
-        self.previous_responses.append(answer)
+        formatted_answer = {
+            "role": "assistant",
+            "name": pbp_name if role == "play-by-play" else color_name,
+            "content": answer
+        }
+        self.previous_responses.append(formatted_answer)
 
-        # If the list is too long, remove the oldest response
-        if len(self.previous_responses) > limit:
+        # If the list is too long, remove the two oldest responses
+        length = int(self.settings["commentary"]["memory_limit"]) * 2
+        if len(self.previous_responses) > length:
             self.previous_responses.pop(0)
-        
-        return answer
+            self.previous_responses.pop(0)
 
+        # Return the answer
+        return answer
+    
 class VoiceGenerator:
     """
     Handles text-to-speech functionality for race commentary.
