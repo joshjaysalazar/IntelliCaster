@@ -160,6 +160,20 @@ class VoiceGenerator:
         # Set the API key
         elevenlabs.set_api_key(self.settings["keys"]["elevenlabs_api_key"])
 
+        # Get the user's subscription tier
+        user = elevenlabs.api.User.from_api()
+        self.tier = user.subscription.tier
+
+        # Set sample rate based on tier (used for time calculations)
+        if self.tier == "free":
+            self.sample_rate = 16000
+        elif self.tier == "starter":
+            self.sample_rate = 22050
+        elif self.tier == "creator":
+            self.sample_rate = 24000
+        else:
+            self.sample_rate = 44100
+
     def generate(self, text, timestamp, yelling=False, voice="Harry"):
         """Generate and play audio for the provided text.
 
@@ -200,7 +214,7 @@ class VoiceGenerator:
         elevenlabs.save(audio, os.path.join(path, file_name))
 
         # Get the length of the audio file
-        length = len(audio) / 44100
+        length = len(audio) / self.sample_rate
 
         # Wait for the length of the audio
         time.sleep(length)
