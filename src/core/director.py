@@ -222,7 +222,6 @@ class Director:
                     output,
                     "play-by-play",
                     "neutral",
-                    10,
                     self.ir,
                     "Be sure to include the position of the overtaking driver."
                 )
@@ -251,7 +250,6 @@ class Director:
                         "Add color commentary to the previous overtake.",
                         "color",
                         "neutral",
-                        20,
                         self.ir
                     )
                     self.add_message(commentary)
