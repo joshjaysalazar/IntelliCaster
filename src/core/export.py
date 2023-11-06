@@ -14,6 +14,9 @@ class Export(ctk.CTkToplevel):
 
         Args:
             master (CTk): The parent window
+
+        Attributes:
+            progress_tracker (ProgressTracker): The progress tracker object
         """
         super().__init__(master)
 

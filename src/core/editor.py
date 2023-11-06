@@ -9,11 +9,32 @@ from core import export
 
 
 class Editor:
+    """The editor class
+
+    This class is responsible for creating the final video. It combines the
+    original video with the commentary audio clips and exports the result to a
+    file.
+    """
+
     def __init__(self, settings):
+        """Constructor for the editor
+
+        Args:
+            settings (ConfigParser): Settings parsed from an INI file.
+        """
         # Member variables
         self.settings = settings
 
     def create_video(self, root_window):
+        """Create the video
+
+        Creates the video by combining the original video with the commentary
+        audio clips. This method is called by the main window when the user
+        clicks the 'Stop Commentary' button.
+
+        Args:
+            root_window (CTk): The root window
+        """
         # Create export window
         export_window = export.Export(root_window)
 
@@ -53,6 +74,11 @@ class Editor:
         self.delete_latest_video()
 
     def delete_commentary_audio(self):
+        """Delete the commentary audio clips from the iRacing videos folder
+
+        Deletes the commentary audio clips from the iRacing videos folder. This
+        is used to clean up the videos folder after the video has been exported.
+        """
         # Get the iRacing videos folder
         path = os.path.join(self.settings["general"]["iracing_path"], "videos")
 
@@ -67,6 +93,11 @@ class Editor:
             os.remove(file)
 
     def delete_latest_video(self):
+        """Delete the latest video from the iRacing videos folder
+        
+        Deletes the latest video from the iRacing videos folder. This is used to
+        clean up the videos folder after the video has been exported.
+        """
         # Get the iRacing videos folder
         path = os.path.join(self.settings["general"]["iracing_path"], "videos")
 
@@ -81,6 +112,11 @@ class Editor:
         os.remove(latest_file)
 
     def get_commentary_audio(self):
+        """Get the commentary audio clips from the iRacing videos folder
+        
+        Returns:
+            list: A list of audio clips
+        """
         # Get the iRacing videos folder
         path = os.path.join(self.settings["general"]["iracing_path"], "videos")
 
@@ -110,6 +146,11 @@ class Editor:
         return audio_clips
 
     def get_latest_video(self):
+        """Get the latest video clip from the iRacing videos folder
+        
+        Returns:
+            VideoFileClip: The video clip
+        """
         # Get the iRacing videos folder
         path = os.path.join(self.settings["general"]["iracing_path"], "videos")
 

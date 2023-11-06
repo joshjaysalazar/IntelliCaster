@@ -15,9 +15,8 @@ class Director:
     
     The Director class orchestrates the broadcast by monitoring the state of 
     the race and generating commentary. It interfaces with the iRacing SDK to 
-    collect real-time data, maintains the state of drivers, detects overtakes, 
-    and coordinates with the TextGenerator and VoiceGenerator classes for 
-    real-time commentary.
+    collect real-time data, maintains the state of drivers, detects events, and
+    coordinates with the generator classes to generate commentary.
     """
 
     def __init__(self, settings, add_message):
