@@ -8,7 +8,7 @@ class TextGenerator:
     """
     Handles text generation for race commentary.
 
-    Uses OpenAI's GPT-3 to generate text commentary based on events, roles,
+    Uses OpenAI's GPT to generate text commentary based on events, roles,
     tones, and additional information. Maintains a list of previous responses
     to use as context for future commentary.
     """
@@ -22,6 +22,12 @@ class TextGenerator:
         Args:
             settings (ConfigParser): The settings containing API keys and
             other configurations.
+
+        Attributes:
+            settings (ConfigParser): The settings containing API keys and
+            other configurations.
+            previous_responses (list): A list of previous responses generated
+            for commentary.
         """
         # Member variables
         self.settings = settings
@@ -36,7 +42,7 @@ class TextGenerator:
         """Generate text commentary for the given event.
         
         Generates text commentary for the given event based on the provided
-        role and tone. Uses the provided iRacing information to provide context
+        instructions. Uses the provided iRacing information to provide context
         for the commentary. Adds the generated commentary to the list of
         previous responses.
         
@@ -167,8 +173,8 @@ class VoiceGenerator:
     """
     Handles text-to-speech functionality for race commentary.
 
-    Utilizes the ElevenLabs API to convert text into audio. Streams the
-    generated audio to provide real-time commentary.
+    Utilizes the ElevenLabs API to convert text into audio. Handles the
+    generation and saving of audio files.
     """
 
     def __init__(self, settings):
@@ -179,6 +185,11 @@ class VoiceGenerator:
 
         Args:
             settings (ConfigParser): Settings parsed from an INI file.
+
+        Attributes:
+            settings (ConfigParser): Settings parsed from an INI file.
+            tier (str): The user's subscription tier.
+            sample_rate (int): The sample rate to use for audio.
         """
         # Member variables
         self.settings = settings
@@ -201,15 +212,16 @@ class VoiceGenerator:
             self.sample_rate = 44100
 
     def generate(self, text, timestamp, yelling=False, voice="Harry"):
-        """Generate and play audio for the provided text.
+        """Generate and save audio for the provided text.
 
         Calls the ElevenLabs API to create audio from the text using the
-        specified voice, then streams the audio.
+        specified voice, then saves the audio.
 
         Args:
-            text (str): The text to be converted to audio.
-            voice (str, optional): The voice to use for text-to-speech. Defaults
-                to "Arnold".
+            text (str): The text to convert to audio.
+            timestamp (str): The timestamp of the event.
+            yelling (bool): Whether or not to convert the text to yelling.
+            voice (str): The voice to use for the audio.
         """
         # Convert to yelling for voice commentary if requested
         if yelling:
