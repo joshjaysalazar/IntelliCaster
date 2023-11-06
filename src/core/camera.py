@@ -1,16 +1,15 @@
 class Camera:
-    """Class for changing cameras in iRacing
-
-    Attributes:
-        ir (irsdk.IRSDK): Instance of the IRSDK class
-        cameras (dict): Dictionary of camera names and numbers
-    """
+    """Class for changing cameras in iRacing"""
     
     def __init__(self, ir):
         """Initializes the Camera class
         
         Args:
-            ir (irsdk.IRSDK): Instance of the IRSDK class
+            ir (IRSDK): Instance of the IRSDK class
+
+        Attributes:
+            ir (IRSDK): Instance of the IRSDK class
+            cameras (dict): Dictionary of camera names and numbers
         """
         # Member variables
         self.ir = ir

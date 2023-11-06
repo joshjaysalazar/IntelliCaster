@@ -1,12 +1,13 @@
-import irsdk
+from copy import deepcopy
 import os
 import random
 import threading
 import time
-from copy import deepcopy
 
-from core import commentary
+import irsdk
+
 from core import camera
+from core import commentary
 
 
 class Director:
@@ -15,9 +16,8 @@ class Director:
     
     The Director class orchestrates the broadcast by monitoring the state of 
     the race and generating commentary. It interfaces with the iRacing SDK to 
-    collect real-time data, maintains the state of drivers, detects overtakes, 
-    and coordinates with the TextGenerator and VoiceGenerator classes for 
-    real-time commentary.
+    collect real-time data, maintains the state of drivers, detects events, and
+    coordinates with the generator classes to generate commentary.
     """
 
     def __init__(self, settings, add_message):
@@ -104,6 +104,14 @@ class Director:
         return True
 
     def create_drivers(self):
+        """Create a list of drivers.
+
+        This method creates a list of drivers from the iRacing SDK. It is called
+        when the Director class is initialized.
+
+        Returns:
+            list: A list of dictionaries containing driver data.
+        """
         # Create an empty list to track drivers
         driver_dict = []
 
@@ -417,6 +425,11 @@ class Director:
         self.ir.replay_set_play_speed(0)
 
     def update_drivers(self):
+        """Update the drivers list.
+
+        This method updates the drivers list by getting the latest data from the
+        iRacing SDK and updating the drivers list accordingly.
+        """
         # Get driver data from iRacing SDK
         driver_data = self.ir["DriverInfo"]["Drivers"]
 

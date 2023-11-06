@@ -1,5 +1,5 @@
-import os
 from configparser import ConfigParser
+import os
 
 
 def create_settings_file(file_name):

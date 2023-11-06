@@ -1,7 +1,8 @@
-import customtkinter as ctk
-from elevenlabs import voices
 from tkinter import filedialog
 import threading
+
+import customtkinter as ctk
+from elevenlabs import voices
 
 from core import director
 from core import editor
@@ -30,6 +31,7 @@ class App(ctk.CTk):
             settings (ConfigParser): Stores settings from the INI file.
             director (Director object): Instance of the Director class to manage
                 race commentary.
+            editor (Editor object): Instance of the Editor class to manage
         """
         super().__init__()
         
@@ -477,8 +479,7 @@ class App(ctk.CTk):
         This method gathers the settings from various entry boxes, updates the
         settings dictionary, and then saves these settings to a 'settings.ini'
         file. A message is also added to indicate that the settings have been
-        saved. Additionally, a label saying 'Settings saved!' is shown for 3
-        seconds.
+        saved.
 
         Args:
             event: Not used, but included for compatibility with button clicks.
@@ -516,14 +517,14 @@ class App(ctk.CTk):
         )
 
     def show_frame(self, event=None, frame="home"):
-        """Switch between 'Home' and 'Settings' frames and update button colors.
+        """Switch between frames and update button colors.
 
         Hides the current frame and shows the selected frame. Also updates the
         button colors to indicate the currently active frame.
 
         Args:
             event: Not used, but included for compatibility with button clicks.
-            frame (str): The name of the frame to show ('home' or 'settings').
+            frame (str): The name of the frame to show.
         """
         # set button color for selected button
         selected = ("gray75", "gray25")
