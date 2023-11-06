@@ -21,6 +21,9 @@ class Editor:
 
         Args:
             settings (ConfigParser): Settings parsed from an INI file.
+
+        Attributes:
+            settings (ConfigParser): Settings parsed from an INI file.
         """
         # Member variables
         self.settings = settings
