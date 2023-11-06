@@ -103,6 +103,14 @@ class Director:
         return True
 
     def create_drivers(self):
+        """Create a list of drivers.
+
+        This method creates a list of drivers from the iRacing SDK. It is called
+        when the Director class is initialized.
+
+        Returns:
+            list: A list of dictionaries containing driver data.
+        """
         # Create an empty list to track drivers
         driver_dict = []
 
