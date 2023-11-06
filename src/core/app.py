@@ -1,7 +1,8 @@
-import customtkinter as ctk
-from elevenlabs import voices
 from tkinter import filedialog
 import threading
+
+import customtkinter as ctk
+from elevenlabs import voices
 
 from core import director
 from core import editor

@@ -1,12 +1,13 @@
-import irsdk
+from copy import deepcopy
 import os
 import random
 import threading
 import time
-from copy import deepcopy
 
-from core import commentary
+import irsdk
+
 from core import camera
+from core import commentary
 
 
 class Director:

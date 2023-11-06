@@ -1,7 +1,8 @@
-import openai
-import elevenlabs
 import os
 import time
+
+import elevenlabs
+import openai
 
 
 class TextGenerator:
