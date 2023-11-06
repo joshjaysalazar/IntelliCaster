@@ -13,7 +13,7 @@ class Export(ctk.CTkToplevel):
         """Constructor for the Export window
 
         Args:
-            master (Tk): The parent window
+            master (CTk): The parent window
         """
         super().__init__(master)
 
