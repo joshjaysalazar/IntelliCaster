@@ -424,6 +424,11 @@ class Director:
         self.ir.replay_set_play_speed(0)
 
     def update_drivers(self):
+        """Update the drivers list.
+
+        This method updates the drivers list by getting the latest data from the
+        iRacing SDK and updating the drivers list accordingly.
+        """
         # Get driver data from iRacing SDK
         driver_data = self.ir["DriverInfo"]["Drivers"]
 
