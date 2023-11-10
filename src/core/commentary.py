@@ -38,6 +38,17 @@ class TextGenerator:
             api_key=self.settings["keys"]["openai_api_key"]
         )
 
+        # Pick the appropriate model based on settings
+        model_setting = self.settings["commentary"]["gpt_model"]
+        if model_setting == "GPT-3.5 Turbo":
+            self.model = "gpt-3.5-turbo"
+        elif model_setting == "GPT-4 Turbo":
+            self.model = "gpt-4-1106-preview"
+        elif model_setting == "GPT-4 Turbo with Vision":
+            self.model = "gpt-4-1106-vision-preview"
+        else:
+            raise ValueError("Invalid GPT model setting.")
+
         # Create an empty list to hold previous responses
         self.previous_responses = []
     
@@ -148,8 +159,7 @@ class TextGenerator:
 
         # Call the API
         response = self.client.chat.completions.create(
-            # model="gpt-3.5-turbo",
-            model="gpt-4-1106-preview",
+            model=self.model,
             messages=messages
         )
 

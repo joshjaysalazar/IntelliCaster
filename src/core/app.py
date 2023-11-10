@@ -425,6 +425,15 @@ class App(ctk.CTk):
 
         # Create commentary section
         create_section("commentary", "Commentary")
+
+        # Create GPT model dropdown
+        default = self.settings["commentary"]["gpt_model"]
+        create_dropdown(
+            "gpt_model",
+            "GPT Model",
+            ["GPT-3.5 Turbo", "GPT-4 Turbo", "GPT-4 Turbo with Vision"],
+            default
+        )
         
         # Get list of voices
         voice_list = [voice.name for voice in voices()]
