@@ -148,7 +148,8 @@ class TextGenerator:
 
         # Call the API
         response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            # model="gpt-3.5-turbo",
+            model="gpt-4-1106-preview",
             messages=messages
         )
 
