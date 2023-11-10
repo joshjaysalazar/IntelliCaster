@@ -33,8 +33,10 @@ class TextGenerator:
         # Member variables
         self.settings = settings
 
-        # Set the API key
-        openai.api_key = self.settings["keys"]["openai_api_key"]
+        # Create the OpenAI client
+        self.client = openai.OpenAI(
+            api_key=self.settings["keys"]["openai_api_key"]
+        )
 
         # Create an empty list to hold previous responses
         self.previous_responses = []
@@ -145,13 +147,13 @@ class TextGenerator:
         self.previous_responses.append(event_msg)
 
         # Call the API
-        response = openai.ChatCompletion.create(
+        response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=messages
         )
 
         # Extract the response
-        answer = response["choices"][0]["message"]["content"]   
+        answer = response.choices[0].message.content
 
         # Add the response to the list of previous responses
         formatted_answer = {
