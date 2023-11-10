@@ -126,7 +126,7 @@ class Editor:
         path = os.path.join(
             self.settings["general"]["iracing_path"],
             "videos",
-            "screenshot.jpg"
+            "screenshot.png"
         )
 
         # Delete the file if it exists
