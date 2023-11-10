@@ -214,7 +214,8 @@ class TextGenerator:
                 "content": [
                     {
                         "type": "text",
-                        "text": "Use this image to help you commentate."
+                        "text": "Use this image in addition to the other " \
+                            "information to help you commentate."
                     },
                     {
                         "type": "image_url",
