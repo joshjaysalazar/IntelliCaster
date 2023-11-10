@@ -1,3 +1,4 @@
+import base64
 import os
 import time
 
@@ -52,7 +53,7 @@ class TextGenerator:
         # Create an empty list to hold previous responses
         self.previous_responses = []
     
-    def generate(self, event, role, tone, ir_info, other_info=""):
+    def generate(self, event, role, tone, ir, other_info=""):
         """Generate text commentary for the given event.
         
         Generates text commentary for the given event based on the provided
@@ -122,12 +123,12 @@ class TextGenerator:
         new_msg = ""
 
         # Gather the information from iRacing
-        track = ir_info["WeekendInfo"]["TrackDisplayName"]
-        city = ir_info["WeekendInfo"]["TrackCity"]
-        country = ir_info["WeekendInfo"]["TrackCountry"]
-        air_temp = ir_info["WeekendInfo"]["TrackAirTemp"]
-        track_temp = ir_info["WeekendInfo"]["TrackSurfaceTemp"]
-        skies = ir_info["WeekendInfo"]["TrackSkies"]
+        track = ir["WeekendInfo"]["TrackDisplayName"]
+        city = ir["WeekendInfo"]["TrackCity"]
+        country = ir["WeekendInfo"]["TrackCountry"]
+        air_temp = ir["WeekendInfo"]["TrackAirTemp"]
+        track_temp = ir["WeekendInfo"]["TrackSurfaceTemp"]
+        skies = ir["WeekendInfo"]["TrackSkies"]
 
         # Compile that information into a message
         new_msg += f"The race is at {track} in {city}, {country}. "
@@ -156,6 +157,49 @@ class TextGenerator:
 
         # Add the event message to previous messages
         self.previous_responses.append(event_msg)
+
+        # If the vision model is being used, add the image to the messages
+        model_setting = self.settings["commentary"]["gpt_model"]
+        if model_setting == "GPT-4 Turbo with Vision":
+            # Capture a screenshot
+            ir.video_capture(0)
+
+            # Get the screenshots path
+            path = os.path.join(
+                self.settings["general"]["iracing_path"],
+                "screenshots"
+            )
+
+            # Find the most recent screenshot
+            files = []
+            for file in os.listdir(path):
+                if file.endswith(".png"):
+                    files.append(os.path.join(path, file))
+            latest_screenshot = max(files, key=os.path.getctime)
+
+            # Encode that image in base64
+            with open(latest_screenshot, "rb") as file:
+                encoded_image = base64.b64encode(file.read()).decode("utf-8")
+
+            # Create the image message
+            image_msg = {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "image": "Use this image to help you commentate."
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{encoded_image}"
+                        }
+                    }
+                ]
+            }
+
+            # Add the image message to the list of messages
+            messages.append(image_msg)
 
         # Call the API
         response = self.client.chat.completions.create(
