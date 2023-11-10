@@ -1,5 +1,7 @@
 openai
 Pillow
+pygetwindow
+pyautogui
 pyirsdk
 elevenlabs
 customtkinter

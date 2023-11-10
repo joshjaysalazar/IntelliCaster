@@ -5,6 +5,8 @@ import time
 import elevenlabs
 import openai
 from PIL import Image
+import pyautogui
+import pygetwindow as gw
 
 
 class TextGenerator:
@@ -162,24 +164,30 @@ class TextGenerator:
         # If the vision model is being used, add the image to the messages
         model_setting = self.settings["commentary"]["gpt_model"]
         if model_setting == "GPT-4 Turbo with Vision":
-            # Capture a screenshot
-
-
-            # Get the screenshots path
+            # Set the screenshot path
             path = os.path.join(
                 self.settings["general"]["iracing_path"],
-                "screenshots"
+                "videos"
             )
 
-            # Find the most recent screenshot
-            files = []
-            for file in os.listdir(path):
-                if file.endswith(".png"):
-                    files.append(os.path.join(path, file))
-            latest_screenshot = max(files, key=os.path.getctime)
+            # Get the iRacing window
+            window = gw.getWindowsWithTitle("iRacing.com Simulator")[0]
+
+            # Get the coordinates of the window
+            x = window.left
+            y = window.top
+            width = window.width
+            height = window.height
+
+            # Take a screenshot of the window
+            screenshot = pyautogui.screenshot(region=(x, y, width, height))
+
+            # Save the screenshot
+            screenshot_path = os.path.join(path, "screenshot.png")
+            screenshot.save(screenshot_path)
 
             # Process the image and save it
-            with Image.open(latest_screenshot) as image:
+            with Image.open(screenshot_path) as image:
                 # Get the image's current dimensions
                 width, height = image.size
 
@@ -194,10 +202,10 @@ class TextGenerator:
                 image = image.resize((512, 512))
 
                 # Save the image
-                image.save(latest_screenshot)
+                image.save(screenshot_path)
 
             # Encode that image in base64
-            with open(latest_screenshot, "rb") as file:
+            with open(screenshot_path, "rb") as file:
                 encoded_image = base64.b64encode(file.read()).decode("utf-8")
 
             # Create the image message
@@ -212,7 +220,7 @@ class TextGenerator:
                         "type": "image_url",
                         "image_url": {
                             "url": f"data:image/jpeg;base64,{encoded_image}",
-                            "detail": "low"
+                            "detail": "high"
                         }
                     }
                 ]
