@@ -46,7 +46,7 @@ class TextGenerator:
         elif model_setting == "GPT-4 Turbo":
             self.model = "gpt-4-1106-preview"
         elif model_setting == "GPT-4 Turbo with Vision":
-            self.model = "gpt-4-1106-vision-preview"
+            self.model = "gpt-4-vision-preview"
         else:
             raise ValueError("Invalid GPT model setting.")
 
@@ -187,12 +187,13 @@ class TextGenerator:
                 "content": [
                     {
                         "type": "text",
-                        "image": "Use this image to help you commentate."
+                        "text": "Use this image to help you commentate."
                     },
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": f"data:image/jpeg;base64,{encoded_image}"
+                            "url": f"data:image/jpeg;base64,{encoded_image}",
+                            "detail": "low"
                         }
                     }
                 ]
@@ -204,7 +205,8 @@ class TextGenerator:
         # Call the API
         response = self.client.chat.completions.create(
             model=self.model,
-            messages=messages
+            messages=messages,
+            max_tokens=300
         )
 
         # Extract the response
