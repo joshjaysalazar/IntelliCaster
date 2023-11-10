@@ -76,6 +76,7 @@ class Editor:
         # Clean up videos directory
         self.delete_commentary_audio()
         self.delete_latest_video()
+        self.delete_screenshot()
 
     def delete_commentary_audio(self):
         """Delete the commentary audio clips from the iRacing videos folder
@@ -114,6 +115,23 @@ class Editor:
 
         # Delete the file
         os.remove(latest_file)
+    
+    def delete_screenshot(self):
+        """Delete the screenshot from the iRacing videos folder
+        
+        Deletes the screenshot from the iRacing videos folder. This is used to
+        clean up the videos folder after the video has been exported.
+        """
+        # Get the path to the screenshot
+        path = os.path.join(
+            self.settings["general"]["iracing_path"],
+            "videos",
+            "screenshot.png"
+        )
+
+        # Delete the file if it exists
+        if os.path.exists(path):
+            os.remove(path)
 
     def get_commentary_audio(self):
         """Get the commentary audio clips from the iRacing videos folder

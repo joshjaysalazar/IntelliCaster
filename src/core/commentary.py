@@ -1,8 +1,12 @@
+import base64
 import os
 import time
 
 import elevenlabs
 import openai
+from PIL import Image
+import pyautogui
+import pygetwindow as gw
 
 
 class TextGenerator:
@@ -33,13 +37,26 @@ class TextGenerator:
         # Member variables
         self.settings = settings
 
-        # Set the API key
-        openai.api_key = self.settings["keys"]["openai_api_key"]
+        # Create the OpenAI client
+        self.client = openai.OpenAI(
+            api_key=self.settings["keys"]["openai_api_key"]
+        )
+
+        # Pick the appropriate model based on settings
+        model_setting = self.settings["commentary"]["gpt_model"]
+        if model_setting == "GPT-3.5 Turbo":
+            self.model = "gpt-3.5-turbo"
+        elif model_setting == "GPT-4 Turbo":
+            self.model = "gpt-4-1106-preview"
+        elif model_setting == "GPT-4 Turbo with Vision":
+            self.model = "gpt-4-vision-preview"
+        else:
+            raise ValueError("Invalid GPT model setting.")
 
         # Create an empty list to hold previous responses
         self.previous_responses = []
     
-    def generate(self, event, role, tone, ir_info, other_info=""):
+    def generate(self, event, role, tone, ir, other_info=""):
         """Generate text commentary for the given event.
         
         Generates text commentary for the given event based on the provided
@@ -51,7 +68,7 @@ class TextGenerator:
             event (str): The event that occurred.
             role (str): The role of the commentator.
             tone (str): The tone of the commentary.
-            ir_info (dict): The information from iRacing.
+            ir (IRSDK): The information from iRacing.
             other_info (str): Additional information to be included in the
                 system message.
         
@@ -109,12 +126,12 @@ class TextGenerator:
         new_msg = ""
 
         # Gather the information from iRacing
-        track = ir_info["WeekendInfo"]["TrackDisplayName"]
-        city = ir_info["WeekendInfo"]["TrackCity"]
-        country = ir_info["WeekendInfo"]["TrackCountry"]
-        air_temp = ir_info["WeekendInfo"]["TrackAirTemp"]
-        track_temp = ir_info["WeekendInfo"]["TrackSurfaceTemp"]
-        skies = ir_info["WeekendInfo"]["TrackSkies"]
+        track = ir["WeekendInfo"]["TrackDisplayName"]
+        city = ir["WeekendInfo"]["TrackCity"]
+        country = ir["WeekendInfo"]["TrackCountry"]
+        air_temp = ir["WeekendInfo"]["TrackAirTemp"]
+        track_temp = ir["WeekendInfo"]["TrackSurfaceTemp"]
+        skies = ir["WeekendInfo"]["TrackSkies"]
 
         # Compile that information into a message
         new_msg += f"The race is at {track} in {city}, {country}. "
@@ -144,14 +161,87 @@ class TextGenerator:
         # Add the event message to previous messages
         self.previous_responses.append(event_msg)
 
+        # If the vision model is being used, add the image to the messages
+        model_setting = self.settings["commentary"]["gpt_model"]
+        if model_setting == "GPT-4 Turbo with Vision":
+            # Wait a moment for the camera to focus
+            time.sleep(0.25)
+
+            # Set the screenshot path
+            path = os.path.join(
+                self.settings["general"]["iracing_path"],
+                "videos"
+            )
+
+            # Get the iRacing window
+            window = gw.getWindowsWithTitle("iRacing.com Simulator")[0]
+
+            # Get the coordinates of the window
+            x = window.left
+            y = window.top
+            width = window.width
+            height = window.height
+
+            # Take a screenshot of the window
+            screenshot = pyautogui.screenshot(region=(x, y, width, height))
+
+            # Save the screenshot
+            screenshot_path = os.path.join(path, "screenshot.png")
+            screenshot.save(screenshot_path)
+
+            # Process the image and save it
+            with Image.open(screenshot_path) as image:
+                # Get the image's current dimensions
+                width, height = image.size
+
+                # Crop the left and right sides on center
+                left = width // 4
+                right = width - left
+                top = 0
+                bottom = height
+                image = image.crop((left, top, right, bottom))
+
+                # Resize the image
+                image = image.resize((512, 512))
+
+                # Save the image
+                image.save(screenshot_path)
+
+            # Encode that image in base64
+            with open(screenshot_path, "rb") as file:
+                encoded_image = base64.b64encode(file.read()).decode("utf-8")
+
+            # Create the image message
+            image_msg = {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "Use this image in addition to the other " \
+                            "information to help you commentate."
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{encoded_image}",
+                            "detail": "high"
+                        }
+                    }
+                ]
+            }
+
+            # Add the image message to the list of messages
+            messages.append(image_msg)
+
         # Call the API
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=messages
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            max_tokens=300
         )
 
         # Extract the response
-        answer = response["choices"][0]["message"]["content"]   
+        answer = response.choices[0].message.content
 
         # Add the response to the list of previous responses
         formatted_answer = {
