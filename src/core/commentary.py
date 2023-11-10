@@ -68,7 +68,7 @@ class TextGenerator:
             event (str): The event that occurred.
             role (str): The role of the commentator.
             tone (str): The tone of the commentary.
-            ir_info (dict): The information from iRacing.
+            ir (IRSDK): The information from iRacing.
             other_info (str): Additional information to be included in the
                 system message.
         
