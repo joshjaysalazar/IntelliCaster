@@ -164,6 +164,9 @@ class TextGenerator:
         # If the vision model is being used, add the image to the messages
         model_setting = self.settings["commentary"]["gpt_model"]
         if model_setting == "GPT-4 Turbo with Vision":
+            # Wait a moment for the camera to focus
+            time.sleep(0.25)
+
             # Set the screenshot path
             path = os.path.join(
                 self.settings["general"]["iracing_path"],
