@@ -4,6 +4,7 @@ import time
 
 import elevenlabs
 import openai
+from PIL import Image
 
 
 class TextGenerator:
@@ -162,7 +163,7 @@ class TextGenerator:
         model_setting = self.settings["commentary"]["gpt_model"]
         if model_setting == "GPT-4 Turbo with Vision":
             # Capture a screenshot
-            ir.video_capture(0)
+
 
             # Get the screenshots path
             path = os.path.join(
@@ -176,6 +177,24 @@ class TextGenerator:
                 if file.endswith(".png"):
                     files.append(os.path.join(path, file))
             latest_screenshot = max(files, key=os.path.getctime)
+
+            # Process the image and save it
+            with Image.open(latest_screenshot) as image:
+                # Get the image's current dimensions
+                width, height = image.size
+
+                # Crop the left and right sides on center
+                left = width // 4
+                right = width - left
+                top = 0
+                bottom = height
+                image = image.crop((left, top, right, bottom))
+
+                # Resize the image
+                image = image.resize((512, 512))
+
+                # Save the image
+                image.save(latest_screenshot)
 
             # Encode that image in base64
             with open(latest_screenshot, "rb") as file:

@@ -1,4 +1,5 @@
 openai
+Pillow
 pyirsdk
 elevenlabs
 customtkinter
