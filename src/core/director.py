@@ -64,7 +64,11 @@ class Director:
         self.recording_start_time = None
 
         # Create the commentary generator
-        self.commentary = commentary.Commentary(self.settings, self.ir)
+        self.commentary = commentary.Commentary(
+            self.settings,
+            self.ir, 
+            self.add_message
+        )
 
         # Create the camera manager
         self.camera = camera.Camera(self.ir)
@@ -233,7 +237,6 @@ class Director:
                     yelling=True,
                     rec_start_time=self.recording_start_time
                 )
-                self.add_message(f"Play-by-play: {commentary}")
 
                 # Occassionally, generate color commentary
                 chance = float(self.settings["commentary"]["color_chance"])
@@ -245,7 +248,6 @@ class Director:
                         yelling=True,
                         rec_start_time=self.recording_start_time
                     )
-                    self.add_message(f"Color: {commentary}")
 
                 # End this iteration of the loop
                 break
