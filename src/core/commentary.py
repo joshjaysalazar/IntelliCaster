@@ -75,6 +75,8 @@ class Commentary:
             yelling (bool): Whether or not to convert the text to yelling.
             rec_start_time (float): The time the recording started.
         """
+        # Get the start time of this method
+        start_time = time.time()
 
         # Get the timestamp
         timestamp = time.time() - rec_start_time
@@ -97,12 +99,17 @@ class Commentary:
         elif role == "color":
             voice = self.settings["commentary"]["color_voice"]
         
+        # Add the message to the message box
         self.add_message(f"{voice}: {text}")
 
+        # Calculate how long it took to generate the text
+        gpt_time = time.time() - start_time
+
         # Generate the audio
-        self.voice_generator.generate(
+        audio = self.voice_generator.generate(
             text=text,
             timestamp=timestamp,
+            gpt_time=gpt_time,
             yelling=yelling,
             voice=voice
         )
@@ -400,7 +407,7 @@ class VoiceGenerator:
         else:
             self.sample_rate = 44100
 
-    def generate(self, text, timestamp, yelling=False, voice="Harry"):
+    def generate(self, text, timestamp, gpt_time, yelling=False, voice="Harry"):
         """Generate and save audio for the provided text.
 
         Calls the ElevenLabs API to create audio from the text using the
@@ -412,6 +419,9 @@ class VoiceGenerator:
             yelling (bool): Whether or not to convert the text to yelling.
             voice (str): The voice to use for the audio.
         """
+        # Get the start time of this method
+        start_time = time.time()
+
         # Convert to yelling for voice commentary if requested
         if yelling:
             text = text.upper()
@@ -443,5 +453,9 @@ class VoiceGenerator:
         # Get the length of the audio file
         length = len(audio) / self.sample_rate
 
-        # Wait for the length of the audio
-        time.sleep(length)
+        # Calculate how long it took to generate the audio
+        gen_time = time.time() - start_time
+
+        # Wait for the length of the audio minus the time it took to generate
+        if length - gen_time - gpt_time > 0:
+            time.sleep(length - gen_time - gpt_time)
