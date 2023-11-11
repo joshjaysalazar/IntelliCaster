@@ -63,9 +63,12 @@ class Director:
         # Track recording start time
         self.recording_start_time = None
 
-        # Create the commentary generators
-        self.text_generator = commentary.TextGenerator(self.settings)
-        self.voice_generator = commentary.VoiceGenerator(self.settings)
+        # Create the commentary generator
+        self.commentary = commentary.Commentary(
+            self.settings,
+            self.ir, 
+            self.add_message
+        )
 
         # Create the camera manager
         self.camera = camera.Camera(self.ir)
@@ -225,55 +228,25 @@ class Director:
                 # Move the camera to focus on the overtaking driver
                 self.camera.change_camera(driver["number"], "TV1")
 
-                # Generate the text commentary
-                commentary = self.text_generator.generate(
+                # Generate the commentary
+                self.commentary.generate(
                     output,
                     "play-by-play",
                     "neutral",
-                    self.ir,
-                    "Be sure to include the position of the overtaking driver."
-                )
-                self.add_message(commentary)
-
-                # Get the timestamp
-                timestamp = time.time() - self.recording_start_time
-
-                # Convert the timestamp to milliseconds
-                timestamp = int(timestamp * 1000)
-
-                # Generate the voice commentary
-                self.voice_generator.generate(
-                    commentary,
-                    timestamp,
+                    "Be sure to include the position of the overtaking driver.",
                     yelling=True,
-                    voice=self.settings["commentary"]["pbp_voice"]
+                    rec_start_time=self.recording_start_time
                 )
 
                 # Occassionally, generate color commentary
                 chance = float(self.settings["commentary"]["color_chance"])
                 if random.random() < chance:
-
-                    # Generate the text commentary
-                    commentary = self.text_generator.generate(
+                    self.commentary.generate(
                         "Add color commentary to the previous overtake.",
                         "color",
                         "neutral",
-                        self.ir
-                    )
-                    self.add_message(commentary)
-
-                    # Get the timestamp
-                    timestamp = time.time() - self.recording_start_time
-
-                    # Convert the timestamp to milliseconds
-                    timestamp = int(timestamp * 1000)
-
-                    # Generate the voice commentary
-                    self.voice_generator.generate(
-                        commentary,
-                        timestamp,
                         yelling=True,
-                        voice=self.settings["commentary"]["color_voice"]
+                        rec_start_time=self.recording_start_time
                     )
 
                 # End this iteration of the loop
