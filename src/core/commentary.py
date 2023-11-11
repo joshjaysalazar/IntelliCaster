@@ -46,7 +46,15 @@ class Commentary:
         # Create the voice generator
         self.voice_generator = VoiceGenerator(self.settings)
 
-    def generate(self, event, role, tone, other_info="", yelling=False):
+    def generate(
+            self, 
+            event, 
+            role, 
+            tone, 
+            other_info="", 
+            yelling=False,
+            rec_start_time=0
+        ):
         """Generate commentary for the given event.
 
         Generates text commentary for the given event based on the provided
@@ -60,10 +68,11 @@ class Commentary:
             other_info (str): Additional information to be included in the
                 system message.
             yelling (bool): Whether or not to convert the text to yelling.
+            rec_start_time (float): The time the recording started.
         """
 
         # Get the timestamp
-        timestamp = time.time() - self.recording_start_time
+        timestamp = time.time() - rec_start_time
 
         # Convert the timestamp to milliseconds
         timestamp = int(timestamp * 1000)

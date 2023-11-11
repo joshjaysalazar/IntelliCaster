@@ -230,7 +230,8 @@ class Director:
                     "play-by-play",
                     "neutral",
                     "Be sure to include the position of the overtaking driver.",
-                    yelling=True
+                    yelling=True,
+                    rec_start_time=self.recording_start_time
                 )
                 self.add_message(f"Play-by-play: {commentary}")
 
@@ -241,7 +242,8 @@ class Director:
                         "Add color commentary to the previous overtake.",
                         "color",
                         "neutral",
-                        yelling=True
+                        yelling=True,
+                        rec_start_time=self.recording_start_time
                     )
                     self.add_message(f"Color: {commentary}")
 
