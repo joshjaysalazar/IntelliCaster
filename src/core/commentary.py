@@ -445,7 +445,7 @@ class VoiceGenerator:
         path = os.path.join(self.settings["general"]["iracing_path"], "videos")
 
         # Create the file name
-        file_name = f"commentary_{timestamp}.wav"
+        file_name = f"commentary_{timestamp}.mp3"
 
         # Save the audio to a file
         elevenlabs.save(audio, os.path.join(path, file_name))
