@@ -3,6 +3,7 @@ import os
 import time
 
 import elevenlabs
+from mutagen.mp3 import MP3
 import openai
 from PIL import Image
 import pyautogui
@@ -451,7 +452,8 @@ class VoiceGenerator:
         elevenlabs.save(audio, os.path.join(path, file_name))
 
         # Get the length of the audio file
-        length = len(audio) / self.sample_rate
+        mp3_file = MP3(os.path.join(path, file_name))
+        length = mp3_file.info.length
 
         # Calculate how long it took to generate the audio
         gen_time = time.time() - start_time
