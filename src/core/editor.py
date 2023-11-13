@@ -87,13 +87,13 @@ class Editor:
         # Get the iRacing videos folder
         path = os.path.join(self.settings["general"]["iracing_path"], "videos")
 
-        # Get a list of all of the .wav files in that folder
+        # Get a list of all of the .mp3 files in that folder
         files = []
         for file in os.listdir(path):
-            if file.endswith(".wav"):
+            if file.endswith(".mp3"):
                 files.append(os.path.join(path, file))
 
-        # Delete all of the .wav files
+        # Delete all of the .mp3 files
         for file in files:
             os.remove(file)
 
@@ -142,10 +142,10 @@ class Editor:
         # Get the iRacing videos folder
         path = os.path.join(self.settings["general"]["iracing_path"], "videos")
 
-        # Get a list of all of the .wav files in that folder
+        # Get a list of all of the .mp3 files in that folder
         files = []
         for file in os.listdir(path):
-            if file.endswith(".wav"):
+            if file.endswith(".mp3"):
                 files.append(os.path.join(path, file))
 
         audio_clips = []
@@ -155,7 +155,7 @@ class Editor:
 
             # Extract the timestamp from the file name
             timestamp = file_name.replace("commentary_", "")
-            timestamp = timestamp.replace(".wav", "")
+            timestamp = timestamp.replace(".mp3", "")
             timestamp = float(timestamp) / 1000
 
             # Create the audio clip

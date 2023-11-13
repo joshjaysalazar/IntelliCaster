@@ -6,3 +6,4 @@ pyirsdk
 elevenlabs
 customtkinter
 moviepy
+mutagen

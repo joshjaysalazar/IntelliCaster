@@ -3,6 +3,7 @@ import os
 import time
 
 import elevenlabs
+from mutagen.mp3 import MP3
 import openai
 from PIL import Image
 import pyautogui
@@ -75,6 +76,8 @@ class Commentary:
             yelling (bool): Whether or not to convert the text to yelling.
             rec_start_time (float): The time the recording started.
         """
+        # Get the start time of this method
+        start_time = time.time()
 
         # Get the timestamp
         timestamp = time.time() - rec_start_time
@@ -97,12 +100,17 @@ class Commentary:
         elif role == "color":
             voice = self.settings["commentary"]["color_voice"]
         
+        # Add the message to the message box
         self.add_message(f"{voice}: {text}")
 
+        # Calculate how long it took to generate the text
+        gpt_time = time.time() - start_time
+
         # Generate the audio
-        self.voice_generator.generate(
+        audio = self.voice_generator.generate(
             text=text,
             timestamp=timestamp,
+            gpt_time=gpt_time,
             yelling=yelling,
             voice=voice
         )
@@ -193,8 +201,6 @@ class TextGenerator:
             # Add play-by-play instructions
             new_msg += "You will respond with a single short sentence. "
             new_msg += "Do not provide too much detail. Focus on the action. "
-            new_msg += "Almost always refer to drivers by only their surname. "
-            new_msg += f"Use a {tone} tone. "
 
         elif role == "color":
             # Add the name to the system message
@@ -206,8 +212,12 @@ class TextGenerator:
             new_msg += "You will respond with one to two short sentences. "
             new_msg += "Stick to providing insight or context that enhances "
             new_msg += "the viewer's understanding. "
-            new_msg += "Usually refer to drivers by only their surname. "
-            new_msg += f"Use a {tone} tone. "
+
+        # Add common instructions
+        new_msg += "Almost always refer to drivers by only their surname. "
+        new_msg += f"Use a {tone} tone. "
+        new_msg += "Occasionally mention your co-commentator by name, but " \
+            "never refer to yourself by name. "
 
         # Add additional info to the end of the system message
         new_msg += other_info
@@ -322,7 +332,7 @@ class TextGenerator:
                         "type": "image_url",
                         "image_url": {
                             "url": f"data:image/jpeg;base64,{encoded_image}",
-                            "detail": "high"
+                            "detail": "low"
                         }
                     }
                 ]
@@ -377,8 +387,6 @@ class VoiceGenerator:
 
         Attributes:
             settings (ConfigParser): Settings parsed from an INI file.
-            tier (str): The user's subscription tier.
-            sample_rate (int): The sample rate to use for audio.
         """
         # Member variables
         self.settings = settings
@@ -386,21 +394,7 @@ class VoiceGenerator:
         # Set the API key
         elevenlabs.set_api_key(self.settings["keys"]["elevenlabs_api_key"])
 
-        # Get the user's subscription tier
-        user = elevenlabs.api.User.from_api()
-        self.tier = user.subscription.tier
-
-        # Set sample rate based on tier (used for time calculations)
-        if self.tier == "free":
-            self.sample_rate = 16000
-        elif self.tier == "starter":
-            self.sample_rate = 22050
-        elif self.tier == "creator":
-            self.sample_rate = 24000
-        else:
-            self.sample_rate = 44100
-
-    def generate(self, text, timestamp, yelling=False, voice="Harry"):
+    def generate(self, text, timestamp, gpt_time, yelling=False, voice="Harry"):
         """Generate and save audio for the provided text.
 
         Calls the ElevenLabs API to create audio from the text using the
@@ -412,6 +406,9 @@ class VoiceGenerator:
             yelling (bool): Whether or not to convert the text to yelling.
             voice (str): The voice to use for the audio.
         """
+        # Get the start time of this method
+        start_time = time.time()
+
         # Convert to yelling for voice commentary if requested
         if yelling:
             text = text.upper()
@@ -435,13 +432,18 @@ class VoiceGenerator:
         path = os.path.join(self.settings["general"]["iracing_path"], "videos")
 
         # Create the file name
-        file_name = f"commentary_{timestamp}.wav"
+        file_name = f"commentary_{timestamp}.mp3"
 
         # Save the audio to a file
         elevenlabs.save(audio, os.path.join(path, file_name))
 
         # Get the length of the audio file
-        length = len(audio) / self.sample_rate
+        mp3_file = MP3(os.path.join(path, file_name))
+        length = mp3_file.info.length
 
-        # Wait for the length of the audio
-        time.sleep(length)
+        # Calculate how long it took to generate the audio
+        gen_time = time.time() - start_time
+
+        # Wait for the length of the audio minus the time it took to generate
+        if length - gen_time - gpt_time > 0:
+            time.sleep(length - gen_time - gpt_time)
