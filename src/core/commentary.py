@@ -201,8 +201,6 @@ class TextGenerator:
             # Add play-by-play instructions
             new_msg += "You will respond with a single short sentence. "
             new_msg += "Do not provide too much detail. Focus on the action. "
-            new_msg += "Almost always refer to drivers by only their surname. "
-            new_msg += f"Use a {tone} tone. "
 
         elif role == "color":
             # Add the name to the system message
@@ -214,8 +212,12 @@ class TextGenerator:
             new_msg += "You will respond with one to two short sentences. "
             new_msg += "Stick to providing insight or context that enhances "
             new_msg += "the viewer's understanding. "
-            new_msg += "Usually refer to drivers by only their surname. "
-            new_msg += f"Use a {tone} tone. "
+
+        # Add common instructions
+        new_msg += "Almost always refer to drivers by only their surname. "
+        new_msg += f"Use a {tone} tone. "
+        new_msg += "Occasionally mention your co-commentator by name, but " \
+            "never refer to yourself by name. "
 
         # Add additional info to the end of the system message
         new_msg += other_info
@@ -385,28 +387,12 @@ class VoiceGenerator:
 
         Attributes:
             settings (ConfigParser): Settings parsed from an INI file.
-            tier (str): The user's subscription tier.
-            sample_rate (int): The sample rate to use for audio.
         """
         # Member variables
         self.settings = settings
 
         # Set the API key
         elevenlabs.set_api_key(self.settings["keys"]["elevenlabs_api_key"])
-
-        # Get the user's subscription tier
-        user = elevenlabs.api.User.from_api()
-        self.tier = user.subscription.tier
-
-        # Set sample rate based on tier (used for time calculations)
-        if self.tier == "free":
-            self.sample_rate = 16000
-        elif self.tier == "starter":
-            self.sample_rate = 22050
-        elif self.tier == "creator":
-            self.sample_rate = 24000
-        else:
-            self.sample_rate = 44100
 
     def generate(self, text, timestamp, gpt_time, yelling=False, voice="Harry"):
         """Generate and save audio for the provided text.
