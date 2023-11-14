@@ -680,6 +680,10 @@ class App(ctk.CTk):
             filetypes=(("JSON Files", "*.json"),)
         )
 
+        # Check to make sure file name was provided
+        if not file_name:
+            return
+
         # Save context to file
         with open(file_name, "w") as f:
             json.dump(self.context, f, indent=4)
