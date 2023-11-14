@@ -219,6 +219,7 @@ class App(ctk.CTk):
                 text (str): The text to display next to the dropdown.
                 options (list): A list of options to select from.
                 default (str): The default value to select in the dropdown.
+                variable (dict): The dictionary to add the dropdown to.
             """
             nonlocal row
 
@@ -279,6 +280,7 @@ class App(ctk.CTk):
                 text (str): The text to display next to the entry box.
                 default (str): The default value to insert into the entry box.
                 browse (bool): Whether or not to create a 'Browse' button.
+                variable (dict): The dictionary to add the entry box to.
             """
             def browse_dir():
                 """Open a file dialog to browse for a directory."""
@@ -362,6 +364,7 @@ class App(ctk.CTk):
             Args:
                 name (str): The name of the section to create.
                 text (str): The text to display in the section header.
+                variable (dict): The dictionary to add the section to.
             """
             nonlocal row
             nonlocal current_section
