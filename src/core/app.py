@@ -207,7 +207,7 @@ class App(ctk.CTk):
         current_section = ""
         self.current_settings = {}
 
-        def create_dropdown(name, text, options, default=None):
+        def create_dropdown(name, text, options, default=None, variable={}):
             """Create a dropdown for the settings frame.
             
             Creates a dropdown for the settings frame that is used to select
@@ -263,9 +263,9 @@ class App(ctk.CTk):
             row += 1
 
             # Add dropdown to current settings
-            self.current_settings[current_section][name] = drp
+            variable[current_section][name] = drp
 
-        def create_entry(name, text, default=None, browse=False):
+        def create_entry(name, text, default=None, browse=False, variable=None):
             """Create an entry box for the settings frame.
             
             Creates an entry box for the settings frame that is used to input
@@ -350,9 +350,9 @@ class App(ctk.CTk):
             row += 1
 
             # Add entry box to current settings
-            self.current_settings[current_section][name] = ent
+            variable[current_section][name] = ent
 
-        def create_section(name, text):
+        def create_section(name, text, variable=None):
             """Create a section header for the settings frame.
             
             Creates a section header for the settings frame that is used to
@@ -386,7 +386,7 @@ class App(ctk.CTk):
             row += 1
 
             # Add section to current settings
-            self.current_settings[name] = {}
+            variable[name] = {}
 
             # Update current section
             current_section = name
@@ -400,23 +400,37 @@ class App(ctk.CTk):
         self.frm_settings.grid_columnconfigure(1, weight=1)
 
         # Create API keys section
-        create_section("keys", "API Keys")
+        create_section("keys", "API Keys", self.current_settings)
 
         # Create API key entry box for OpenAI
         default = self.settings["keys"]["openai_api_key"]
-        create_entry("openai_api_key", "OpenAI API Key", default)
+        create_entry(
+            "openai_api_key",
+            "OpenAI API Key",
+            default,
+            variable=self.current_settings
+        )
 
         # Create API key entry box for ElevenLabs
         default = self.settings["keys"]["elevenlabs_api_key"]
-        create_entry("elevenlabs_api_key", "ElevenLabs API Key", default)
+        create_entry(
+            "elevenlabs_api_key",
+            "ElevenLabs API Key",
+            default,
+            variable=self.current_settings
+        )
 
         # Create iRacing section
-        create_section("general", "General")
+        create_section("general", "General", self.current_settings)
 
         # Create iRacing directory entry box
         default = self.settings["general"]["iracing_path"]
         create_entry(
-            "iracing_path", "iRacing Documents Directory", default, True
+            "iracing_path",
+            "iRacing Documents Directory",
+            default,
+            True,
+            variable=self.current_settings
         )
 
         # Create the video format dropdown
@@ -425,7 +439,8 @@ class App(ctk.CTk):
             "video_format",
             "Video Format",
             ["mp4", "wmv", "avi2", "avi"],
-            default
+            default,
+            self.current_settings
         )
 
         # Create the video framerate dropdown
@@ -434,7 +449,8 @@ class App(ctk.CTk):
             "video_framerate",
             "Video Framerate",
             ["30", "60"],
-            default
+            default,
+            self.current_settings
         )
 
         # Create the video resolution dropdown
@@ -443,18 +459,24 @@ class App(ctk.CTk):
             "video_resolution",
             "Video Resolution",
             ["1920x1080", "1280x720", "854x480"],
-            default
+            default,
+            self.current_settings
         )
 
         # Create Director section
-        create_section("director", "Director")
+        create_section("director", "Director", self.current_settings)
 
         # Create update frequency entry box
         default = self.settings["director"]["update_frequency"]
-        create_entry("update_frequency", "Update Frequency (seconds)", default)
+        create_entry(
+            "update_frequency",
+            "Update Frequency (seconds)",
+            default,
+            variable=self.current_settings
+        )
 
         # Create commentary section
-        create_section("commentary", "Commentary")
+        create_section("commentary", "Commentary", self.current_settings)
 
         # Create GPT model dropdown
         default = self.settings["commentary"]["gpt_model"]
@@ -462,7 +484,8 @@ class App(ctk.CTk):
             "gpt_model",
             "GPT Model",
             ["GPT-3.5 Turbo", "GPT-4 Turbo", "GPT-4 Turbo with Vision"],
-            default
+            default,
+            self.current_settings
         )
         
         # Get list of voices
@@ -474,7 +497,8 @@ class App(ctk.CTk):
             "pbp_voice",
             "Play-by-Play Voice",
             voice_list,
-            default
+            default,
+            self.current_settings
         )
 
         # Create color commentary voice dropdown
@@ -483,16 +507,27 @@ class App(ctk.CTk):
             "color_voice",
             "Color Commentary Voice",
             voice_list,
-            default
+            default,
+            self.current_settings
         )
 
         # Create color commentary chance entry box
         default = self.settings["commentary"]["color_chance"]
-        create_entry("color_chance", "Color Commentary Chance (%)", default)
+        create_entry(
+            "color_chance",
+            "Color Commentary Chance (%)",
+            default,
+            variable=self.current_settings
+        )
 
         # Create memory limit entry box
         default = self.settings["commentary"]["memory_limit"]
-        create_entry("memory_limit", "Memory Limit (messages)", default)
+        create_entry(
+            "memory_limit",
+            "Memory Limit (messages)",
+            default,
+            variable=self.current_settings
+        )
 
         # Create save settings button
         self.btn_save_settings = ctk.CTkButton(
