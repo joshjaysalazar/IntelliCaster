@@ -38,7 +38,12 @@ class App(ctk.CTk):
         
         # Member variables
         self.settings = settings
-        self.context = {"league": {}}
+        
+        # Load context from file
+        self.load_context(
+            file=self.settings["system"]["context_file"],
+            startup=True
+        )
 
         # Set window properties
         ctk.set_appearance_mode("Dark")
@@ -147,7 +152,7 @@ class App(ctk.CTk):
         )
 
         # Create league name entry box
-        default = "My Awesome League"
+        default = self.context["league"]["name"]
         self.create_entry(
             self.frm_context,
             "name",
@@ -157,7 +162,7 @@ class App(ctk.CTk):
         )
 
         # Create league short name entry box
-        default = "MAL"
+        default = self.context["league"]["short_name"]
         self.create_entry(
             self.frm_context,
             "short_name",
@@ -657,7 +662,7 @@ class App(ctk.CTk):
         del self.row
         del self.current_section
     
-    def load_context(self, event=None, file=None):
+    def load_context(self, event=None, file=None, startup=False):
         """Load context from a context.json file.
 
         This method opens a file dialog to allow users to select a JSON file
@@ -669,6 +674,15 @@ class App(ctk.CTk):
             event: Not used, but included for compatibility with button clicks.
             file (str): The name of the file to load context from.
         """
+        # If startup flag is set, just load the context into the dictionary
+        if startup:
+            # Load context from file
+            with open(file, "r") as f:
+                self.context = json.load(f)
+
+            # End method
+            return
+        
         # Open file dialog
         if not file:
             file = filedialog.askopenfilename(
