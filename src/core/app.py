@@ -115,8 +115,11 @@ class App(ctk.CTk):
         self.btn_start_stop.pack(padx=20, pady=20)
 
     def create_context(self):
-        row = 0
-        current_section = ""
+        # Temporary variables
+        self.row = 0
+        self.current_section = ""
+
+        # Create context dictionary
         self.current_context = {}
 
         # Create content frame
@@ -127,7 +130,47 @@ class App(ctk.CTk):
         )
         self.frm_context.grid_columnconfigure(1, weight=1)
 
-    def create_dropdown(self, name, text, options, default=None, variable={}):
+        # Create league section
+        self.create_section(
+            self.frm_context,
+            "league",
+            "League",
+            self.current_context
+        )
+
+        # Create league name entry box
+        default = "My Awesome League"
+        self.create_entry(
+            self.frm_context,
+            "name",
+            "Name",
+            default,
+            variable=self.current_context
+        )
+
+        # Create league short name entry box
+        default = "MAL"
+        self.create_entry(
+            self.frm_context,
+            "short_name",
+            "Short Name",
+            default,
+            variable=self.current_context
+        )
+
+        # Delete temporary variables
+        del self.row
+        del self.current_section
+
+    def create_dropdown(
+        self,
+        master,
+        name,
+        text,
+        options,
+        default=None,
+        variable={}
+    ):
         """Create a dropdown for the frame.
         
         Creates a dropdown for the frame that is used to select from a list of
@@ -143,7 +186,7 @@ class App(ctk.CTk):
 
         # Create label
         lbl = ctk.CTkLabel(
-            master=self.frm_settings,
+            master=master,
             text=text,
             font=ctk.CTkFont(size=14)
         )
@@ -159,7 +202,7 @@ class App(ctk.CTk):
 
         # Create dropdown
         drp = ctk.CTkOptionMenu(
-            master=self.frm_settings,
+            master=master,
             values=options,
             font=ctk.CTkFont(size=14)
         )
@@ -184,7 +227,15 @@ class App(ctk.CTk):
         # Add dropdown to current settings
         variable[self.current_section][name] = drp
 
-    def create_entry(self, name, text, default=None, browse=False, variable={}):
+    def create_entry(
+        self,
+        master,
+        name,
+        text,
+        default=None,
+        browse=False,
+        variable={}
+    ):
         """Create an entry box for the frame.
         
         Creates an entry box for the frame that is used to input various
@@ -210,7 +261,7 @@ class App(ctk.CTk):
 
         # Create label
         lbl = ctk.CTkLabel(
-            master=self.frm_settings,
+            master=master,
             text=text,
             font=ctk.CTkFont(size=14)
         )
@@ -226,7 +277,7 @@ class App(ctk.CTk):
 
         # Create entry box
         ent = ctk.CTkEntry(
-            master=self.frm_settings,
+            master=master,
             font=ctk.CTkFont(size=14)
         )
 
@@ -247,7 +298,7 @@ class App(ctk.CTk):
         # If browse button is requested, create it
         if browse:
             btn = ctk.CTkButton(
-                master=self.frm_settings,
+                master=master,
                 text="Browse",
                 width=100,
                 font=ctk.CTkFont(size=14),
@@ -338,7 +389,7 @@ class App(ctk.CTk):
         )
         self.btn_settings.grid(row=3, column=0, sticky="ew")
     
-    def create_section(self, name, text, variable={}):
+    def create_section(self, master, name, text, variable={}):
         """Create a section header for the frame.
         
         Creates a section header for the frame that is used to separate
@@ -353,7 +404,7 @@ class App(ctk.CTk):
 
         # Create label
         lbl = ctk.CTkLabel(
-            master=self.frm_settings,
+            master=master,
             text=text,
             font=ctk.CTkFont(size=18, weight="bold")
         )
@@ -399,11 +450,17 @@ class App(ctk.CTk):
         self.frm_settings.grid_columnconfigure(1, weight=1)
 
         # Create API keys section
-        self.create_section("keys", "API Keys", self.current_settings)
+        self.create_section(
+            self.frm_settings,
+            "keys",
+            "API Keys",
+            self.current_settings
+        )
 
         # Create API key entry box for OpenAI
         default = self.settings["keys"]["openai_api_key"]
         self.create_entry(
+            self.frm_settings,
             "openai_api_key",
             "OpenAI API Key",
             default,
@@ -413,6 +470,7 @@ class App(ctk.CTk):
         # Create API key entry box for ElevenLabs
         default = self.settings["keys"]["elevenlabs_api_key"]
         self.create_entry(
+            self.frm_settings,
             "elevenlabs_api_key",
             "ElevenLabs API Key",
             default,
@@ -420,11 +478,17 @@ class App(ctk.CTk):
         )
 
         # Create iRacing section
-        self.create_section("general", "General", self.current_settings)
+        self.create_section(
+            self.frm_settings,
+            "general",
+            "General",
+            self.current_settings
+        )
 
         # Create iRacing directory entry box
         default = self.settings["general"]["iracing_path"]
         self.create_entry(
+            self.frm_settings,
             "iracing_path",
             "iRacing Documents Directory",
             default,
@@ -435,6 +499,7 @@ class App(ctk.CTk):
         # Create the video format dropdown
         default = self.settings["general"]["video_format"]
         self.create_dropdown(
+            self.frm_settings,
             "video_format",
             "Video Format",
             ["mp4", "wmv", "avi2", "avi"],
@@ -445,6 +510,7 @@ class App(ctk.CTk):
         # Create the video framerate dropdown
         default = self.settings["general"]["video_framerate"]
         self.create_dropdown(
+            self.frm_settings,
             "video_framerate",
             "Video Framerate",
             ["30", "60"],
@@ -455,6 +521,7 @@ class App(ctk.CTk):
         # Create the video resolution dropdown
         default = self.settings["general"]["video_resolution"]
         self.create_dropdown(
+            self.frm_settings,
             "video_resolution",
             "Video Resolution",
             ["1920x1080", "1280x720", "854x480"],
@@ -463,11 +530,17 @@ class App(ctk.CTk):
         )
 
         # Create Director section
-        self.create_section("director", "Director", self.current_settings)
+        self.create_section(
+            self.frm_settings, 
+            "director",
+            "Director",
+            self.current_settings
+        )
 
         # Create update frequency entry box
         default = self.settings["director"]["update_frequency"]
         self.create_entry(
+            self.frm_settings,
             "update_frequency",
             "Update Frequency (seconds)",
             default,
@@ -475,11 +548,17 @@ class App(ctk.CTk):
         )
 
         # Create commentary section
-        self.create_section("commentary", "Commentary", self.current_settings)
+        self.create_section(
+            self.frm_settings, 
+            "commentary",
+            "Commentary",
+            self.current_settings
+        )
 
         # Create GPT model dropdown
         default = self.settings["commentary"]["gpt_model"]
         self.create_dropdown(
+            self.frm_settings,
             "gpt_model",
             "GPT Model",
             ["GPT-3.5 Turbo", "GPT-4 Turbo", "GPT-4 Turbo with Vision"],
@@ -493,6 +572,7 @@ class App(ctk.CTk):
         # Create play-by-play voice dropdown
         default = self.settings["commentary"]["pbp_voice"]
         self.create_dropdown(
+            self.frm_settings,
             "pbp_voice",
             "Play-by-Play Voice",
             voice_list,
@@ -503,6 +583,7 @@ class App(ctk.CTk):
         # Create color commentary voice dropdown
         default = self.settings["commentary"]["color_voice"]
         self.create_dropdown(
+            self.frm_settings,
             "color_voice",
             "Color Commentary Voice",
             voice_list,
@@ -513,6 +594,7 @@ class App(ctk.CTk):
         # Create color commentary chance entry box
         default = self.settings["commentary"]["color_chance"]
         self.create_entry(
+            self.frm_settings,
             "color_chance",
             "Color Commentary Chance (%)",
             default,
@@ -522,6 +604,7 @@ class App(ctk.CTk):
         # Create memory limit entry box
         default = self.settings["commentary"]["memory_limit"]
         self.create_entry(
+            self.frm_settings,
             "memory_limit",
             "Memory Limit (messages)",
             default,
