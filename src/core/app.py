@@ -51,6 +51,7 @@ class App(ctk.CTk):
         # Create widgets
         self.create_navigation()
         self.create_home()
+        self.create_context()
         self.create_settings()
 
         # Select home frame
@@ -113,6 +114,15 @@ class App(ctk.CTk):
         )
         self.btn_start_stop.pack(padx=20, pady=20)
 
+    def create_context(self):
+        # Create content frame
+        self.frm_context = ctk.CTkScrollableFrame(
+            master=self,
+            corner_radius=0,
+            fg_color="transparent"
+        )
+        self.frm_context.grid_columnconfigure(1, weight=1)
+
     def create_navigation(self):
         """Create the navigation frame and its components.
     
@@ -123,7 +133,7 @@ class App(ctk.CTk):
         # Create navigation frame
         self.frm_navigation = ctk.CTkFrame(master=self, corner_radius=0)
         self.frm_navigation.grid(row=0, column=0, sticky="nsew")
-        self.frm_navigation.grid_rowconfigure(3, weight=1)
+        self.frm_navigation.grid_rowconfigure(4, weight=1)
 
         # Create title label
         self.lbl_title = ctk.CTkLabel(
@@ -150,6 +160,22 @@ class App(ctk.CTk):
         )
         self.btn_home.grid(row=1, column=0, sticky="ew")
 
+        # Create context button
+        self.btn_context = ctk.CTkButton(
+            master=self.frm_navigation,
+            text="Context",
+            corner_radius=0,
+            height=40,
+            border_spacing=20,
+            fg_color="transparent",
+            text_color=("gray10", "gray90"),
+            hover_color=("gray70", "gray30"),
+            font=ctk.CTkFont(size=18, weight="bold"),
+            anchor="w",
+            command=lambda: self.show_frame(frame="context")
+        )
+        self.btn_context.grid(row=2, column=0, sticky="ew")
+
         # Create settings button
         self.btn_settings = ctk.CTkButton(
             master=self.frm_navigation,
@@ -164,7 +190,7 @@ class App(ctk.CTk):
             anchor="w",
             command=lambda: self.show_frame(frame="settings")
         )
-        self.btn_settings.grid(row=2, column=0, sticky="ew")
+        self.btn_settings.grid(row=3, column=0, sticky="ew")
     
     def create_settings(self):
         """Create the settings frame and its components.
@@ -549,6 +575,10 @@ class App(ctk.CTk):
             self.frm_home.grid(row=0, column=1, sticky="nsew")
         else:
             self.frm_home.grid_forget()
+        if frame == "context":
+            self.frm_context.grid(row=0, column=1, sticky="nsew")
+        else:
+            self.frm_context.grid_forget()
         if frame == "settings":
             self.frm_settings.grid(row=0, column=1, sticky="nsew")
         else:
