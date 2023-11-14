@@ -203,8 +203,11 @@ class App(ctk.CTk):
         settings. It also includes a 'Save Settings' button to preserve these
         settings.
         """
-        row = 0
-        current_section = ""
+        # Temporary variables
+        self.row = 0
+        self.current_section = ""
+
+        # Create settings dictionary
         self.current_settings = {}
 
         def create_dropdown(name, text, options, default=None, variable={}):
@@ -221,7 +224,6 @@ class App(ctk.CTk):
                 default (str): The default value to select in the dropdown.
                 variable (dict): The dictionary to add the dropdown to.
             """
-            nonlocal row
 
             # Create label
             lbl = ctk.CTkLabel(
@@ -232,7 +234,7 @@ class App(ctk.CTk):
 
             # Grid label
             lbl.grid(
-                row=row,
+                row=self.row,
                 column=0,
                 sticky="e",
                 padx=20,
@@ -252,7 +254,7 @@ class App(ctk.CTk):
 
             # Grid dropdown
             drp.grid(
-                row=row,
+                row=self.row,
                 column=1,
                 sticky="ew",
                 padx=(0, 20),
@@ -261,10 +263,10 @@ class App(ctk.CTk):
             )
 
             # Increment row
-            row += 1
+            self.row += 1
 
             # Add dropdown to current settings
-            variable[current_section][name] = drp
+            variable[self.current_section][name] = drp
 
         def create_entry(name, text, default=None, browse=False, variable=None):
             """Create an entry box for the settings frame.
@@ -291,8 +293,6 @@ class App(ctk.CTk):
                 ent.delete(0, "end")
                 ent.insert(0, directory)
 
-            nonlocal row
-
             # Create label
             lbl = ctk.CTkLabel(
                 master=self.frm_settings,
@@ -302,7 +302,7 @@ class App(ctk.CTk):
 
             # Grid label
             lbl.grid(
-                row=row,
+                row=self.row,
                 column=0,
                 sticky="e",
                 padx=20,
@@ -321,7 +321,7 @@ class App(ctk.CTk):
 
             # Grid entry box
             ent.grid(
-                row=row,
+                row=self.row,
                 column=1,
                 sticky="ew",
                 padx=(0, 20),
@@ -341,7 +341,7 @@ class App(ctk.CTk):
 
                 # Grid browse button
                 btn.grid(
-                    row=row,
+                    row=self.row,
                     column=2,
                     sticky="ew",
                     padx=(0, 20),
@@ -349,10 +349,10 @@ class App(ctk.CTk):
                 )
 
             # Increment row
-            row += 1
+            self.row += 1
 
             # Add entry box to current settings
-            variable[current_section][name] = ent
+            variable[self.current_section][name] = ent
 
         def create_section(name, text, variable=None):
             """Create a section header for the settings frame.
@@ -366,8 +366,6 @@ class App(ctk.CTk):
                 text (str): The text to display in the section header.
                 variable (dict): The dictionary to add the section to.
             """
-            nonlocal row
-            nonlocal current_section
 
             # Create label
             lbl = ctk.CTkLabel(
@@ -378,7 +376,7 @@ class App(ctk.CTk):
 
             # Grid label
             lbl.grid(
-                row=row,
+                row=self.row,
                 column=0,
                 columnspan=3,
                 sticky="ew",
@@ -386,13 +384,13 @@ class App(ctk.CTk):
             )
 
             # Increment row
-            row += 1
+            self.row += 1
 
             # Add section to current settings
             variable[name] = {}
 
             # Update current section
-            current_section = name
+            self.current_section = name
 
         # Create content frame
         self.frm_settings = ctk.CTkScrollableFrame(
@@ -541,14 +539,17 @@ class App(ctk.CTk):
             command=self.save_settings
         )
         self.btn_save_settings.grid(
-            row=row,
+            row=self.row,
             column=0,
             columnspan=3,
             sticky="ew",
             padx=20,
             pady=20
         )
-        row += 1
+        
+        # Delete temporary variables
+        del self.row
+        del self.current_section
     
     def save_settings(self, event=None):
         """Save settings from entry boxes to a settings.ini file.
