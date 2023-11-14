@@ -127,6 +127,148 @@ class App(ctk.CTk):
         )
         self.frm_context.grid_columnconfigure(1, weight=1)
 
+    def create_dropdown(self, name, text, options, default=None, variable={}):
+        """Create a dropdown for the frame.
+        
+        Creates a dropdown for the frame that is used to select from a list of
+        options. If a default value is provided, it is selected in the dropdown.
+        
+        Args:
+            name (str): The name of the dropdown to create.
+            text (str): The text to display next to the dropdown.
+            options (list): A list of options to select from.
+            default (str): The default value to select in the dropdown.
+            variable (dict): The dictionary to add the dropdown to.
+        """
+
+        # Create label
+        lbl = ctk.CTkLabel(
+            master=self.frm_settings,
+            text=text,
+            font=ctk.CTkFont(size=14)
+        )
+
+        # Grid label
+        lbl.grid(
+            row=self.row,
+            column=0,
+            sticky="e",
+            padx=20,
+            pady=(0, 20)
+        )
+
+        # Create dropdown
+        drp = ctk.CTkOptionMenu(
+            master=self.frm_settings,
+            values=options,
+            font=ctk.CTkFont(size=14)
+        )
+
+        # If default value is provided, select it in the dropdown
+        if default:
+            drp.set(default)
+
+        # Grid dropdown
+        drp.grid(
+            row=self.row,
+            column=1,
+            sticky="ew",
+            padx=(0, 20),
+            pady=(0, 20),
+            columnspan=2
+        )
+
+        # Increment row
+        self.row += 1
+
+        # Add dropdown to current settings
+        variable[self.current_section][name] = drp
+
+    def create_entry(self, name, text, default=None, browse=False, variable={}):
+        """Create an entry box for the frame.
+        
+        Creates an entry box for the frame that is used to input various
+        settings. If a default value is provided, it is inserted into the entry
+        box. If the browse flag is set to True, a 'Browse' button is created
+        next to the entry box that allows users to browse for a directory.
+        
+        Args:
+            name (str): The name of the entry box to create.
+            text (str): The text to display next to the entry box.
+            default (str): The default value to insert into the entry box.
+            browse (bool): Whether or not to create a 'Browse' button.
+            variable (dict): The dictionary to add the entry box to.
+        """
+        def browse_dir():
+            """Open a file dialog to browse for a directory."""
+            # Get directory
+            directory = filedialog.askdirectory()
+
+            # Insert directory into entry box
+            ent.delete(0, "end")
+            ent.insert(0, directory)
+
+        # Create label
+        lbl = ctk.CTkLabel(
+            master=self.frm_settings,
+            text=text,
+            font=ctk.CTkFont(size=14)
+        )
+
+        # Grid label
+        lbl.grid(
+            row=self.row,
+            column=0,
+            sticky="e",
+            padx=20,
+            pady=(0, 20)
+        )
+
+        # Create entry box
+        ent = ctk.CTkEntry(
+            master=self.frm_settings,
+            font=ctk.CTkFont(size=14)
+        )
+
+        # If default value is provided, insert it into the entry box
+        if default:
+            ent.insert(0, default)
+
+        # Grid entry box
+        ent.grid(
+            row=self.row,
+            column=1,
+            sticky="ew",
+            padx=(0, 20),
+            pady=(0, 20),
+            columnspan=1 if browse else 2
+        )
+
+        # If browse button is requested, create it
+        if browse:
+            btn = ctk.CTkButton(
+                master=self.frm_settings,
+                text="Browse",
+                width=100,
+                font=ctk.CTkFont(size=14),
+                command=browse_dir
+            )
+
+            # Grid browse button
+            btn.grid(
+                row=self.row,
+                column=2,
+                sticky="ew",
+                padx=(0, 20),
+                pady=(0, 20)
+            )
+
+        # Increment row
+        self.row += 1
+
+        # Add entry box to current settings
+        variable[self.current_section][name] = ent
+
     def create_navigation(self):
         """Create the navigation frame and its components.
     
@@ -196,6 +338,44 @@ class App(ctk.CTk):
         )
         self.btn_settings.grid(row=3, column=0, sticky="ew")
     
+    def create_section(self, name, text, variable={}):
+        """Create a section header for the frame.
+        
+        Creates a section header for the frame that is used to separate
+        different sections of the frame. The section header is a label with a
+        bold font and a large font size.
+        
+        Args:
+            name (str): The name of the section to create.
+            text (str): The text to display in the section header.
+            variable (dict): The dictionary to add the section to.
+        """
+
+        # Create label
+        lbl = ctk.CTkLabel(
+            master=self.frm_settings,
+            text=text,
+            font=ctk.CTkFont(size=18, weight="bold")
+        )
+
+        # Grid label
+        lbl.grid(
+            row=self.row,
+            column=0,
+            columnspan=3,
+            sticky="ew",
+            pady=20
+        )
+
+        # Increment row
+        self.row += 1
+
+        # Add section to current settings
+        variable[name] = {}
+
+        # Update current section
+        self.current_section = name
+
     def create_settings(self):
         """Create the settings frame and its components.
     
@@ -210,188 +390,6 @@ class App(ctk.CTk):
         # Create settings dictionary
         self.current_settings = {}
 
-        def create_dropdown(name, text, options, default=None, variable={}):
-            """Create a dropdown for the settings frame.
-            
-            Creates a dropdown for the settings frame that is used to select
-            from a list of options. If a default value is provided, it is
-            selected in the dropdown.
-            
-            Args:
-                name (str): The name of the dropdown to create.
-                text (str): The text to display next to the dropdown.
-                options (list): A list of options to select from.
-                default (str): The default value to select in the dropdown.
-                variable (dict): The dictionary to add the dropdown to.
-            """
-
-            # Create label
-            lbl = ctk.CTkLabel(
-                master=self.frm_settings,
-                text=text,
-                font=ctk.CTkFont(size=14)
-            )
-
-            # Grid label
-            lbl.grid(
-                row=self.row,
-                column=0,
-                sticky="e",
-                padx=20,
-                pady=(0, 20)
-            )
-
-            # Create dropdown
-            drp = ctk.CTkOptionMenu(
-                master=self.frm_settings,
-                values=options,
-                font=ctk.CTkFont(size=14)
-            )
-
-            # If default value is provided, select it in the dropdown
-            if default:
-                drp.set(default)
-
-            # Grid dropdown
-            drp.grid(
-                row=self.row,
-                column=1,
-                sticky="ew",
-                padx=(0, 20),
-                pady=(0, 20),
-                columnspan=2
-            )
-
-            # Increment row
-            self.row += 1
-
-            # Add dropdown to current settings
-            variable[self.current_section][name] = drp
-
-        def create_entry(name, text, default=None, browse=False, variable=None):
-            """Create an entry box for the settings frame.
-            
-            Creates an entry box for the settings frame that is used to input
-            various settings. If a default value is provided, it is
-            inserted into the entry box. If the browse flag is set to True, a
-            'Browse' button is created next to the entry box that allows users
-            to browse for a directory.
-            
-            Args:
-                name (str): The name of the entry box to create.
-                text (str): The text to display next to the entry box.
-                default (str): The default value to insert into the entry box.
-                browse (bool): Whether or not to create a 'Browse' button.
-                variable (dict): The dictionary to add the entry box to.
-            """
-            def browse_dir():
-                """Open a file dialog to browse for a directory."""
-                # Get directory
-                directory = filedialog.askdirectory()
-
-                # Insert directory into entry box
-                ent.delete(0, "end")
-                ent.insert(0, directory)
-
-            # Create label
-            lbl = ctk.CTkLabel(
-                master=self.frm_settings,
-                text=text,
-                font=ctk.CTkFont(size=14)
-            )
-
-            # Grid label
-            lbl.grid(
-                row=self.row,
-                column=0,
-                sticky="e",
-                padx=20,
-                pady=(0, 20)
-            )
-
-            # Create entry box
-            ent = ctk.CTkEntry(
-                master=self.frm_settings,
-                font=ctk.CTkFont(size=14)
-            )
-
-            # If default value is provided, insert it into the entry box
-            if default:
-                ent.insert(0, default)
-
-            # Grid entry box
-            ent.grid(
-                row=self.row,
-                column=1,
-                sticky="ew",
-                padx=(0, 20),
-                pady=(0, 20),
-                columnspan=1 if browse else 2
-            )
-
-            # If browse button is requested, create it
-            if browse:
-                btn = ctk.CTkButton(
-                    master=self.frm_settings,
-                    text="Browse",
-                    width=100,
-                    font=ctk.CTkFont(size=14),
-                    command=browse_dir
-                )
-
-                # Grid browse button
-                btn.grid(
-                    row=self.row,
-                    column=2,
-                    sticky="ew",
-                    padx=(0, 20),
-                    pady=(0, 20)
-                )
-
-            # Increment row
-            self.row += 1
-
-            # Add entry box to current settings
-            variable[self.current_section][name] = ent
-
-        def create_section(name, text, variable=None):
-            """Create a section header for the settings frame.
-            
-            Creates a section header for the settings frame that is used to
-            separate different sections of the settings frame. The section
-            header is a label with a bold font and a large font size.
-            
-            Args:
-                name (str): The name of the section to create.
-                text (str): The text to display in the section header.
-                variable (dict): The dictionary to add the section to.
-            """
-
-            # Create label
-            lbl = ctk.CTkLabel(
-                master=self.frm_settings,
-                text=text,
-                font=ctk.CTkFont(size=18, weight="bold")
-            )
-
-            # Grid label
-            lbl.grid(
-                row=self.row,
-                column=0,
-                columnspan=3,
-                sticky="ew",
-                pady=20
-            )
-
-            # Increment row
-            self.row += 1
-
-            # Add section to current settings
-            variable[name] = {}
-
-            # Update current section
-            self.current_section = name
-
         # Create content frame
         self.frm_settings = ctk.CTkScrollableFrame(
             master=self,
@@ -401,11 +399,11 @@ class App(ctk.CTk):
         self.frm_settings.grid_columnconfigure(1, weight=1)
 
         # Create API keys section
-        create_section("keys", "API Keys", self.current_settings)
+        self.create_section("keys", "API Keys", self.current_settings)
 
         # Create API key entry box for OpenAI
         default = self.settings["keys"]["openai_api_key"]
-        create_entry(
+        self.create_entry(
             "openai_api_key",
             "OpenAI API Key",
             default,
@@ -414,7 +412,7 @@ class App(ctk.CTk):
 
         # Create API key entry box for ElevenLabs
         default = self.settings["keys"]["elevenlabs_api_key"]
-        create_entry(
+        self.create_entry(
             "elevenlabs_api_key",
             "ElevenLabs API Key",
             default,
@@ -422,11 +420,11 @@ class App(ctk.CTk):
         )
 
         # Create iRacing section
-        create_section("general", "General", self.current_settings)
+        self.create_section("general", "General", self.current_settings)
 
         # Create iRacing directory entry box
         default = self.settings["general"]["iracing_path"]
-        create_entry(
+        self.create_entry(
             "iracing_path",
             "iRacing Documents Directory",
             default,
@@ -436,7 +434,7 @@ class App(ctk.CTk):
 
         # Create the video format dropdown
         default = self.settings["general"]["video_format"]
-        create_dropdown(
+        self.create_dropdown(
             "video_format",
             "Video Format",
             ["mp4", "wmv", "avi2", "avi"],
@@ -446,7 +444,7 @@ class App(ctk.CTk):
 
         # Create the video framerate dropdown
         default = self.settings["general"]["video_framerate"]
-        create_dropdown(
+        self.create_dropdown(
             "video_framerate",
             "Video Framerate",
             ["30", "60"],
@@ -456,7 +454,7 @@ class App(ctk.CTk):
 
         # Create the video resolution dropdown
         default = self.settings["general"]["video_resolution"]
-        create_dropdown(
+        self.create_dropdown(
             "video_resolution",
             "Video Resolution",
             ["1920x1080", "1280x720", "854x480"],
@@ -465,11 +463,11 @@ class App(ctk.CTk):
         )
 
         # Create Director section
-        create_section("director", "Director", self.current_settings)
+        self.create_section("director", "Director", self.current_settings)
 
         # Create update frequency entry box
         default = self.settings["director"]["update_frequency"]
-        create_entry(
+        self.create_entry(
             "update_frequency",
             "Update Frequency (seconds)",
             default,
@@ -477,11 +475,11 @@ class App(ctk.CTk):
         )
 
         # Create commentary section
-        create_section("commentary", "Commentary", self.current_settings)
+        self.create_section("commentary", "Commentary", self.current_settings)
 
         # Create GPT model dropdown
         default = self.settings["commentary"]["gpt_model"]
-        create_dropdown(
+        self.create_dropdown(
             "gpt_model",
             "GPT Model",
             ["GPT-3.5 Turbo", "GPT-4 Turbo", "GPT-4 Turbo with Vision"],
@@ -494,7 +492,7 @@ class App(ctk.CTk):
 
         # Create play-by-play voice dropdown
         default = self.settings["commentary"]["pbp_voice"]
-        create_dropdown(
+        self.create_dropdown(
             "pbp_voice",
             "Play-by-Play Voice",
             voice_list,
@@ -504,7 +502,7 @@ class App(ctk.CTk):
 
         # Create color commentary voice dropdown
         default = self.settings["commentary"]["color_voice"]
-        create_dropdown(
+        self.create_dropdown(
             "color_voice",
             "Color Commentary Voice",
             voice_list,
@@ -514,7 +512,7 @@ class App(ctk.CTk):
 
         # Create color commentary chance entry box
         default = self.settings["commentary"]["color_chance"]
-        create_entry(
+        self.create_entry(
             "color_chance",
             "Color Commentary Chance (%)",
             default,
@@ -523,7 +521,7 @@ class App(ctk.CTk):
 
         # Create memory limit entry box
         default = self.settings["commentary"]["memory_limit"]
-        create_entry(
+        self.create_entry(
             "memory_limit",
             "Memory Limit (messages)",
             default,
