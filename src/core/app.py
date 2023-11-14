@@ -678,6 +678,9 @@ class App(ctk.CTk):
         with open("context.json", "w") as f:
             json.dump(self.context, f, indent=4)
 
+        # Update context file in settings
+        self.settings["system"]["context_file"] = "context.json"
+
         # Add message
         self.add_message("Context saved!")
 

@@ -60,6 +60,10 @@ def create_settings_file(file_name):
         config.set("commentary", "color_chance", "0.5")
         config.set("commentary", "memory_limit", "10")
 
+        # Set up system section
+        config.add_section("system")
+        config.set("system", "context_file", "context.json")
+
         # Write to file
         with open(file_name, "w") as config_file:
             config.write(config_file)
