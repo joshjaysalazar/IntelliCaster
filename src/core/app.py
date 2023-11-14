@@ -674,12 +674,18 @@ class App(ctk.CTk):
                 new_setting = self.current_context[key][setting].get()
                 self.context[key][setting] = new_setting
 
+        # Open save as dialog
+        file_name = filedialog.asksaveasfilename(
+            defaultextension=".json",
+            filetypes=(("JSON Files", "*.json"),)
+        )
+
         # Save context to file
-        with open("context.json", "w") as f:
+        with open(file_name, "w") as f:
             json.dump(self.context, f, indent=4)
 
         # Update context file in settings
-        self.settings["system"]["context_file"] = "context.json"
+        self.settings["system"]["context_file"] = file_name
 
         # Save settings to file
         with open("settings.ini", "w") as f:
