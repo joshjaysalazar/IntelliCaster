@@ -245,7 +245,7 @@ class TextGenerator:
             if len(self.context["league"]["short_name"].split()) == 1:
                 short_name = ""
                 for letter in self.context["league"]["short_name"]:
-                    short_name += f"{letter}-"
+                    short_name += f"{letter.upper()}-"
 
                 # Remove the last hyphen
                 short_name = short_name[:-1]
