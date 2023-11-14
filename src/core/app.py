@@ -1,3 +1,4 @@
+import json
 from tkinter import filedialog
 import threading
 
@@ -37,6 +38,12 @@ class App(ctk.CTk):
         
         # Member variables
         self.settings = settings
+        
+        # Load context from file
+        self.load_context(
+            file=self.settings["system"]["context_file"],
+            startup=True
+        )
 
         # Set window properties
         ctk.set_appearance_mode("Dark")
@@ -51,13 +58,18 @@ class App(ctk.CTk):
         # Create widgets
         self.create_navigation()
         self.create_home()
+        self.create_context()
         self.create_settings()
 
         # Select home frame
         self.show_frame(frame="home")
 
         # Create the director
-        self.director = director.Director(self.settings, self.add_message)
+        self.director = director.Director(
+            self.settings,
+            self.context,
+            self.add_message
+        )
 
         # Create the editor
         self.editor = editor.Editor(self.settings)
@@ -113,6 +125,252 @@ class App(ctk.CTk):
         )
         self.btn_start_stop.pack(padx=20, pady=20)
 
+    def create_context(self):
+        """Create the context frame and its components.
+
+        Sets up a frame for the 'Context' tab that allows users to input
+        context for the commentary. It also includes a 'Save Context' button to
+        preserve these settings, and a 'Load Context' button to load context.
+        """
+        # Temporary variables
+        self.row = 0
+        self.current_section = ""
+
+        # Create context dictionary
+        self.current_context = {}
+
+        # Create content frame
+        self.frm_context = ctk.CTkScrollableFrame(
+            master=self,
+            corner_radius=0,
+            fg_color="transparent"
+        )
+        self.frm_context.grid_columnconfigure(1, weight=1)
+
+        # Create league section
+        self.create_section(
+            self.frm_context,
+            "league",
+            "League",
+            self.current_context
+        )
+
+        # Create league name entry box
+        default = self.context["league"]["name"]
+        self.create_entry(
+            self.frm_context,
+            "name",
+            "Name",
+            default,
+            variable=self.current_context
+        )
+
+        # Create league short name entry box
+        default = self.context["league"]["short_name"]
+        self.create_entry(
+            self.frm_context,
+            "short_name",
+            "Short Name",
+            default,
+            variable=self.current_context
+        )
+
+        # Create load context button
+        self.btn_load_context = ctk.CTkButton(
+            master=self.frm_context,
+            text="Load Context",
+            height=50,
+            font=ctk.CTkFont(size=18, weight="bold"),
+            command=self.load_context
+        )
+        self.btn_load_context.grid(
+            row=self.row,
+            column=0,
+            columnspan=3,
+            sticky="ew",
+            padx=20
+        )
+        self.row += 1
+
+        # Create save context button
+        self.btn_save_context = ctk.CTkButton(
+            master=self.frm_context,
+            text="Save Context",
+            height=50,
+            font=ctk.CTkFont(size=18, weight="bold"),
+            command=self.save_context
+        )
+        self.btn_save_context.grid(
+            row=self.row,
+            column=0,
+            columnspan=3,
+            sticky="ew",
+            padx=20,
+            pady=20
+        )
+
+        # Delete temporary variables
+        del self.row
+        del self.current_section
+
+    def create_dropdown(
+        self,
+        master,
+        name,
+        text,
+        options,
+        default=None,
+        variable={}
+    ):
+        """Create a dropdown for the frame.
+        
+        Creates a dropdown for the frame that is used to select from a list of
+        options. If a default value is provided, it is selected in the dropdown.
+        
+        Args:
+            name (str): The name of the dropdown to create.
+            text (str): The text to display next to the dropdown.
+            options (list): A list of options to select from.
+            default (str): The default value to select in the dropdown.
+            variable (dict): The dictionary to add the dropdown to.
+        """
+
+        # Create label
+        lbl = ctk.CTkLabel(
+            master=master,
+            text=text,
+            font=ctk.CTkFont(size=14)
+        )
+
+        # Grid label
+        lbl.grid(
+            row=self.row,
+            column=0,
+            sticky="e",
+            padx=20,
+            pady=(0, 20)
+        )
+
+        # Create dropdown
+        drp = ctk.CTkOptionMenu(
+            master=master,
+            values=options,
+            font=ctk.CTkFont(size=14)
+        )
+
+        # If default value is provided, select it in the dropdown
+        if default:
+            drp.set(default)
+
+        # Grid dropdown
+        drp.grid(
+            row=self.row,
+            column=1,
+            sticky="ew",
+            padx=(0, 20),
+            pady=(0, 20),
+            columnspan=2
+        )
+
+        # Increment row
+        self.row += 1
+
+        # Add dropdown to current settings
+        variable[self.current_section][name] = drp
+
+    def create_entry(
+        self,
+        master,
+        name,
+        text,
+        default=None,
+        browse=False,
+        variable={}
+    ):
+        """Create an entry box for the frame.
+        
+        Creates an entry box for the frame that is used to input various
+        settings. If a default value is provided, it is inserted into the entry
+        box. If the browse flag is set to True, a 'Browse' button is created
+        next to the entry box that allows users to browse for a directory.
+        
+        Args:
+            name (str): The name of the entry box to create.
+            text (str): The text to display next to the entry box.
+            default (str): The default value to insert into the entry box.
+            browse (bool): Whether or not to create a 'Browse' button.
+            variable (dict): The dictionary to add the entry box to.
+        """
+        def browse_dir():
+            """Open a file dialog to browse for a directory."""
+            # Get directory
+            directory = filedialog.askdirectory()
+
+            # Insert directory into entry box
+            ent.delete(0, "end")
+            ent.insert(0, directory)
+
+        # Create label
+        lbl = ctk.CTkLabel(
+            master=master,
+            text=text,
+            font=ctk.CTkFont(size=14)
+        )
+
+        # Grid label
+        lbl.grid(
+            row=self.row,
+            column=0,
+            sticky="e",
+            padx=20,
+            pady=(0, 20)
+        )
+
+        # Create entry box
+        ent = ctk.CTkEntry(
+            master=master,
+            font=ctk.CTkFont(size=14)
+        )
+
+        # If default value is provided, insert it into the entry box
+        if default:
+            ent.insert(0, default)
+
+        # Grid entry box
+        ent.grid(
+            row=self.row,
+            column=1,
+            sticky="ew",
+            padx=(0, 20),
+            pady=(0, 20),
+            columnspan=1 if browse else 2
+        )
+
+        # If browse button is requested, create it
+        if browse:
+            btn = ctk.CTkButton(
+                master=master,
+                text="Browse",
+                width=100,
+                font=ctk.CTkFont(size=14),
+                command=browse_dir
+            )
+
+            # Grid browse button
+            btn.grid(
+                row=self.row,
+                column=2,
+                sticky="ew",
+                padx=(0, 20),
+                pady=(0, 20)
+            )
+
+        # Increment row
+        self.row += 1
+
+        # Add entry box to current settings
+        variable[self.current_section][name] = ent
+
     def create_navigation(self):
         """Create the navigation frame and its components.
     
@@ -123,7 +381,7 @@ class App(ctk.CTk):
         # Create navigation frame
         self.frm_navigation = ctk.CTkFrame(master=self, corner_radius=0)
         self.frm_navigation.grid(row=0, column=0, sticky="nsew")
-        self.frm_navigation.grid_rowconfigure(3, weight=1)
+        self.frm_navigation.grid_rowconfigure(4, weight=1)
 
         # Create title label
         self.lbl_title = ctk.CTkLabel(
@@ -150,6 +408,22 @@ class App(ctk.CTk):
         )
         self.btn_home.grid(row=1, column=0, sticky="ew")
 
+        # Create context button
+        self.btn_context = ctk.CTkButton(
+            master=self.frm_navigation,
+            text="Context",
+            corner_radius=0,
+            height=40,
+            border_spacing=20,
+            fg_color="transparent",
+            text_color=("gray10", "gray90"),
+            hover_color=("gray70", "gray30"),
+            font=ctk.CTkFont(size=18, weight="bold"),
+            anchor="w",
+            command=lambda: self.show_frame(frame="context")
+        )
+        self.btn_context.grid(row=2, column=0, sticky="ew")
+
         # Create settings button
         self.btn_settings = ctk.CTkButton(
             master=self.frm_navigation,
@@ -164,8 +438,46 @@ class App(ctk.CTk):
             anchor="w",
             command=lambda: self.show_frame(frame="settings")
         )
-        self.btn_settings.grid(row=2, column=0, sticky="ew")
+        self.btn_settings.grid(row=3, column=0, sticky="ew")
     
+    def create_section(self, master, name, text, variable={}):
+        """Create a section header for the frame.
+        
+        Creates a section header for the frame that is used to separate
+        different sections of the frame. The section header is a label with a
+        bold font and a large font size.
+        
+        Args:
+            name (str): The name of the section to create.
+            text (str): The text to display in the section header.
+            variable (dict): The dictionary to add the section to.
+        """
+
+        # Create label
+        lbl = ctk.CTkLabel(
+            master=master,
+            text=text,
+            font=ctk.CTkFont(size=18, weight="bold")
+        )
+
+        # Grid label
+        lbl.grid(
+            row=self.row,
+            column=0,
+            columnspan=3,
+            sticky="ew",
+            pady=20
+        )
+
+        # Increment row
+        self.row += 1
+
+        # Add section to current settings
+        variable[name] = {}
+
+        # Update current section
+        self.current_section = name
+
     def create_settings(self):
         """Create the settings frame and its components.
     
@@ -173,193 +485,12 @@ class App(ctk.CTk):
         settings. It also includes a 'Save Settings' button to preserve these
         settings.
         """
-        row = 0
-        current_section = ""
+        # Temporary variables
+        self.row = 0
+        self.current_section = ""
+
+        # Create settings dictionary
         self.current_settings = {}
-
-        def create_dropdown(name, text, options, default=None):
-            """Create a dropdown for the settings frame.
-            
-            Creates a dropdown for the settings frame that is used to select
-            from a list of options. If a default value is provided, it is
-            selected in the dropdown.
-            
-            Args:
-                name (str): The name of the dropdown to create.
-                text (str): The text to display next to the dropdown.
-                options (list): A list of options to select from.
-                default (str): The default value to select in the dropdown.
-            """
-            nonlocal row
-
-            # Create label
-            lbl = ctk.CTkLabel(
-                master=self.frm_settings,
-                text=text,
-                font=ctk.CTkFont(size=14)
-            )
-
-            # Grid label
-            lbl.grid(
-                row=row,
-                column=0,
-                sticky="e",
-                padx=20,
-                pady=(0, 20)
-            )
-
-            # Create dropdown
-            drp = ctk.CTkOptionMenu(
-                master=self.frm_settings,
-                values=options,
-                font=ctk.CTkFont(size=14)
-            )
-
-            # If default value is provided, select it in the dropdown
-            if default:
-                drp.set(default)
-
-            # Grid dropdown
-            drp.grid(
-                row=row,
-                column=1,
-                sticky="ew",
-                padx=(0, 20),
-                pady=(0, 20),
-                columnspan=2
-            )
-
-            # Increment row
-            row += 1
-
-            # Add dropdown to current settings
-            self.current_settings[current_section][name] = drp
-
-        def create_entry(name, text, default=None, browse=False):
-            """Create an entry box for the settings frame.
-            
-            Creates an entry box for the settings frame that is used to input
-            various settings. If a default value is provided, it is
-            inserted into the entry box. If the browse flag is set to True, a
-            'Browse' button is created next to the entry box that allows users
-            to browse for a directory.
-            
-            Args:
-                name (str): The name of the entry box to create.
-                text (str): The text to display next to the entry box.
-                default (str): The default value to insert into the entry box.
-                browse (bool): Whether or not to create a 'Browse' button.
-            """
-            def browse_dir():
-                """Open a file dialog to browse for a directory."""
-                # Get directory
-                directory = filedialog.askdirectory()
-
-                # Insert directory into entry box
-                ent.delete(0, "end")
-                ent.insert(0, directory)
-
-            nonlocal row
-
-            # Create label
-            lbl = ctk.CTkLabel(
-                master=self.frm_settings,
-                text=text,
-                font=ctk.CTkFont(size=14)
-            )
-
-            # Grid label
-            lbl.grid(
-                row=row,
-                column=0,
-                sticky="e",
-                padx=20,
-                pady=(0, 20)
-            )
-
-            # Create entry box
-            ent = ctk.CTkEntry(
-                master=self.frm_settings,
-                font=ctk.CTkFont(size=14)
-            )
-
-            # If default value is provided, insert it into the entry box
-            if default:
-                ent.insert(0, default)
-
-            # Grid entry box
-            ent.grid(
-                row=row,
-                column=1,
-                sticky="ew",
-                padx=(0, 20),
-                pady=(0, 20),
-                columnspan=1 if browse else 2
-            )
-
-            # If browse button is requested, create it
-            if browse:
-                btn = ctk.CTkButton(
-                    master=self.frm_settings,
-                    text="Browse",
-                    width=100,
-                    font=ctk.CTkFont(size=14),
-                    command=browse_dir
-                )
-
-                # Grid browse button
-                btn.grid(
-                    row=row,
-                    column=2,
-                    sticky="ew",
-                    padx=(0, 20),
-                    pady=(0, 20)
-                )
-
-            # Increment row
-            row += 1
-
-            # Add entry box to current settings
-            self.current_settings[current_section][name] = ent
-
-        def create_section(name, text):
-            """Create a section header for the settings frame.
-            
-            Creates a section header for the settings frame that is used to
-            separate different sections of the settings frame. The section
-            header is a label with a bold font and a large font size.
-            
-            Args:
-                name (str): The name of the section to create.
-                text (str): The text to display in the section header.
-            """
-            nonlocal row
-            nonlocal current_section
-
-            # Create label
-            lbl = ctk.CTkLabel(
-                master=self.frm_settings,
-                text=text,
-                font=ctk.CTkFont(size=18, weight="bold")
-            )
-
-            # Grid label
-            lbl.grid(
-                row=row,
-                column=0,
-                columnspan=3,
-                sticky="ew",
-                pady=20
-            )
-
-            # Increment row
-            row += 1
-
-            # Add section to current settings
-            self.current_settings[name] = {}
-
-            # Update current section
-            current_section = name
 
         # Create content frame
         self.frm_settings = ctk.CTkScrollableFrame(
@@ -370,69 +501,120 @@ class App(ctk.CTk):
         self.frm_settings.grid_columnconfigure(1, weight=1)
 
         # Create API keys section
-        create_section("keys", "API Keys")
+        self.create_section(
+            self.frm_settings,
+            "keys",
+            "API Keys",
+            self.current_settings
+        )
 
         # Create API key entry box for OpenAI
         default = self.settings["keys"]["openai_api_key"]
-        create_entry("openai_api_key", "OpenAI API Key", default)
+        self.create_entry(
+            self.frm_settings,
+            "openai_api_key",
+            "OpenAI API Key",
+            default,
+            variable=self.current_settings
+        )
 
         # Create API key entry box for ElevenLabs
         default = self.settings["keys"]["elevenlabs_api_key"]
-        create_entry("elevenlabs_api_key", "ElevenLabs API Key", default)
+        self.create_entry(
+            self.frm_settings,
+            "elevenlabs_api_key",
+            "ElevenLabs API Key",
+            default,
+            variable=self.current_settings
+        )
 
         # Create iRacing section
-        create_section("general", "General")
+        self.create_section(
+            self.frm_settings,
+            "general",
+            "General",
+            self.current_settings
+        )
 
         # Create iRacing directory entry box
         default = self.settings["general"]["iracing_path"]
-        create_entry(
-            "iracing_path", "iRacing Documents Directory", default, True
+        self.create_entry(
+            self.frm_settings,
+            "iracing_path",
+            "iRacing Documents Directory",
+            default,
+            True,
+            variable=self.current_settings
         )
 
         # Create the video format dropdown
         default = self.settings["general"]["video_format"]
-        create_dropdown(
+        self.create_dropdown(
+            self.frm_settings,
             "video_format",
             "Video Format",
             ["mp4", "wmv", "avi2", "avi"],
-            default
+            default,
+            self.current_settings
         )
 
         # Create the video framerate dropdown
         default = self.settings["general"]["video_framerate"]
-        create_dropdown(
+        self.create_dropdown(
+            self.frm_settings,
             "video_framerate",
             "Video Framerate",
             ["30", "60"],
-            default
+            default,
+            self.current_settings
         )
 
         # Create the video resolution dropdown
         default = self.settings["general"]["video_resolution"]
-        create_dropdown(
+        self.create_dropdown(
+            self.frm_settings,
             "video_resolution",
             "Video Resolution",
             ["1920x1080", "1280x720", "854x480"],
-            default
+            default,
+            self.current_settings
         )
 
         # Create Director section
-        create_section("director", "Director")
+        self.create_section(
+            self.frm_settings, 
+            "director",
+            "Director",
+            self.current_settings
+        )
 
         # Create update frequency entry box
         default = self.settings["director"]["update_frequency"]
-        create_entry("update_frequency", "Update Frequency (seconds)", default)
+        self.create_entry(
+            self.frm_settings,
+            "update_frequency",
+            "Update Frequency (seconds)",
+            default,
+            variable=self.current_settings
+        )
 
         # Create commentary section
-        create_section("commentary", "Commentary")
+        self.create_section(
+            self.frm_settings, 
+            "commentary",
+            "Commentary",
+            self.current_settings
+        )
 
         # Create GPT model dropdown
         default = self.settings["commentary"]["gpt_model"]
-        create_dropdown(
+        self.create_dropdown(
+            self.frm_settings,
             "gpt_model",
             "GPT Model",
             ["GPT-3.5 Turbo", "GPT-4 Turbo", "GPT-4 Turbo with Vision"],
-            default
+            default,
+            self.current_settings
         )
         
         # Get list of voices
@@ -440,29 +622,45 @@ class App(ctk.CTk):
 
         # Create play-by-play voice dropdown
         default = self.settings["commentary"]["pbp_voice"]
-        create_dropdown(
+        self.create_dropdown(
+            self.frm_settings,
             "pbp_voice",
             "Play-by-Play Voice",
             voice_list,
-            default
+            default,
+            self.current_settings
         )
 
         # Create color commentary voice dropdown
         default = self.settings["commentary"]["color_voice"]
-        create_dropdown(
+        self.create_dropdown(
+            self.frm_settings,
             "color_voice",
             "Color Commentary Voice",
             voice_list,
-            default
+            default,
+            self.current_settings
         )
 
         # Create color commentary chance entry box
         default = self.settings["commentary"]["color_chance"]
-        create_entry("color_chance", "Color Commentary Chance (%)", default)
+        self.create_entry(
+            self.frm_settings,
+            "color_chance",
+            "Color Commentary Chance (%)",
+            default,
+            variable=self.current_settings
+        )
 
         # Create memory limit entry box
         default = self.settings["commentary"]["memory_limit"]
-        create_entry("memory_limit", "Memory Limit (messages)", default)
+        self.create_entry(
+            self.frm_settings,
+            "memory_limit",
+            "Memory Limit (messages)",
+            default,
+            variable=self.current_settings
+        )
 
         # Create save settings button
         self.btn_save_settings = ctk.CTkButton(
@@ -473,15 +671,149 @@ class App(ctk.CTk):
             command=self.save_settings
         )
         self.btn_save_settings.grid(
-            row=row,
+            row=self.row,
             column=0,
             columnspan=3,
             sticky="ew",
             padx=20,
             pady=20
         )
-        row += 1
+        
+        # Delete temporary variables
+        del self.row
+        del self.current_section
     
+    def load_context(self, event=None, file=None, startup=False):
+        """Load context from a context.json file.
+
+        This method opens a file dialog to allow users to select a JSON file
+        containing context for the commentary. It then loads the context from
+        the file and updates the entry boxes with these settings. If a file is
+        provided, it is used instead of opening a file dialog.
+
+        Args:
+            event: Not used, but included for compatibility with button clicks.
+            file (str): The name of the file to load context from.
+        """
+        # If startup flag is set, just load the context into the dictionary
+        if startup:
+            # Load context from file
+            with open(file, "r") as f:
+                self.context = json.load(f)
+
+            # End method
+            return
+        
+        # Open file dialog
+        if not file:
+            file = filedialog.askopenfilename(
+                defaultextension=".json",
+                filetypes=(("JSON Files", "*.json"),)
+            )
+
+        # Check to make sure file name was provided
+        if not file:
+            return
+
+        # Load context from file
+        with open(file, "r") as f:
+            self.context = json.load(f)
+
+        # Update context file in settings
+        self.settings["system"]["context_file"] = file
+
+        # Save settings to file
+        with open("settings.ini", "w") as f:
+            self.settings.write(f)
+
+        # Update entry boxes with context
+        for key in self.current_context:
+            for setting in self.current_context[key]:
+                value = self.context[key][setting]
+                self.current_context[key][setting].delete(0, "end")
+                self.current_context[key][setting].insert(0, value)
+
+        # Add message
+        self.add_message("Context loaded!")
+
+        # Change load context button text and color
+        original_fg_color = self.btn_load_context.cget("fg_color")
+        original_hover_color = self.btn_load_context.cget("hover_color")
+        self.btn_load_context.configure(
+            text="Context Loaded!",
+            fg_color="green",
+            hover_color="green"
+        )
+
+        # Change it back after 3 seconds
+        self.after(
+            3000,
+            lambda: self.btn_load_context.configure(
+                text="Load Context",
+                fg_color=original_fg_color,
+                hover_color=original_hover_color
+            )
+        )
+
+    def save_context(self, event=None):
+        """Save context from entry boxes to a JSON file.
+        
+        This method gathers the context from various entry boxes, updates the
+        context dictionary, and then saves these settings to a JSON file. A
+        message is also added to indicate that the context has been saved.
+        
+        Args:
+            event: Not used, but included for compatibility with button clicks.
+        """
+        # Update context with values from entry boxes
+        for key in self.current_context:
+            for setting in self.current_context[key]:
+                new_setting = self.current_context[key][setting].get()
+                self.context[key][setting] = new_setting
+
+        # Open save as dialog
+        file_name = filedialog.asksaveasfilename(
+            defaultextension=".json",
+            filetypes=(("JSON Files", "*.json"),)
+        )
+
+        # Check to make sure file name was provided
+        if not file_name:
+            return
+
+        # Save context to file
+        with open(file_name, "w") as f:
+            json.dump(self.context, f, indent=4)
+
+        # Update context file in settings
+        self.settings["system"]["context_file"] = file_name
+
+        # Save settings to file
+        with open("settings.ini", "w") as f:
+            self.settings.write(f)
+
+        # Add message
+        self.add_message("Context saved!")
+
+        # Change save context button text and color
+        original_fg_color = self.btn_save_context.cget("fg_color")
+        original_hover_color = self.btn_save_context.cget("hover_color")
+        self.btn_save_context.configure(
+            text="Context Saved!",
+            fg_color="green",
+            hover_color="green"
+        )
+
+        # Change it back after 3 seconds
+        self.after(
+            3000,
+            lambda: self.btn_save_context.configure(
+                text="Save Context",
+                fg_color=original_fg_color,
+                hover_color=original_hover_color
+            )
+        )
+
     def save_settings(self, event=None):
         """Save settings from entry boxes to a settings.ini file.
 
@@ -549,6 +881,10 @@ class App(ctk.CTk):
             self.frm_home.grid(row=0, column=1, sticky="nsew")
         else:
             self.frm_home.grid_forget()
+        if frame == "context":
+            self.frm_context.grid(row=0, column=1, sticky="nsew")
+        else:
+            self.frm_context.grid_forget()
         if frame == "settings":
             self.frm_settings.grid(row=0, column=1, sticky="nsew")
         else:

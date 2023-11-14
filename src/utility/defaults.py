@@ -1,6 +1,27 @@
 from configparser import ConfigParser
+import json
 import os
 
+
+def create_context_file(file_name):
+    """
+    Creates a context JSON file with default values if it doesn't exist.
+    
+    Args:
+        file_name (str): The name of the JSON file to create.
+    """
+    if not os.path.exists(file_name):
+        # Create the context dictionary
+        context = {
+            "league": {
+                "name": "My Awesome League",
+                "short_name": "MAL"
+            }
+        }
+
+        # Write to file
+        with open(file_name, "w") as context_file:
+            json.dump(context, context_file, indent=4)
 
 def create_settings_file(file_name):
     """
@@ -38,6 +59,10 @@ def create_settings_file(file_name):
         config.set("commentary", "color_voice", "Elli")
         config.set("commentary", "color_chance", "0.5")
         config.set("commentary", "memory_limit", "10")
+
+        # Set up system section
+        config.add_section("system")
+        config.set("system", "context_file", "context.json")
 
         # Write to file
         with open(file_name, "w") as config_file:

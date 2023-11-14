@@ -4,6 +4,7 @@
 # Ignore certain files for security purposes
 keys.py
 settings.ini
+*.json
 
 # Video and audio files
 *.mp4
