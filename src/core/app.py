@@ -657,13 +657,75 @@ class App(ctk.CTk):
         del self.row
         del self.current_section
     
+    def load_context(self, event=None, file=None):
+        """Load context from a context.json file.
+
+        This method opens a file dialog to allow users to select a JSON file
+        containing context for the commentary. It then loads the context from
+        the file and updates the entry boxes with these settings. If a file is
+        provided, it is used instead of opening a file dialog.
+
+        Args:
+            event: Not used, but included for compatibility with button clicks.
+            file (str): The name of the file to load context from.
+        """
+        # Open file dialog
+        if not file:
+            file = filedialog.askopenfilename(
+                defaultextension=".json",
+                filetypes=(("JSON Files", "*.json"),)
+            )
+
+        # Check to make sure file name was provided
+        if not file:
+            return
+
+        # Load context from file
+        with open(file, "r") as f:
+            self.context = json.load(f)
+
+        # Update context file in settings
+        self.settings["system"]["context_file"] = file
+
+        # Save settings to file
+        with open("settings.ini", "w") as f:
+            self.settings.write(f)
+
+        # Update entry boxes with context
+        for key in self.current_context:
+            for setting in self.current_context[key]:
+                value = self.context[key][setting]
+                self.current_context[key][setting].delete(0, "end")
+                self.current_context[key][setting].insert(0, value)
+
+        # Add message
+        self.add_message("Context loaded!")
+
+        # Change load context button text and color
+        original_fg_color = self.btn_load_context.cget("fg_color")
+        original_hover_color = self.btn_load_context.cget("hover_color")
+        self.btn_load_context.configure(
+            text="Context Loaded!",
+            fg_color="green",
+            hover_color="green"
+        )
+
+        # Change it back after 3 seconds
+        self.after(
+            3000,
+            lambda: self.btn_load_context.configure(
+                text="Load Context",
+                fg_color=original_fg_color,
+                hover_color=original_hover_color
+            )
+        )
+
     def save_context(self, event=None):
-        """Save context from entry boxes to a context.json file.
+        """Save context from entry boxes to a JSON file.
         
         This method gathers the context from various entry boxes, updates the
-        context dictionary, and then saves these settings to a 'context.json'
-        file. A message is also added to indicate that the context has been
-        saved.
+        context dictionary, and then saves these settings to a JSON file. A
+        message is also added to indicate that the context has been saved.
         
         Args:
             event: Not used, but included for compatibility with button clicks.
