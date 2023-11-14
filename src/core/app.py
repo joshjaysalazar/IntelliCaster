@@ -171,6 +171,23 @@ class App(ctk.CTk):
             variable=self.current_context
         )
 
+        # Create load context button
+        self.btn_load_context = ctk.CTkButton(
+            master=self.frm_context,
+            text="Load Context",
+            height=50,
+            font=ctk.CTkFont(size=18, weight="bold"),
+            command=self.load_context
+        )
+        self.btn_load_context.grid(
+            row=self.row,
+            column=0,
+            columnspan=3,
+            sticky="ew",
+            padx=20
+        )
+        self.row += 1
+
         # Create save context button
         self.btn_save_context = ctk.CTkButton(
             master=self.frm_context,
