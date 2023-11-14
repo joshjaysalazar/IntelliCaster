@@ -115,6 +115,12 @@ class App(ctk.CTk):
         self.btn_start_stop.pack(padx=20, pady=20)
 
     def create_context(self):
+        """Create the context frame and its components.
+
+        Sets up a frame for the 'Context' tab that allows users to input
+        context for the commentary. It also includes a 'Save Context' button to
+        preserve these settings, and a 'Load Context' button to load context.
+        """
         # Temporary variables
         self.row = 0
         self.current_section = ""
