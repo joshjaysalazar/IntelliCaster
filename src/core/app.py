@@ -115,6 +115,10 @@ class App(ctk.CTk):
         self.btn_start_stop.pack(padx=20, pady=20)
 
     def create_context(self):
+        row = 0
+        current_section = ""
+        self.current_context = {}
+
         # Create content frame
         self.frm_context = ctk.CTkScrollableFrame(
             master=self,
