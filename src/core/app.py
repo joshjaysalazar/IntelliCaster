@@ -1,3 +1,4 @@
+import json
 from tkinter import filedialog
 import threading
 
@@ -37,6 +38,7 @@ class App(ctk.CTk):
         
         # Member variables
         self.settings = settings
+        self.context = {"league": {}}
 
         # Set window properties
         ctk.set_appearance_mode("Dark")
@@ -162,6 +164,23 @@ class App(ctk.CTk):
             "Short Name",
             default,
             variable=self.current_context
+        )
+
+        # Create save context button
+        self.btn_save_context = ctk.CTkButton(
+            master=self.frm_context,
+            text="Save Context",
+            height=50,
+            font=ctk.CTkFont(size=18, weight="bold"),
+            command=self.save_context
+        )
+        self.btn_save_context.grid(
+            row=self.row,
+            column=0,
+            columnspan=3,
+            sticky="ew",
+            padx=20,
+            pady=20
         )
 
         # Delete temporary variables
@@ -638,6 +657,49 @@ class App(ctk.CTk):
         del self.row
         del self.current_section
     
+    def save_context(self, event=None):
+        """Save context from entry boxes to a context.json file.
+        
+        This method gathers the context from various entry boxes, updates the
+        context dictionary, and then saves these settings to a 'context.json'
+        file. A message is also added to indicate that the context has been
+        saved.
+        
+        Args:
+            event: Not used, but included for compatibility with button clicks.
+        """
+        # Update context with values from entry boxes
+        for key in self.current_context:
+            for setting in self.current_context[key]:
+                new_setting = self.current_context[key][setting].get()
+                self.context[key][setting] = new_setting
+
+        # Save context to file
+        with open("context.json", "w") as f:
+            json.dump(self.context, f, indent=4)
+
+        # Add message
+        self.add_message("Context saved!")
+
+        # Change save context button text and color
+        original_fg_color = self.btn_save_context.cget("fg_color")
+        original_hover_color = self.btn_save_context.cget("hover_color")
+        self.btn_save_context.configure(
+            text="Context Saved!",
+            fg_color="green",
+            hover_color="green"
+        )
+
+        # Change it back after 3 seconds
+        self.after(
+            3000,
+            lambda: self.btn_save_context.configure(
+                text="Save Context",
+                fg_color=original_fg_color,
+                hover_color=original_hover_color
+            )
+        )
+
     def save_settings(self, event=None):
         """Save settings from entry boxes to a settings.ini file.
 
