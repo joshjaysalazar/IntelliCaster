@@ -65,7 +65,11 @@ class App(ctk.CTk):
         self.show_frame(frame="home")
 
         # Create the director
-        self.director = director.Director(self.settings, self.add_message)
+        self.director = director.Director(
+            self.settings,
+            self.context,
+            self.add_message
+        )
 
         # Create the editor
         self.editor = editor.Editor(self.settings)

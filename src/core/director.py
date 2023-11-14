@@ -20,16 +20,18 @@ class Director:
     coordinates with the generator classes to generate commentary.
     """
 
-    def __init__(self, settings, add_message):
+    def __init__(self, settings, context, add_message):
         """Initialize the Director class with necessary settings and utilities.
 
         Args:
             settings (ConfigParser): Settings parsed from an INI file.
+            context (dict): A dictionary containing the user context.
             add_message (callable): A function to append messages to the
                 application's message box.
 
         Attributes:
             settings (ConfigParser): Stores settings from the INI file.
+            context (dict): Stores the user context.
             add_message (callable): Method to append messages.
             ir (IRSDK object): Instance for iRacing SDK.
             drivers (list): List of dictionaries to track drivers in the race.
@@ -45,6 +47,7 @@ class Director:
         """
         # Member variables
         self.settings = settings
+        self.context = context
         self.add_message = add_message
 
         # Set up the iRacing SDK
@@ -66,6 +69,7 @@ class Director:
         # Create the commentary generator
         self.commentary = commentary.Commentary(
             self.settings,
+            self.context,
             self.ir, 
             self.add_message
         )
