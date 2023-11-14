@@ -241,8 +241,17 @@ class TextGenerator:
         if self.context.get("league", {}).get("name") is not None:
             new_msg += f"The league is {self.context['league']['name']}. "
         if self.context.get("league", {}).get("short_name") is not None:
+            # If the league short name is one word, add hyphens between letters
+            if len(self.context["league"]["short_name"].split()) == 1:
+                short_name = ""
+                for letter in self.context["league"]["short_name"]:
+                    short_name += f"{letter}-"
+
+                # Remove the last hyphen
+                short_name = short_name[:-1]
+
             new_msg += "The league can be abbreviated as "
-            new_msg += f"{self.context['league']['short_name']}. "
+            new_msg += f"{short_name}. "
 
         # If the new message is not empty, add it to the list of messages
         if new_msg != "":
