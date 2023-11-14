@@ -681,6 +681,10 @@ class App(ctk.CTk):
         # Update context file in settings
         self.settings["system"]["context_file"] = "context.json"
 
+        # Save settings to file
+        with open("settings.ini", "w") as f:
+            self.settings.write(f)
+
         # Add message
         self.add_message("Context saved!")
 
