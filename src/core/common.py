@@ -1,2 +1,5 @@
-# Holds settings for the application loaded from the settings file
+# A configparser object which contains the settings from the settings file
 settings = None
+
+# A dict holding additional context information for commentary
+context = None
