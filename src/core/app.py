@@ -1,3 +1,4 @@
+import configparser
 import json
 from tkinter import filedialog
 import threading
@@ -5,8 +6,10 @@ import threading
 import customtkinter as ctk
 from elevenlabs import voices
 
+from core import common
 from core import director
 from core import editor
+from utility import defaults
 
 
 class App(ctk.CTk):
@@ -19,29 +22,31 @@ class App(ctk.CTk):
     frames such as 'Home' and 'Settings', and adjusting various settings.
     """
 
-    def __init__(self, settings):
+    def __init__(self):
         """Initialize the App class.
 
         Initializes the application window and its various components such as
-        navigation and settings. Also creates an instance of the Director class.
-
-        Args:
-            settings (ConfigParser): Settings parsed from an INI file.
+        navigation and settings. Also creates an instance of the Director class
+        and the Editor class.
 
         Attributes:
-            settings (ConfigParser): Stores settings from the INI file.
             director (Director object): Instance of the Director class to manage
                 race commentary.
             editor (Editor object): Instance of the Editor class to manage
         """
         super().__init__()
-        
-        # Member variables
-        self.settings = settings
+
+        # Create default files if they don't exist
+        defaults.create_context_file("context.json")
+        defaults.create_settings_file("settings.ini")
+
+        # Load the settings file into common.settings
+        common.settings = configparser.ConfigParser()
+        common.settings.read("settings.ini")
         
         # Load context from file
         self.load_context(
-            file=self.settings["system"]["context_file"],
+            file=common.settings["system"]["context_file"],
             startup=True
         )
 
@@ -66,13 +71,12 @@ class App(ctk.CTk):
 
         # Create the director
         self.director = director.Director(
-            self.settings,
             self.context,
             self.add_message
         )
 
         # Create the editor
-        self.editor = editor.Editor(self.settings)
+        self.editor = editor.Editor()
 
         # Add ready message
         self.add_message("Ready to start commentary...")
@@ -509,7 +513,7 @@ class App(ctk.CTk):
         )
 
         # Create API key entry box for OpenAI
-        default = self.settings["keys"]["openai_api_key"]
+        default = common.settings["keys"]["openai_api_key"]
         self.create_entry(
             self.frm_settings,
             "openai_api_key",
@@ -519,7 +523,7 @@ class App(ctk.CTk):
         )
 
         # Create API key entry box for ElevenLabs
-        default = self.settings["keys"]["elevenlabs_api_key"]
+        default = common.settings["keys"]["elevenlabs_api_key"]
         self.create_entry(
             self.frm_settings,
             "elevenlabs_api_key",
@@ -537,7 +541,7 @@ class App(ctk.CTk):
         )
 
         # Create iRacing directory entry box
-        default = self.settings["general"]["iracing_path"]
+        default = common.settings["general"]["iracing_path"]
         self.create_entry(
             self.frm_settings,
             "iracing_path",
@@ -548,7 +552,7 @@ class App(ctk.CTk):
         )
 
         # Create the video format dropdown
-        default = self.settings["general"]["video_format"]
+        default = common.settings["general"]["video_format"]
         self.create_dropdown(
             self.frm_settings,
             "video_format",
@@ -559,7 +563,7 @@ class App(ctk.CTk):
         )
 
         # Create the video framerate dropdown
-        default = self.settings["general"]["video_framerate"]
+        default = common.settings["general"]["video_framerate"]
         self.create_dropdown(
             self.frm_settings,
             "video_framerate",
@@ -570,7 +574,7 @@ class App(ctk.CTk):
         )
 
         # Create the video resolution dropdown
-        default = self.settings["general"]["video_resolution"]
+        default = common.settings["general"]["video_resolution"]
         self.create_dropdown(
             self.frm_settings,
             "video_resolution",
@@ -589,7 +593,7 @@ class App(ctk.CTk):
         )
 
         # Create update frequency entry box
-        default = self.settings["director"]["update_frequency"]
+        default = common.settings["director"]["update_frequency"]
         self.create_entry(
             self.frm_settings,
             "update_frequency",
@@ -607,7 +611,7 @@ class App(ctk.CTk):
         )
 
         # Create GPT model dropdown
-        default = self.settings["commentary"]["gpt_model"]
+        default = common.settings["commentary"]["gpt_model"]
         self.create_dropdown(
             self.frm_settings,
             "gpt_model",
@@ -621,7 +625,7 @@ class App(ctk.CTk):
         voice_list = [voice.name for voice in voices()]
 
         # Create play-by-play voice dropdown
-        default = self.settings["commentary"]["pbp_voice"]
+        default = common.settings["commentary"]["pbp_voice"]
         self.create_dropdown(
             self.frm_settings,
             "pbp_voice",
@@ -632,7 +636,7 @@ class App(ctk.CTk):
         )
 
         # Create color commentary voice dropdown
-        default = self.settings["commentary"]["color_voice"]
+        default = common.settings["commentary"]["color_voice"]
         self.create_dropdown(
             self.frm_settings,
             "color_voice",
@@ -643,7 +647,7 @@ class App(ctk.CTk):
         )
 
         # Create color commentary chance entry box
-        default = self.settings["commentary"]["color_chance"]
+        default = common.settings["commentary"]["color_chance"]
         self.create_entry(
             self.frm_settings,
             "color_chance",
@@ -653,7 +657,7 @@ class App(ctk.CTk):
         )
 
         # Create memory limit entry box
-        default = self.settings["commentary"]["memory_limit"]
+        default = common.settings["commentary"]["memory_limit"]
         self.create_entry(
             self.frm_settings,
             "memory_limit",
@@ -720,11 +724,11 @@ class App(ctk.CTk):
             self.context = json.load(f)
 
         # Update context file in settings
-        self.settings["system"]["context_file"] = file
+        common.settings["system"]["context_file"] = file
 
         # Save settings to file
         with open("settings.ini", "w") as f:
-            self.settings.write(f)
+            common.settings.write(f)
 
         # Update entry boxes with context
         for key in self.current_context:
@@ -786,11 +790,11 @@ class App(ctk.CTk):
             json.dump(self.context, f, indent=4)
 
         # Update context file in settings
-        self.settings["system"]["context_file"] = file_name
+        common.settings["system"]["context_file"] = file_name
 
         # Save settings to file
         with open("settings.ini", "w") as f:
-            self.settings.write(f)
+            common.settings.write(f)
 
         # Add message
         self.add_message("Context saved!")
@@ -829,11 +833,11 @@ class App(ctk.CTk):
         for key in self.current_settings:
             for setting in self.current_settings[key]:
                 new_setting = self.current_settings[key][setting].get()
-                self.settings[key][setting] = new_setting
+                common.settings[key][setting] = new_setting
 
         # Save settings to file
         with open("settings.ini", "w") as f:
-            self.settings.write(f)
+            common.settings.write(f)
 
         # Add message
         self.add_message("Settings saved!")

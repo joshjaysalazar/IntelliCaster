@@ -7,6 +7,7 @@ import time
 import irsdk
 
 from core import camera
+from core import common
 from core import commentary
 
 
@@ -20,17 +21,15 @@ class Director:
     coordinates with the generator classes to generate commentary.
     """
 
-    def __init__(self, settings, context, add_message):
+    def __init__(self, context, add_message):
         """Initialize the Director class with necessary settings and utilities.
 
         Args:
-            settings (ConfigParser): Settings parsed from an INI file.
             context (dict): A dictionary containing the user context.
             add_message (callable): A function to append messages to the
                 application's message box.
 
         Attributes:
-            settings (ConfigParser): Stores settings from the INI file.
             context (dict): Stores the user context.
             add_message (callable): Method to append messages.
             ir (IRSDK object): Instance for iRacing SDK.
@@ -46,7 +45,6 @@ class Director:
             running (bool): Flag to control the run loop for the director.
         """
         # Member variables
-        self.settings = settings
         self.context = context
         self.add_message = add_message
 
@@ -68,7 +66,6 @@ class Director:
 
         # Create the commentary generator
         self.commentary = commentary.Commentary(
-            self.settings,
             self.context,
             self.ir, 
             self.add_message
@@ -243,7 +240,7 @@ class Director:
                 )
 
                 # Occassionally, generate color commentary
-                chance = float(self.settings["commentary"]["color_chance"])
+                chance = float(common.settings["commentary"]["color_chance"])
                 if random.random() < chance:
                     self.commentary.generate(
                         "Add color commentary to the previous overtake.",
@@ -348,7 +345,7 @@ class Director:
                 self.detect_overtakes(prev_drivers)
             
             # Wait the amount of time specified in the settings
-            time.sleep(float(self.settings["director"]["update_frequency"]))
+            time.sleep(float(common.settings["director"]["update_frequency"]))
 
     def start(self):
         """Start the director.
@@ -489,7 +486,7 @@ class Director:
         and set the video format, framerate, and resolution.
         """
         # Get the iRacing directory
-        path = self.settings["general"]["iracing_path"]
+        path = common.settings["general"]["iracing_path"]
 
         # Read app.ini
         with open(os.path.join(path, "app.ini"), "r") as f:
@@ -502,13 +499,13 @@ class Director:
         app_ini = app_ini.replace("videoCaptureMic=1", "videoCaptureMic=0")
 
         # Set the video file format
-        if self.settings["general"]["video_format"] == "mp4":
+        if common.settings["general"]["video_format"] == "mp4":
             format = 0
-        elif self.settings["general"]["video_format"] == "wmv":
+        elif common.settings["general"]["video_format"] == "wmv":
             format = 1
-        elif self.settings["general"]["video_format"] == "avi2":
+        elif common.settings["general"]["video_format"] == "avi2":
             format = 2
-        elif self.settings["general"]["video_format"] == "avi":
+        elif common.settings["general"]["video_format"] == "avi":
             format = 3
         for i in range(4):
             app_ini = app_ini.replace(
@@ -517,9 +514,9 @@ class Director:
             )
 
         # Set the video framerate
-        if self.settings["general"]["video_framerate"] == "60":
+        if common.settings["general"]["video_framerate"] == "60":
             framerate = 0
-        elif self.settings["general"]["video_framerate"] == "30":
+        elif common.settings["general"]["video_framerate"] == "30":
             framerate = 1
         for i in range(2):
             app_ini = app_ini.replace(
@@ -528,11 +525,11 @@ class Director:
             )
 
         # Set the video resolution
-        if self.settings["general"]["video_resolution"] == "1920x1080":
+        if common.settings["general"]["video_resolution"] == "1920x1080":
             resolution = 1
-        elif self.settings["general"]["video_resolution"] == "1280x720":
+        elif common.settings["general"]["video_resolution"] == "1280x720":
             resolution = 2
-        elif self.settings["general"]["video_resolution"] == "854x480":
+        elif common.settings["general"]["video_resolution"] == "854x480":
             resolution = 3
         for i in range(4):
             app_ini = app_ini.replace(

@@ -6,6 +6,7 @@ from moviepy.audio.fx.volumex import volumex
 from moviepy.audio.io.AudioFileClip import AudioFileClip
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
+from core import common
 from core import export
 
 
@@ -16,18 +17,6 @@ class Editor:
     original video with the commentary audio clips and exports the result to a
     file.
     """
-
-    def __init__(self, settings):
-        """Constructor for the editor
-
-        Args:
-            settings (ConfigParser): Settings parsed from an INI file.
-
-        Attributes:
-            settings (ConfigParser): Settings parsed from an INI file.
-        """
-        # Member variables
-        self.settings = settings
 
     def create_video(self, root_window):
         """Create the video
@@ -68,8 +57,8 @@ class Editor:
 
         # Write the result to a file
         video.write_videofile(
-            f"output_video.{self.settings['general']['video_format']}",
-            fps=int(self.settings["general"]["video_framerate"]),
+            f"output_video.{common.settings['general']['video_format']}",
+            fps=int(common.settings["general"]["video_framerate"]),
             logger=export_window.progress_tracker
         )
 
@@ -85,7 +74,7 @@ class Editor:
         is used to clean up the videos folder after the video has been exported.
         """
         # Get the iRacing videos folder
-        path = os.path.join(self.settings["general"]["iracing_path"], "videos")
+        path = os.path.join(common.settings["general"]["iracing_path"], "videos")
 
         # Get a list of all of the .mp3 files in that folder
         files = []
@@ -104,7 +93,7 @@ class Editor:
         clean up the videos folder after the video has been exported.
         """
         # Get the iRacing videos folder
-        path = os.path.join(self.settings["general"]["iracing_path"], "videos")
+        path = os.path.join(common.settings["general"]["iracing_path"], "videos")
 
         # Find the most recent .mp4 video in that folder
         files = []
@@ -124,7 +113,7 @@ class Editor:
         """
         # Get the path to the screenshot
         path = os.path.join(
-            self.settings["general"]["iracing_path"],
+            common.settings["general"]["iracing_path"],
             "videos",
             "screenshot.png"
         )
@@ -140,7 +129,7 @@ class Editor:
             list: A list of audio clips
         """
         # Get the iRacing videos folder
-        path = os.path.join(self.settings["general"]["iracing_path"], "videos")
+        path = os.path.join(common.settings["general"]["iracing_path"], "videos")
 
         # Get a list of all of the .mp3 files in that folder
         files = []
@@ -174,7 +163,7 @@ class Editor:
             VideoFileClip: The video clip
         """
         # Get the iRacing videos folder
-        path = os.path.join(self.settings["general"]["iracing_path"], "videos")
+        path = os.path.join(common.settings["general"]["iracing_path"], "videos")
 
         # Find the most recent .mp4 video in that folder
         files = []
