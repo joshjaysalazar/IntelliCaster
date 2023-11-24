@@ -28,7 +28,6 @@ class Director:
 
         Attributes:
             add_message (callable): Method to append messages.
-            ir (IRSDK object): Instance for iRacing SDK.
             drivers (list): List of dictionaries to track drivers in the race.
             race_started (bool): Flag to indicate if the race has started.
             race_start_time (float): Stores the time the race starts.
