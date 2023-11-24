@@ -86,15 +86,19 @@ class App(ctk.CTk):
     def add_message(self, message):
         """Add a new message to the messages text box widget.
     
-        Appends the given message at the top of the text box and disables 
+        Appends the given message at the bottom of the text box and disables 
         editing afterward.
         
         Args:
             message (str): The message to append to the text box.
         """
+        # Insert message at the bottom of the text box
         self.txt_messages.configure(state="normal")
-        self.txt_messages.insert("0.0", message + "\n")
+        self.txt_messages.insert("end", message + "\n")
         self.txt_messages.configure(state="disabled")
+
+        # Scroll to the bottom of the text box
+        self.txt_messages.yview_moveto(1)
 
     def create_home(self):
         """Create the home frame and its components.
