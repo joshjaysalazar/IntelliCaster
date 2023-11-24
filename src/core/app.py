@@ -95,6 +95,7 @@ class App(ctk.CTk):
         self.txt_messages.configure(state="normal")
         self.txt_messages.insert("end", message + "\n")
         self.txt_messages.configure(state="disabled")
+        self.txt_messages.yview_moveto(1)
 
     def create_home(self):
         """Create the home frame and its components.
