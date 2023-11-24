@@ -75,9 +75,7 @@ class App(ctk.CTk):
         self.show_frame(frame="home")
 
         # Create the director
-        self.director = director.Director(
-            self.add_message
-        )
+        self.director = director.Director()
 
         # Create the editor
         self.editor = editor.Editor()

@@ -19,15 +19,10 @@ class Director:
     coordinates with the generator classes to generate commentary.
     """
 
-    def __init__(self, add_message):
+    def __init__(self):
         """Initialize the Director class with necessary settings and utilities.
 
-        Args:
-            add_message (callable): A function to append messages to the
-                application's message box.
-
         Attributes:
-            add_message (callable): Method to append messages.
             drivers (list): List of dictionaries to track drivers in the race.
             race_started (bool): Flag to indicate if the race has started.
             race_start_time (float): Stores the time the race starts.
@@ -39,9 +34,6 @@ class Director:
                 generator.
             running (bool): Flag to control the run loop for the director.
         """
-        # Member variables
-        self.add_message = add_message
-
         # Create the drivers dict
         self.drivers = self.create_drivers()
 
@@ -55,9 +47,7 @@ class Director:
         self.recording_start_time = None
 
         # Create the commentary generator
-        self.commentary = commentary.Commentary(
-            self.add_message
-        )
+        self.commentary = commentary.Commentary()
 
         # Create the camera manager
         self.camera = camera.Camera()
