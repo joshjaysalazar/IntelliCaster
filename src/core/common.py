@@ -1,3 +1,6 @@
+# Contains the pointer to the root application window
+app = None
+
 # A configparser object which contains the settings from the settings file
 settings = None
 

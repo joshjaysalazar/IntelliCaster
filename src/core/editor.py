@@ -18,18 +18,15 @@ class Editor:
     file.
     """
 
-    def create_video(self, root_window):
+    def create_video(self):
         """Create the video
 
         Creates the video by combining the original video with the commentary
         audio clips. This method is called by the main window when the user
         clicks the 'Stop Commentary' button.
-
-        Args:
-            root_window (CTk): The root window
         """
         # Create export window
-        export_window = export.Export(root_window)
+        export_window = export.Export(common.app)
 
         # Load the video clip
         video = self.get_latest_video()

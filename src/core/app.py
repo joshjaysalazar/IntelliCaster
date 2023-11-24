@@ -931,11 +931,7 @@ class App(ctk.CTk):
             self.add_message("Generating video...")
 
             # Create the video
-            threading.Thread(
-                target=self.editor.create_video,
-                args=(self,)
-            ).start()
-            # self.editor.create_video(self)
+            threading.Thread(target=self.editor.create_video).start()
 
             # Add message
             self.add_message("Video generated!")

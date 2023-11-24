@@ -1,4 +1,5 @@
 from core.app import App
+from core import common
 
 
 def main():
@@ -9,8 +10,8 @@ def main():
     """
 
     # Create the app
-    app = App()
-    app.mainloop()
+    common.app = App()
+    common.app.mainloop()
 
 if __name__ == "__main__":
     main()
