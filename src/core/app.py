@@ -93,7 +93,7 @@ class App(ctk.CTk):
             message (str): The message to append to the text box.
         """
         self.txt_messages.configure(state="normal")
-        self.txt_messages.insert("0.0", message + "\n")
+        self.txt_messages.insert("end", message + "\n")
         self.txt_messages.configure(state="disabled")
 
     def create_home(self):
