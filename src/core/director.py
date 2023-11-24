@@ -4,8 +4,6 @@ import random
 import threading
 import time
 
-import irsdk
-
 from core import camera
 from core import common
 from core import commentary
@@ -45,10 +43,6 @@ class Director:
         # Member variables
         self.add_message = add_message
 
-        # Set up the iRacing SDK
-        self.ir = irsdk.IRSDK()
-        self.ir.startup()
-
         # Create the drivers dict
         self.drivers = self.create_drivers()
 
@@ -63,12 +57,11 @@ class Director:
 
         # Create the commentary generator
         self.commentary = commentary.Commentary(
-            self.ir, 
             self.add_message
         )
 
         # Create the camera manager
-        self.camera = camera.Camera(self.ir)
+        self.camera = camera.Camera()
 
         # Set running to False
         self.running = False
@@ -116,10 +109,10 @@ class Director:
         driver_dict = []
 
         # Get driver data from iRacing SDK
-        driver_data = self.ir["DriverInfo"]["Drivers"]
+        driver_data = common.ir["DriverInfo"]["Drivers"]
 
         # Get quali results
-        for session in self.ir["SessionInfo"]["Sessions"]:
+        for session in common.ir["SessionInfo"]["Sessions"]:
             if session["SessionName"] == "QUALIFY":
                 quali = session["ResultsPositions"]
 
@@ -279,13 +272,13 @@ class Director:
         """
         while self.running:
             # Detect if the race has started
-            if self.ir["RaceLaps"] > 0 and not self.race_started:
+            if common.ir["RaceLaps"] > 0 and not self.race_started:
                 self.race_started = True
-                self.race_start_time = self.ir["SessionTime"]
+                self.race_start_time = common.ir["SessionTime"]
 
             # If the race has already started, update the race length
             elif self.race_started:
-                self.race_time = self.ir["SessionTime"] - self.race_start_time
+                self.race_time = common.ir["SessionTime"] - self.race_start_time
 
             # Store the previous state of the drivers
             prev_drivers = deepcopy(self.drivers)
@@ -296,15 +289,15 @@ class Director:
             # If the race hasn't started yet, focus on the front of the grid
             if not self.race_started:
                 # Get all the current track positions
-                positions = self.ir["CarIdxLapDistPct"]
+                positions = common.ir["CarIdxLapDistPct"]
 
                 # Get the quali results
-                for session in self.ir["SessionInfo"]["Sessions"]:
+                for session in common.ir["SessionInfo"]["Sessions"]:
                     if session["SessionName"] == "QUALIFY":
                         quali = session["ResultsPositions"]
                 
                 # Get driver numbers and add them to quali results
-                for driver in self.ir["DriverInfo"]["Drivers"]:
+                for driver in common.ir["DriverInfo"]["Drivers"]:
                     for car in quali:
                         if car["CarIdx"] == driver["CarIdx"]:
                             car["Number"] = int(driver["CarNumber"])
@@ -316,7 +309,7 @@ class Director:
                     if i == 0:
                         continue
                     # If car is in pits, skip
-                    if self.ir["CarIdxOnPitRoad"][i] == True:
+                    if common.ir["CarIdxOnPitRoad"][i] == True:
                         continue
                     # If position is less than 0 (haven't gridded yet), skip
                     if pos < 0:
@@ -355,17 +348,17 @@ class Director:
         self.update_iracing_settings()
 
         # Jump the beginning of current session, wait for iRacing to catch up
-        self.ir.replay_search(2)
+        common.ir.replay_search(2)
         time.sleep(1)
 
         # Hide UI
-        self.ir.cam_set_state(8)
+        common.ir.cam_set_state(8)
 
         # Start replay
-        self.ir.replay_set_play_speed(1)
+        common.ir.replay_set_play_speed(1)
 
         # Start iRacing video capture
-        self.ir.video_capture(1)
+        common.ir.video_capture(1)
 
         # Set recording start time
         self.recording_start_time = time.time()
@@ -389,10 +382,10 @@ class Director:
         self.running = False
 
         # Stop iRacing video capture
-        self.ir.video_capture(2)
+        common.ir.video_capture(2)
 
         # Stop replay
-        self.ir.replay_set_play_speed(0)
+        common.ir.replay_set_play_speed(0)
 
     def update_drivers(self):
         """Update the drivers list.
@@ -401,11 +394,11 @@ class Director:
         iRacing SDK and updating the drivers list accordingly.
         """
         # Get driver data from iRacing SDK
-        driver_data = self.ir["DriverInfo"]["Drivers"]
+        driver_data = common.ir["DriverInfo"]["Drivers"]
 
         # Update the drivers list
-        if self.ir["CarIdxPosition"] != []:
-            for i, pos in enumerate(self.ir["CarIdxPosition"]):
+        if common.ir["CarIdxPosition"] != []:
+            for i, pos in enumerate(common.ir["CarIdxPosition"]):
                 # Exclude the pace car and cars that don't exist
                 if pos == 0: 
                     continue
@@ -421,7 +414,7 @@ class Director:
                 for j, driver in enumerate(self.drivers):
                     if driver["idx"] == i:
                         # Get the driver's last lap time
-                        last_lap = self.ir["CarIdxLastLapTime"][i]
+                        last_lap = common.ir["CarIdxLastLapTime"][i]
                         self.drivers[j]["last_lap"] = last_lap
 
                         # If there's no fastest lap, set it to the last lap
@@ -433,25 +426,25 @@ class Director:
                             self.drivers[j]["fastest_lap"] = last_lap
 
                         # Update percentage of lap completed
-                        lap_percent = self.ir["CarIdxLapDistPct"][i]
+                        lap_percent = common.ir["CarIdxLapDistPct"][i]
                         self.drivers[j]["lap_percent"] = lap_percent
 
                         # Update laps started and completed
-                        started = self.ir["CarIdxLap"][i]
-                        completed = self.ir["CarIdxLapCompleted"][i]
+                        started = common.ir["CarIdxLap"][i]
+                        completed = common.ir["CarIdxLapCompleted"][i]
                         self.drivers[j]["laps_started"] = started
                         self.drivers[j]["laps_completed"] = completed
 
                         # Update gap to leader
-                        gap_to_leader = self.ir["CarIdxF2Time"][i]
+                        gap_to_leader = common.ir["CarIdxF2Time"][i]
                         self.drivers[j]["gap_to_leader"] = gap_to_leader
 
                         # Update pits status
-                        in_pits = self.ir["CarIdxOnPitRoad"][i]
+                        in_pits = common.ir["CarIdxOnPitRoad"][i]
                         self.drivers[j]["in_pits"] = in_pits
 
                         # Update on track status
-                        if self.ir["CarIdxLapDistPct"][i] > 0:
+                        if common.ir["CarIdxLapDistPct"][i] > 0:
                             self.drivers[j]["on_track"] = True
                         else:
                             self.drivers[j]["on_track"] = False

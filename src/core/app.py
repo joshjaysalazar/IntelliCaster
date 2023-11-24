@@ -5,6 +5,7 @@ import threading
 
 import customtkinter as ctk
 from elevenlabs import voices
+import irsdk
 
 from core import common
 from core import director
@@ -49,6 +50,10 @@ class App(ctk.CTk):
             file=common.settings["system"]["context_file"],
             startup=True
         )
+
+        # Set up the iRacing SDK
+        common.ir = irsdk.IRSDK()
+        common.ir.startup()
 
         # Set window properties
         ctk.set_appearance_mode("Dark")

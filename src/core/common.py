@@ -3,3 +3,6 @@ settings = None
 
 # A dict holding additional context information for commentary
 context = None
+
+# The IRSDK object
+ir = None

@@ -1,18 +1,15 @@
+from core import common
+
+
 class Camera:
     """Class for changing cameras in iRacing"""
     
-    def __init__(self, ir):
+    def __init__(self):
         """Initializes the Camera class
-        
-        Args:
-            ir (IRSDK): Instance of the IRSDK class
 
         Attributes:
-            ir (IRSDK): Instance of the IRSDK class
             cameras (dict): Dictionary of camera names and numbers
         """
-        # Member variables
-        self.ir = ir
 
         # Camera Dictionary
         self.cameras = self.get_cameras()
@@ -24,7 +21,7 @@ class Camera:
             car_idx (int): Index of the car
             camera_name (str): Name of the camera
         """
-        self.ir.cam_switch_num(car_idx, self.cameras[camera_name])
+        common.ir.cam_switch_num(car_idx, self.cameras[camera_name])
 
     def get_cameras(self):
         """Returns a dictionary of camera names and numbers
@@ -36,7 +33,7 @@ class Camera:
         cameras = {}
 
         # Populate the dictionary with the camera names and numbers
-        for camera in self.ir["CameraInfo"]["Groups"]:
+        for camera in common.ir["CameraInfo"]["Groups"]:
             cameras[camera["GroupName"]] = camera["GroupNum"]
 
         # Return the dictionary
