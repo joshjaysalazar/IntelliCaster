@@ -4,9 +4,8 @@ import random
 import threading
 import time
 
-import irsdk
-
 from core import camera
+from core import common
 from core import commentary
 
 
@@ -20,20 +19,10 @@ class Director:
     coordinates with the generator classes to generate commentary.
     """
 
-    def __init__(self, settings, context, add_message):
+    def __init__(self):
         """Initialize the Director class with necessary settings and utilities.
 
-        Args:
-            settings (ConfigParser): Settings parsed from an INI file.
-            context (dict): A dictionary containing the user context.
-            add_message (callable): A function to append messages to the
-                application's message box.
-
         Attributes:
-            settings (ConfigParser): Stores settings from the INI file.
-            context (dict): Stores the user context.
-            add_message (callable): Method to append messages.
-            ir (IRSDK object): Instance for iRacing SDK.
             drivers (list): List of dictionaries to track drivers in the race.
             race_started (bool): Flag to indicate if the race has started.
             race_start_time (float): Stores the time the race starts.
@@ -45,15 +34,6 @@ class Director:
                 generator.
             running (bool): Flag to control the run loop for the director.
         """
-        # Member variables
-        self.settings = settings
-        self.context = context
-        self.add_message = add_message
-
-        # Set up the iRacing SDK
-        self.ir = irsdk.IRSDK()
-        self.ir.startup()
-
         # Create the drivers dict
         self.drivers = self.create_drivers()
 
@@ -67,15 +47,10 @@ class Director:
         self.recording_start_time = None
 
         # Create the commentary generator
-        self.commentary = commentary.Commentary(
-            self.settings,
-            self.context,
-            self.ir, 
-            self.add_message
-        )
+        self.commentary = commentary.Commentary()
 
         # Create the camera manager
-        self.camera = camera.Camera(self.ir)
+        self.camera = camera.Camera()
 
         # Set running to False
         self.running = False
@@ -123,10 +98,10 @@ class Director:
         driver_dict = []
 
         # Get driver data from iRacing SDK
-        driver_data = self.ir["DriverInfo"]["Drivers"]
+        driver_data = common.ir["DriverInfo"]["Drivers"]
 
         # Get quali results
-        for session in self.ir["SessionInfo"]["Sessions"]:
+        for session in common.ir["SessionInfo"]["Sessions"]:
             if session["SessionName"] == "QUALIFY":
                 quali = session["ResultsPositions"]
 
@@ -243,7 +218,7 @@ class Director:
                 )
 
                 # Occassionally, generate color commentary
-                chance = float(self.settings["commentary"]["color_chance"])
+                chance = float(common.settings["commentary"]["color_chance"])
                 if random.random() < chance:
                     self.commentary.generate(
                         "Add color commentary to the previous overtake.",
@@ -286,13 +261,13 @@ class Director:
         """
         while self.running:
             # Detect if the race has started
-            if self.ir["RaceLaps"] > 0 and not self.race_started:
+            if common.ir["RaceLaps"] > 0 and not self.race_started:
                 self.race_started = True
-                self.race_start_time = self.ir["SessionTime"]
+                self.race_start_time = common.ir["SessionTime"]
 
             # If the race has already started, update the race length
             elif self.race_started:
-                self.race_time = self.ir["SessionTime"] - self.race_start_time
+                self.race_time = common.ir["SessionTime"] - self.race_start_time
 
             # Store the previous state of the drivers
             prev_drivers = deepcopy(self.drivers)
@@ -303,15 +278,15 @@ class Director:
             # If the race hasn't started yet, focus on the front of the grid
             if not self.race_started:
                 # Get all the current track positions
-                positions = self.ir["CarIdxLapDistPct"]
+                positions = common.ir["CarIdxLapDistPct"]
 
                 # Get the quali results
-                for session in self.ir["SessionInfo"]["Sessions"]:
+                for session in common.ir["SessionInfo"]["Sessions"]:
                     if session["SessionName"] == "QUALIFY":
                         quali = session["ResultsPositions"]
                 
                 # Get driver numbers and add them to quali results
-                for driver in self.ir["DriverInfo"]["Drivers"]:
+                for driver in common.ir["DriverInfo"]["Drivers"]:
                     for car in quali:
                         if car["CarIdx"] == driver["CarIdx"]:
                             car["Number"] = int(driver["CarNumber"])
@@ -323,7 +298,7 @@ class Director:
                     if i == 0:
                         continue
                     # If car is in pits, skip
-                    if self.ir["CarIdxOnPitRoad"][i] == True:
+                    if common.ir["CarIdxOnPitRoad"][i] == True:
                         continue
                     # If position is less than 0 (haven't gridded yet), skip
                     if pos < 0:
@@ -348,7 +323,7 @@ class Director:
                 self.detect_overtakes(prev_drivers)
             
             # Wait the amount of time specified in the settings
-            time.sleep(float(self.settings["director"]["update_frequency"]))
+            time.sleep(float(common.settings["director"]["update_frequency"]))
 
     def start(self):
         """Start the director.
@@ -362,17 +337,17 @@ class Director:
         self.update_iracing_settings()
 
         # Jump the beginning of current session, wait for iRacing to catch up
-        self.ir.replay_search(2)
+        common.ir.replay_search(2)
         time.sleep(1)
 
         # Hide UI
-        self.ir.cam_set_state(8)
+        common.ir.cam_set_state(8)
 
         # Start replay
-        self.ir.replay_set_play_speed(1)
+        common.ir.replay_set_play_speed(1)
 
         # Start iRacing video capture
-        self.ir.video_capture(1)
+        common.ir.video_capture(1)
 
         # Set recording start time
         self.recording_start_time = time.time()
@@ -396,10 +371,10 @@ class Director:
         self.running = False
 
         # Stop iRacing video capture
-        self.ir.video_capture(2)
+        common.ir.video_capture(2)
 
         # Stop replay
-        self.ir.replay_set_play_speed(0)
+        common.ir.replay_set_play_speed(0)
 
     def update_drivers(self):
         """Update the drivers list.
@@ -408,11 +383,11 @@ class Director:
         iRacing SDK and updating the drivers list accordingly.
         """
         # Get driver data from iRacing SDK
-        driver_data = self.ir["DriverInfo"]["Drivers"]
+        driver_data = common.ir["DriverInfo"]["Drivers"]
 
         # Update the drivers list
-        if self.ir["CarIdxPosition"] != []:
-            for i, pos in enumerate(self.ir["CarIdxPosition"]):
+        if common.ir["CarIdxPosition"] != []:
+            for i, pos in enumerate(common.ir["CarIdxPosition"]):
                 # Exclude the pace car and cars that don't exist
                 if pos == 0: 
                     continue
@@ -428,7 +403,7 @@ class Director:
                 for j, driver in enumerate(self.drivers):
                     if driver["idx"] == i:
                         # Get the driver's last lap time
-                        last_lap = self.ir["CarIdxLastLapTime"][i]
+                        last_lap = common.ir["CarIdxLastLapTime"][i]
                         self.drivers[j]["last_lap"] = last_lap
 
                         # If there's no fastest lap, set it to the last lap
@@ -440,25 +415,25 @@ class Director:
                             self.drivers[j]["fastest_lap"] = last_lap
 
                         # Update percentage of lap completed
-                        lap_percent = self.ir["CarIdxLapDistPct"][i]
+                        lap_percent = common.ir["CarIdxLapDistPct"][i]
                         self.drivers[j]["lap_percent"] = lap_percent
 
                         # Update laps started and completed
-                        started = self.ir["CarIdxLap"][i]
-                        completed = self.ir["CarIdxLapCompleted"][i]
+                        started = common.ir["CarIdxLap"][i]
+                        completed = common.ir["CarIdxLapCompleted"][i]
                         self.drivers[j]["laps_started"] = started
                         self.drivers[j]["laps_completed"] = completed
 
                         # Update gap to leader
-                        gap_to_leader = self.ir["CarIdxF2Time"][i]
+                        gap_to_leader = common.ir["CarIdxF2Time"][i]
                         self.drivers[j]["gap_to_leader"] = gap_to_leader
 
                         # Update pits status
-                        in_pits = self.ir["CarIdxOnPitRoad"][i]
+                        in_pits = common.ir["CarIdxOnPitRoad"][i]
                         self.drivers[j]["in_pits"] = in_pits
 
                         # Update on track status
-                        if self.ir["CarIdxLapDistPct"][i] > 0:
+                        if common.ir["CarIdxLapDistPct"][i] > 0:
                             self.drivers[j]["on_track"] = True
                         else:
                             self.drivers[j]["on_track"] = False
@@ -489,7 +464,7 @@ class Director:
         and set the video format, framerate, and resolution.
         """
         # Get the iRacing directory
-        path = self.settings["general"]["iracing_path"]
+        path = common.settings["general"]["iracing_path"]
 
         # Read app.ini
         with open(os.path.join(path, "app.ini"), "r") as f:
@@ -502,13 +477,13 @@ class Director:
         app_ini = app_ini.replace("videoCaptureMic=1", "videoCaptureMic=0")
 
         # Set the video file format
-        if self.settings["general"]["video_format"] == "mp4":
+        if common.settings["general"]["video_format"] == "mp4":
             format = 0
-        elif self.settings["general"]["video_format"] == "wmv":
+        elif common.settings["general"]["video_format"] == "wmv":
             format = 1
-        elif self.settings["general"]["video_format"] == "avi2":
+        elif common.settings["general"]["video_format"] == "avi2":
             format = 2
-        elif self.settings["general"]["video_format"] == "avi":
+        elif common.settings["general"]["video_format"] == "avi":
             format = 3
         for i in range(4):
             app_ini = app_ini.replace(
@@ -517,9 +492,9 @@ class Director:
             )
 
         # Set the video framerate
-        if self.settings["general"]["video_framerate"] == "60":
+        if common.settings["general"]["video_framerate"] == "60":
             framerate = 0
-        elif self.settings["general"]["video_framerate"] == "30":
+        elif common.settings["general"]["video_framerate"] == "30":
             framerate = 1
         for i in range(2):
             app_ini = app_ini.replace(
@@ -528,11 +503,11 @@ class Director:
             )
 
         # Set the video resolution
-        if self.settings["general"]["video_resolution"] == "1920x1080":
+        if common.settings["general"]["video_resolution"] == "1920x1080":
             resolution = 1
-        elif self.settings["general"]["video_resolution"] == "1280x720":
+        elif common.settings["general"]["video_resolution"] == "1280x720":
             resolution = 2
-        elif self.settings["general"]["video_resolution"] == "854x480":
+        elif common.settings["general"]["video_resolution"] == "854x480":
             resolution = 3
         for i in range(4):
             app_ini = app_ini.replace(
