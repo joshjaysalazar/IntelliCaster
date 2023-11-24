@@ -1,3 +1,9 @@
+"""
+This module contains global variables used throughout the application. It is
+used to store variables which are used by multiple modules, such as the
+application window and the settings file.
+"""
+
 # Contains the pointer to the root application window
 app = None
 
