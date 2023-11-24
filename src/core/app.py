@@ -71,7 +71,6 @@ class App(ctk.CTk):
 
         # Create the director
         self.director = director.Director(
-            self.context,
             self.add_message
         )
 
@@ -160,7 +159,7 @@ class App(ctk.CTk):
         )
 
         # Create league name entry box
-        default = self.context["league"]["name"]
+        default = common.context["league"]["name"]
         self.create_entry(
             self.frm_context,
             "name",
@@ -170,7 +169,7 @@ class App(ctk.CTk):
         )
 
         # Create league short name entry box
-        default = self.context["league"]["short_name"]
+        default = common.context["league"]["short_name"]
         self.create_entry(
             self.frm_context,
             "short_name",
@@ -703,7 +702,7 @@ class App(ctk.CTk):
         if startup:
             # Load context from file
             with open(file, "r") as f:
-                self.context = json.load(f)
+                common.context = json.load(f)
 
             # End method
             return
@@ -721,7 +720,7 @@ class App(ctk.CTk):
 
         # Load context from file
         with open(file, "r") as f:
-            self.context = json.load(f)
+            common.context = json.load(f)
 
         # Update context file in settings
         common.settings["system"]["context_file"] = file
@@ -733,7 +732,7 @@ class App(ctk.CTk):
         # Update entry boxes with context
         for key in self.current_context:
             for setting in self.current_context[key]:
-                value = self.context[key][setting]
+                value = common.context[key][setting]
                 self.current_context[key][setting].delete(0, "end")
                 self.current_context[key][setting].insert(0, value)
 
@@ -773,7 +772,7 @@ class App(ctk.CTk):
         for key in self.current_context:
             for setting in self.current_context[key]:
                 new_setting = self.current_context[key][setting].get()
-                self.context[key][setting] = new_setting
+                common.context[key][setting] = new_setting
 
         # Open save as dialog
         file_name = filedialog.asksaveasfilename(
@@ -787,7 +786,7 @@ class App(ctk.CTk):
 
         # Save context to file
         with open(file_name, "w") as f:
-            json.dump(self.context, f, indent=4)
+            json.dump(common.context, f, indent=4)
 
         # Update context file in settings
         common.settings["system"]["context_file"] = file_name
