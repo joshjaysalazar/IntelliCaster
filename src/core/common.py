@@ -69,3 +69,6 @@ ir = None
 # Dictionaries to track the status of the drivers
 drivers = []
 prev_drivers = []
+
+# Flag to track whether or not commentary is running
+running = False

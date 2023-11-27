@@ -31,7 +31,6 @@ class Director:
                 generator.
             voice_generator (VoiceGenerator object): Voice-based commentary
                 generator.
-            running (bool): Flag to control the run loop for the director.
         """
 
         # Track race start status
@@ -53,7 +52,7 @@ class Director:
         self.camera = None
 
         # Set running to False
-        self.running = False
+        common.running = False
 
     def check_all_cars_started(self):
         """Check if all cars in the race have started.
@@ -244,7 +243,7 @@ class Director:
         self.camera = camera.Camera()
 
         # Keep running until told to stop
-        while self.running:
+        while common.running:
             # Detect if the race has started
             if common.ir["RaceLaps"] > 0 and not self.race_started:
                 self.race_started = True
@@ -338,7 +337,7 @@ class Director:
         time.sleep(1)
 
         # Set running to True
-        self.running = True
+        common.running = True
 
         # Start the director thread
         threading.Thread(target=self.run).start()
@@ -350,7 +349,7 @@ class Director:
         stopping iRacing video capture, and stopping the replay.
         """
         # Set running to False
-        self.running = False
+        common.running = False
 
         # Stop iRacing video capture
         common.ir.video_capture(2)
