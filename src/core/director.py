@@ -27,10 +27,10 @@ class Director:
             race_start_time (float): Stores the time the race starts.
             race_time (float): Stores the elapsed time since the race started.
             all_cars_started (bool): Flag to indicate if all cars have started.
-            text_generator (TextGenerator object): Text-based commentary
-                generator.
-            voice_generator (VoiceGenerator object): Voice-based commentary
-                generator.
+            recording_start_time (float): Stores the time recording starts.
+            events (Events): The events manager.
+            commentary (Commentary): The commentary generator.
+            camera (Camera): The camera manager.
         """
 
         # Track race start status
