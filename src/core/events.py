@@ -33,12 +33,12 @@ class Events:
         # Increment the id counter
         self.id_counter += 1
 
-    def _detect_overtakes(self, drivers, prev_drivers):
+    def _detect_overtakes(self):
         # Go through all the drivers
-        for driver in drivers:
+        for driver in common.drivers:
             # Get this driver's previous information
             prev_driver = None
-            for item in prev_drivers:
+            for item in common.prev_drivers:
                 if item["name"] == driver["name"]:
                     prev_driver = item
                     break
@@ -47,7 +47,7 @@ class Events:
             if prev_driver and driver["position"] < prev_driver["position"]:
                 # Find the driver whose position is 1 higher than this driver's
                 overtaken = None
-                for item in drivers:
+                for item in common.drivers:
                     if item["position"] == driver["position"] + 1:
                         overtaken = item
                         break
@@ -201,7 +201,7 @@ class Events:
             self._update_drivers()
 
             # Detect events
-            self._detect_overtakes(common.drivers, common.prev_drivers)
+            self._detect_overtakes()
 
             # Update the previous drivers list
             common.prev_drivers = deepcopy(common.drivers)
