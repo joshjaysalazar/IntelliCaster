@@ -5,7 +5,22 @@ from core import common
 
 
 class Events:
+    """A class to detect and report events.
+    
+    This class is used to detect and report events such as overtakes and
+    incidents. It is run in a separate thread from the main thread and is
+    responsible for updating the drivers list and the previous drivers list.
+    """
     def __init__(self):
+        """Initialize the Events object.
+
+        This method initializes the Events object by creating an empty events
+        list and setting the id counter to 0.
+
+        Attributes:
+            events (list): A list of events
+            id_counter (int): The id of the next event to be added
+        """
         # Initialize the events list and id counter
         self.events = []
         self.id_counter = 0
@@ -34,6 +49,15 @@ class Events:
         self.id_counter += 1
 
     def _detect_overtakes(self):
+        """Detect overtakes and add them to the events list.
+        
+        This method detects overtakes by comparing the current drivers list to
+        the previous drivers list. If a driver's position has decreased, they
+        have overtaken someone. If this is the case, the driver who was
+        overtaken is found and an overtake event is added to the events list.
+        This method also checks a few other conditions to make sure the overtake
+        is legitimate.
+        """
         # Go through all the drivers
         for driver in common.drivers:
             # Get this driver's previous information
@@ -190,10 +214,11 @@ class Events:
         return event
     
     def run(self):
-        """Update the events list.
+        """Run the events thread.
 
-        This method updates the events list by getting the latest data from the
-        iRacing SDK and updating the events list accordingly.
+        This method runs the events thread, which detects events and adds them
+        to the events list. It also updates the drivers list and the previous
+        drivers list.
         """
         # Keep running until told to stop
         while common.running:
