@@ -157,7 +157,7 @@ class Events:
                         common.drivers[j]["incidents"] = incidents
 
         # Sort the list by current position if race has started
-        if self.race_started:
+        if common.race_started:
             common.drivers.sort(
                 key=lambda x: x["laps_completed"] + x["lap_percent"],
                 reverse=True
