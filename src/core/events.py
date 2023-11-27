@@ -189,7 +189,7 @@ class Events:
         self._remove(event["id"])
         return event
     
-    def update(self):
+    def run(self):
         """Update the events list.
 
         This method updates the events list by getting the latest data from the
@@ -203,3 +203,6 @@ class Events:
 
         # Update the previous drivers list
         common.prev_drivers = deepcopy(common.drivers)
+
+        # Wait the amount of time specified in the settings
+        time.sleep(float(common.settings["director"]["update_frequency"]))
