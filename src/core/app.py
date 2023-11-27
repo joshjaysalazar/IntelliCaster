@@ -911,6 +911,11 @@ class App(ctk.CTk):
             event: Not used, but included for compatibility with button clicks.
         """
         if self.btn_start_stop.cget("text") == "⏵ Start Commentary":
+            # Check if iRacing is running
+            if not common.check_iracing():
+                self.add_message("iRacing is not running!")
+                return
+            
             # Change button text
             self.btn_start_stop.configure(text="⏹ Stop Commentary")
 
