@@ -377,6 +377,9 @@ class Director:
         # Set running to False
         self.running = False
 
+        # Shut down the IRSDK object
+        common.ir.shutdown()
+
         # Stop iRacing video capture
         common.ir.video_capture(2)
 
