@@ -913,7 +913,9 @@ class App(ctk.CTk):
         if self.btn_start_stop.cget("text") == "⏵ Start Commentary":
             # Check if iRacing is running
             if not common.check_iracing():
-                self.add_message("iRacing is not running!")
+                error_message = "iRacing is not running! Please open an " \
+                    "iRacing replay and try again."
+                self.add_message(error_message)
                 return
             
             # Change button text
