@@ -231,5 +231,11 @@ class Events:
             # Update the previous drivers list
             common.prev_drivers = deepcopy(common.drivers)
 
+            # Remove old events
+            max_hist_len = float(common.settings["system"]["event_hist_len"])
+            for event in self.events:
+                if time.time() - event["timestamp"] > max_hist_len:
+                    self._remove(event["id"])
+
             # Wait the amount of time specified in the settings
             time.sleep(float(common.settings["system"]["events_update_freq"]))

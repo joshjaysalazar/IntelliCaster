@@ -61,6 +61,7 @@ def create_settings_file(file_name):
         config.set("system", "context_file", "context.json")
         config.set("system", "director_update_freq", "1")
         config.set("system", "events_update_freq", "1")
+        config.set("system", "event_hist_len", "10")
 
         # Write to file
         with open(file_name, "w") as config_file:
