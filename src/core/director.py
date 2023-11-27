@@ -250,7 +250,7 @@ class Director:
             event["description"] + f" {time_since_event} seconds ago.",
             "play-by-play",
             "neutral",
-            "Be sure to include the position of the driver.",
+            common.instructions[event["type"]],
             yelling=True,
             rec_start_time=self.recording_start_time
         )

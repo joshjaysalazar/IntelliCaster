@@ -72,3 +72,8 @@ prev_drivers = []
 
 # Flag to track whether or not commentary is running
 running = False
+
+# Additional instructions to give to commentary generation depending on event
+instructions = {
+    "overtake": "Be sure to include the position of the driver."
+}
