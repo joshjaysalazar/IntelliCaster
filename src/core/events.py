@@ -195,14 +195,16 @@ class Events:
         This method updates the events list by getting the latest data from the
         iRacing SDK and updating the events list accordingly.
         """
-        # Update the drivers list
-        self._update_drivers()
+        # Keep running until told to stop
+        while common.running:
+            # Update the drivers list
+            self._update_drivers()
 
-        # Detect events
-        self._detect_overtakes(common.drivers, common.prev_drivers)
+            # Detect events
+            self._detect_overtakes(common.drivers, common.prev_drivers)
 
-        # Update the previous drivers list
-        common.prev_drivers = deepcopy(common.drivers)
+            # Update the previous drivers list
+            common.prev_drivers = deepcopy(common.drivers)
 
-        # Wait the amount of time specified in the settings
-        time.sleep(float(common.settings["director"]["update_frequency"]))
+            # Wait the amount of time specified in the settings
+            time.sleep(float(common.settings["director"]["update_frequency"]))
