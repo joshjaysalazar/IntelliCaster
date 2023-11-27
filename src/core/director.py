@@ -34,8 +34,8 @@ class Director:
                 generator.
             running (bool): Flag to control the run loop for the director.
         """
-        # Create the drivers dict
-        self.drivers = self.create_drivers()
+        # Create an empty list to track drivers
+        self.drivers = []
 
         # Track race start status
         self.race_started = False
@@ -49,8 +49,8 @@ class Director:
         # Create the commentary generator
         self.commentary = commentary.Commentary()
 
-        # Create the camera manager
-        self.camera = camera.Camera()
+        # Create a variable for the camera manager (initialized when run)
+        self.camera = None
 
         # Set running to False
         self.running = False
@@ -259,6 +259,13 @@ class Director:
         This method keeps running as long as the director is set to run. It
         handles all of the logic for generating commentary.
         """
+        # Create the drivers dict
+        self.drivers = self.create_drivers()
+
+        # Create the camera manager
+        self.camera = camera.Camera()
+
+        # Keep running until told to stop
         while self.running:
             # Detect if the race has started
             if common.ir["RaceLaps"] > 0 and not self.race_started:
@@ -336,7 +343,7 @@ class Director:
         # Update iRacing settings
         self.update_iracing_settings()
 
-        # Jump the beginning of current session, wait for iRacing to catch up
+        # Jump to beginning of current session, wait for iRacing to catch up
         common.ir.replay_search(2)
         time.sleep(1)
 
@@ -375,6 +382,9 @@ class Director:
 
         # Stop replay
         common.ir.replay_set_play_speed(0)
+
+        # Shut down the IRSDK object
+        common.ir.shutdown()
 
     def update_drivers(self):
         """Update the drivers list.

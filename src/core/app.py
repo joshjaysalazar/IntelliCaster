@@ -53,7 +53,6 @@ class App(ctk.CTk):
 
         # Set up the iRacing SDK
         common.ir = irsdk.IRSDK()
-        common.ir.startup()
 
         # Set window properties
         ctk.set_appearance_mode("Dark")
@@ -912,6 +911,13 @@ class App(ctk.CTk):
             event: Not used, but included for compatibility with button clicks.
         """
         if self.btn_start_stop.cget("text") == "⏵ Start Commentary":
+            # Check if iRacing is running
+            if not common.check_iracing():
+                error_message = "iRacing is not running! Please open an " \
+                    "iRacing replay and try again."
+                self.add_message(error_message)
+                return
+            
             # Change button text
             self.btn_start_stop.configure(text="⏹ Stop Commentary")
 
