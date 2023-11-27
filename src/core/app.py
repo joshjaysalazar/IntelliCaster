@@ -589,24 +589,6 @@ class App(ctk.CTk):
             self.current_settings
         )
 
-        # Create Director section
-        self.create_section(
-            self.frm_settings, 
-            "director",
-            "Director",
-            self.current_settings
-        )
-
-        # Create update frequency entry box
-        default = common.settings["director"]["update_frequency"]
-        self.create_entry(
-            self.frm_settings,
-            "update_frequency",
-            "Update Frequency (seconds)",
-            default,
-            variable=self.current_settings
-        )
-
         # Create commentary section
         self.create_section(
             self.frm_settings, 

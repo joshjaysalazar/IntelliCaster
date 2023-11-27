@@ -1,4 +1,3 @@
-from copy import deepcopy
 import os
 import random
 import threading
@@ -7,6 +6,7 @@ import time
 from core import camera
 from core import common
 from core import commentary
+from core import events
 
 
 class Director:
@@ -23,28 +23,23 @@ class Director:
         """Initialize the Director class with necessary settings and utilities.
 
         Attributes:
-            drivers (list): List of dictionaries to track drivers in the race.
-            race_started (bool): Flag to indicate if the race has started.
-            race_start_time (float): Stores the time the race starts.
-            race_time (float): Stores the elapsed time since the race started.
-            all_cars_started (bool): Flag to indicate if all cars have started.
-            text_generator (TextGenerator object): Text-based commentary
-                generator.
-            voice_generator (VoiceGenerator object): Voice-based commentary
-                generator.
-            running (bool): Flag to control the run loop for the director.
+            recording_start_time (float): Stores the time recording starts.
+            events (Events): The events manager.
+            commentary (Commentary): The commentary generator.
+            camera (Camera): The camera manager.
         """
-        # Create an empty list to track drivers
-        self.drivers = []
 
-        # Track race start status
-        self.race_started = False
-        self.race_start_time = None
-        self.race_time = 0
-        self.all_cars_started = False
+        # Reset race status variables
+        common.race_started = False
+        common.start_time = None
+        common.race_time = 0
+        common.all_cars_started = False
 
-        # Track recording start time
-        self.recording_start_time = None
+        # Reset recording start time
+        common.recording_start_time = None
+
+        # Create the events manager
+        self.events = events.Events()
 
         # Create the commentary generator
         self.commentary = commentary.Commentary()
@@ -53,7 +48,7 @@ class Director:
         self.camera = None
 
         # Set running to False
-        self.running = False
+        common.running = False
 
     def check_all_cars_started(self):
         """Check if all cars in the race have started.
@@ -66,13 +61,13 @@ class Director:
             bool: True if all cars have started, False otherwise.
         """
         # If drivers list is empty, return False
-        if self.drivers == []:
+        if common.drivers == []:
             return False
 
         # Check if race recently started
-        if self.race_time <= 20:
+        if common.race_time <= 20:
             # Check if each car has crossed the line
-            for driver in self.drivers:           
+            for driver in common.drivers:           
                 d = driver["laps_completed"] + driver["lap_percent"]
                 # If between 0.8 and 1, car hasn't started first lap
                 if 0.8 < d < 1:
@@ -85,173 +80,50 @@ class Director:
         # If all cars have started, return True
         return True
 
-    def create_drivers(self):
-        """Create a list of drivers.
+    def generate_color_commentary(self):
+        """Generate color commentary.
 
-        This method creates a list of drivers from the iRacing SDK. It is called
-        when the Director class is initialized.
-
-        Returns:
-            list: A list of dictionaries containing driver data.
+        A random chance is used to determine if color commentary should be
+        generated. If the chance is met, the commentary generator is called to
+        generate color commentary.
         """
-        # Create an empty list to track drivers
-        driver_dict = []
+        # Get the chance of generating color commentary
+        chance = float(common.settings["commentary"]["color_chance"])
 
-        # Get driver data from iRacing SDK
-        driver_data = common.ir["DriverInfo"]["Drivers"]
-
-        # Get quali results
-        for session in common.ir["SessionInfo"]["Sessions"]:
-            if session["SessionName"] == "QUALIFY":
-                quali = session["ResultsPositions"]
-
-        # Create a dictionary for each driver
-        for driver in driver_data:
-            # Skip the pace car
-            if driver["CarIdx"] == 0:
-                continue
-
-            # Get the driver's quali position
-            for car in quali:
-                if car["CarIdx"] == driver["CarIdx"]:
-                    quali_pos = car["Position"]
-
-            # Add the driver to the list
-            driver_dict.append(
-                {
-                    "car_name": driver["CarScreenNameShort"],
-                    "fastest_lap": None,
-                    "gap_to_leader": None,
-                    "grid_position": quali_pos,
-                    "idx": driver["CarIdx"],
-                    "in_pits": False,
-                    "incidents": driver["CurDriverIncidentCount"],
-                    "irating": driver["IRating"],
-                    "lap_percent": 0,
-                    "laps_completed": 0,
-                    "laps_started": 0,
-                    "last_lap": None,
-                    "license": driver["LicString"],
-                    "name": driver["UserName"],
-                    "number": driver["CarNumberRaw"],
-                    "on_track": False,
-                    "position": quali_pos
-                }
+        # Generate color commentary with the specified chance
+        if random.random() < chance:
+            self.commentary.generate(
+                "Add color commentary to the previous commentary.",
+                "color",
+                "neutral",
+                yelling=True,
+                rec_start_time=common.recording_start_time
             )
 
-        # Sort the list by grid position
-        driver_dict.sort(key=lambda x: x["grid_position"])
+    def generate_event_commentary(self, event):
+        """Generate commentary for an event.
 
-        # Return the list of drivers
-        return driver_dict
-
-    def detect_overtakes(self, prev_drivers):
-        """Detect and report overtakes during the race.
-
-        This method iterates through the current list of drivers and compares
-        their positions with their positions from a previous snapshot
-        (prev_drivers). If a driver has moved up in position, an overtake is
-        detected and appropriate commentary is generated. The camera will also
-        focus on the overtaking driver.
+        This method generates commentary for a specified event. It also changes
+        the camera to focus on the event.
 
         Args:
-            prev_drivers (list): A list of dictionaries containing the previous
-                state of each driver.
-                
-        Note:
-            Overtakes are not reported under specific conditions, like if a
-            driver is in the pits, has a DNF status, or if the overtaken driver
-            is not found in the current list.
+            event (dict): A dictionary containing information about the event.
         """
-        # Go through all the drivers
-        for driver in self.drivers:
-            # Get this driver's previous information
-            prev_driver = None
-            for item in prev_drivers:
-                if item["name"] == driver["name"]:
-                    prev_driver = item
-                    break
+        # Move the camera to focus on the event
+        self.camera.change_camera(event["focus"], "TV1")
 
-            # If a driver's position has decreased, they have overtaken someone
-            if prev_driver and driver["position"] < prev_driver["position"]:
-                # Find the driver whose position is 1 higher than this driver's
-                overtaken = None
-                for item in self.drivers:
-                    if item["position"] == driver["position"] + 1:
-                        overtaken = item
-                        break
-                
-                # If no driver was found, don't report overtake
-                if not overtaken:
-                    continue
+        # Get how long ago the event happened
+        time_since_event = time.time() - event["timestamp"]
 
-                # If either driver is in the pits, don't report overtake
-                if driver["in_pits"] or overtaken["in_pits"]:
-                    continue
-
-                # If laps completed is negative (DNF), don't report overtake
-                if driver["laps_completed"] < 0:
-                    continue
-                if overtaken["laps_completed"] < 0:
-                    continue
-
-                # If an legitimate overtake was found, generate the commentary
-                driver_name = self.remove_numbers(driver["name"])
-                overtaken_name = self.remove_numbers(overtaken["name"])
-                output = (
-                    f"{driver_name} has overtaken "
-                    f"{overtaken_name} for "
-                    f"P{driver['position']}"
-                )
-        
-                # Move the camera to focus on the overtaking driver
-                self.camera.change_camera(driver["number"], "TV1")
-
-                # Generate the commentary
-                self.commentary.generate(
-                    output,
-                    "play-by-play",
-                    "neutral",
-                    "Be sure to include the position of the overtaking driver.",
-                    yelling=True,
-                    rec_start_time=self.recording_start_time
-                )
-
-                # Occassionally, generate color commentary
-                chance = float(common.settings["commentary"]["color_chance"])
-                if random.random() < chance:
-                    self.commentary.generate(
-                        "Add color commentary to the previous overtake.",
-                        "color",
-                        "neutral",
-                        yelling=True,
-                        rec_start_time=self.recording_start_time
-                    )
-
-                # End this iteration of the loop
-                break
-
-    def remove_numbers(self, name):
-        """Remove digits from a driver's name string.
-
-        This method takes a name string that may contain digits and removes
-        those digits.
-
-        Args:
-            name (str): The driver's name possibly containing digits.
-
-        Returns:
-            str: The driver's name without any digits.
-        """
-        # Create a list of digits
-        digits = [str(i) for i in range(10)]
-
-        # Remove any digits from the name
-        for digit in digits:
-            name = name.replace(digit, "")
-        
-        # Return the name
-        return name
+        # Generate the commentary
+        self.commentary.generate(
+            event["description"] + f" {time_since_event} seconds ago.",
+            "play-by-play",
+            "neutral",
+            common.instructions[event["type"]],
+            yelling=True,
+            rec_start_time=common.recording_start_time
+        )
 
     def run(self):
         """The main loop for the Director class.
@@ -259,31 +131,22 @@ class Director:
         This method keeps running as long as the director is set to run. It
         handles all of the logic for generating commentary.
         """
-        # Create the drivers dict
-        self.drivers = self.create_drivers()
-
         # Create the camera manager
         self.camera = camera.Camera()
 
         # Keep running until told to stop
-        while self.running:
+        while common.running:
             # Detect if the race has started
-            if common.ir["RaceLaps"] > 0 and not self.race_started:
-                self.race_started = True
-                self.race_start_time = common.ir["SessionTime"]
+            if common.ir["RaceLaps"] > 0 and not common.race_started:
+                common.race_started = True
+                common.start_time = common.ir["SessionTime"]
 
             # If the race has already started, update the race length
-            elif self.race_started:
-                self.race_time = common.ir["SessionTime"] - self.race_start_time
-
-            # Store the previous state of the drivers
-            prev_drivers = deepcopy(self.drivers)
-
-            # Update the drivers list
-            self.update_drivers()
+            elif common.race_started:
+                common.race_time = common.ir["SessionTime"] - common.start_time
 
             # If the race hasn't started yet, focus on the front of the grid
-            if not self.race_started:
+            if not common.race_started:
                 # Get all the current track positions
                 positions = common.ir["CarIdxLapDistPct"]
 
@@ -321,16 +184,23 @@ class Director:
                 self.camera.change_camera(driver, "TV1")
 
             # Check if all cars have crossed the start line if needed
-            if not self.all_cars_started:
-                self.all_cars_started = self.check_all_cars_started()
+            if not common.all_cars_started:
+                common.all_cars_started = self.check_all_cars_started()
 
             # If the race has started, generate commentary
-            if self.race_started and self.all_cars_started:
-                # Check for overtakes
-                self.detect_overtakes(prev_drivers)
+            if common.race_started and common.all_cars_started:
+                # Get the next event to generate commentary for
+                event = self.events.get_next_event()
+
+                # If an event was found, report it
+                if event:
+                    self.generate_event_commentary(event)
+
+                # Occasionally generate color commentary
+                self.generate_color_commentary()
             
             # Wait the amount of time specified in the settings
-            time.sleep(float(common.settings["director"]["update_frequency"]))
+            time.sleep(float(common.settings["system"]["director_update_freq"]))
 
     def start(self):
         """Start the director.
@@ -357,13 +227,16 @@ class Director:
         common.ir.video_capture(1)
 
         # Set recording start time
-        self.recording_start_time = time.time()
+        common.recording_start_time = time.time()
 
         # Wait for iRacing to catch up
         time.sleep(1)
 
         # Set running to True
-        self.running = True
+        common.running = True
+
+        # Start the events thread
+        threading.Thread(target=self.events.run).start()
 
         # Start the director thread
         threading.Thread(target=self.run).start()
@@ -375,7 +248,7 @@ class Director:
         stopping iRacing video capture, and stopping the replay.
         """
         # Set running to False
-        self.running = False
+        common.running = False
 
         # Stop iRacing video capture
         common.ir.video_capture(2)
@@ -385,87 +258,6 @@ class Director:
 
         # Shut down the IRSDK object
         common.ir.shutdown()
-
-    def update_drivers(self):
-        """Update the drivers list.
-
-        This method updates the drivers list by getting the latest data from the
-        iRacing SDK and updating the drivers list accordingly.
-        """
-        # Get driver data from iRacing SDK
-        driver_data = common.ir["DriverInfo"]["Drivers"]
-
-        # Update the drivers list
-        if common.ir["CarIdxPosition"] != []:
-            for i, pos in enumerate(common.ir["CarIdxPosition"]):
-                # Exclude the pace car and cars that don't exist
-                if pos == 0: 
-                    continue
-                # Exclude disconnected drivers
-                try:
-                    if not driver_data[i]["UserName"]:
-                        continue
-                # If i is out of range, continue
-                except:
-                    continue
-
-                # Find the driver in the drivers list at this index
-                for j, driver in enumerate(self.drivers):
-                    if driver["idx"] == i:
-                        # Get the driver's last lap time
-                        last_lap = common.ir["CarIdxLastLapTime"][i]
-                        self.drivers[j]["last_lap"] = last_lap
-
-                        # If there's no fastest lap, set it to the last lap
-                        if driver["fastest_lap"] == None:
-                            self.drivers[j]["fastest_lap"] = last_lap
-                        
-                        # If the last lap is faster than the fastest lap, update
-                        elif last_lap < driver["fastest_lap"]:
-                            self.drivers[j]["fastest_lap"] = last_lap
-
-                        # Update percentage of lap completed
-                        lap_percent = common.ir["CarIdxLapDistPct"][i]
-                        self.drivers[j]["lap_percent"] = lap_percent
-
-                        # Update laps started and completed
-                        started = common.ir["CarIdxLap"][i]
-                        completed = common.ir["CarIdxLapCompleted"][i]
-                        self.drivers[j]["laps_started"] = started
-                        self.drivers[j]["laps_completed"] = completed
-
-                        # Update gap to leader
-                        gap_to_leader = common.ir["CarIdxF2Time"][i]
-                        self.drivers[j]["gap_to_leader"] = gap_to_leader
-
-                        # Update pits status
-                        in_pits = common.ir["CarIdxOnPitRoad"][i]
-                        self.drivers[j]["in_pits"] = in_pits
-
-                        # Update on track status
-                        if common.ir["CarIdxLapDistPct"][i] > 0:
-                            self.drivers[j]["on_track"] = True
-                        else:
-                            self.drivers[j]["on_track"] = False
-
-                        # Update incidents
-                        incidents = driver_data[i]["CurDriverIncidentCount"]
-                        self.drivers[j]["incidents"] = incidents
-
-        # Sort the list by current position if race has started
-        if self.race_started:
-            self.drivers.sort(
-                key=lambda x: x["laps_completed"] + x["lap_percent"],
-                reverse=True
-            )
-
-            # Update the positions
-            for i, driver in enumerate(self.drivers):
-                self.drivers[i]["position"] = i + 1
-                
-        # Otherwise, sort by grid position
-        else:
-            self.drivers.sort(key=lambda x: x["grid_position"])
             
     def update_iracing_settings(self):
         """Update iRacing settings to enable video capture.

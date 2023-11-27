@@ -192,6 +192,7 @@ class TextGenerator:
         new_msg += f"Use a {tone} tone. "
         new_msg += "Occasionally mention your co-commentator by name, but " \
             "never refer to yourself by name. "
+        new_msg += "Never ask your co-commentator a question. "
 
         # Add additional info to the end of the system message
         new_msg += other_info
