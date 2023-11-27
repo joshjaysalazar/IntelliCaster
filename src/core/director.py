@@ -83,7 +83,9 @@ class Director:
     def generate_color_commentary(self):
         """Generate color commentary.
 
-        This method generates color commentary with a specified chance.
+        A random chance is used to determine if color commentary should be
+        generated. If the chance is met, the commentary generator is called to
+        generate color commentary.
         """
         # Get the chance of generating color commentary
         chance = float(common.settings["commentary"]["color_chance"])
