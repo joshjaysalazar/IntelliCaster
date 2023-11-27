@@ -40,3 +40,48 @@ class Events:
         for event in self.events:
             if event["id"] == id:
                 self.events.remove(event)
+
+    def detect_overtakes(self, drivers, prev_drivers):
+        # Go through all the drivers
+        for driver in drivers:
+            # Get this driver's previous information
+            prev_driver = None
+            for item in prev_drivers:
+                if item["name"] == driver["name"]:
+                    prev_driver = item
+                    break
+
+            # If a driver's position has decreased, they have overtaken someone
+            if prev_driver and driver["position"] < prev_driver["position"]:
+                # Find the driver whose position is 1 higher than this driver's
+                overtaken = None
+                for item in drivers:
+                    if item["position"] == driver["position"] + 1:
+                        overtaken = item
+                        break
+                
+                # If no driver was found, don't report overtake
+                if not overtaken:
+                    continue
+
+                # If either driver is in the pits, don't report overtake
+                if driver["in_pits"] or overtaken["in_pits"]:
+                    continue
+
+                # If laps completed is negative (DNF), don't report overtake
+                if driver["laps_completed"] < 0:
+                    continue
+                if overtaken["laps_completed"] < 0:
+                    continue
+
+                # # If an legitimate overtake was found, generate the commentary
+                # driver_name = self.remove_numbers(driver["name"])
+                # overtaken_name = self.remove_numbers(overtaken["name"])
+                # output = (
+                #     f"{driver_name} has overtaken "
+                #     f"{overtaken_name} for "
+                #     f"P{driver['position']}"
+                # )
+
+                # End this iteration of the loop
+                break
