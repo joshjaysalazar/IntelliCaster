@@ -27,7 +27,7 @@ class Events:
         }
 
         # Add the event to the list
-        self.events.insert(0, new_event)
+        self.events.append(new_event)
 
         # Increment the id counter
         self.id_counter += 1
@@ -99,3 +99,21 @@ class Events:
         """
         # Detect overtakes
         self._detect_overtakes(drivers, prev_drivers)
+
+    def pick_next_event(self):
+        """Pick the next event to report.
+        
+        Returns:
+            dict: The next event to report
+        """
+        # If there are no events, return None
+        if not self.events:
+            return None
+        
+        # Sort the events list by timestamp, with the most recent first
+        self.events.sort(key=lambda x: x["timestamp"], reverse=True)
+
+        # Return the first event in the list and remove it
+        event = self.events[0]
+        self._remove(event["id"])
+        return event

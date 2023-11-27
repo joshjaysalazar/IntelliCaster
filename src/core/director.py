@@ -308,8 +308,11 @@ class Director:
 
             # If the race has started, generate commentary
             if self.race_started and self.all_cars_started:
-                # Check for overtakes
+                # Detect race events
                 self.events.detect_events(self.drivers, prev_drivers)
+
+                # Pick the next event to report
+                event = self.events.pick_next_event()
             
             # Wait the amount of time specified in the settings
             time.sleep(float(common.settings["director"]["update_frequency"]))
