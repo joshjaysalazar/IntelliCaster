@@ -52,7 +52,7 @@ class Events:
         """Create a list of drivers.
 
         This method creates a list of drivers from the iRacing SDK. It is called
-        when the Director class is initialized.
+        when the Events object's run method is called.
 
         Returns:
             list: A list of dictionaries containing driver data.
