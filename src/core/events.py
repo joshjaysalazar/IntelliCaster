@@ -171,7 +171,7 @@ class Events:
         else:
             common.drivers.sort(key=lambda x: x["grid_position"])
 
-    def pick_next_event(self):
+    def get_next_event(self):
         """Pick the next event to report.
         
         Returns:

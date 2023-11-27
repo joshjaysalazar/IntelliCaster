@@ -144,91 +144,127 @@ class Director:
         # Return the list of drivers
         return driver_dict
 
-    def detect_overtakes(self, prev_drivers):
-        """Detect and report overtakes during the race.
+    # def detect_overtakes(self, prev_drivers):
+    #     """Detect and report overtakes during the race.
 
-        This method iterates through the current list of drivers and compares
-        their positions with their positions from a previous snapshot
-        (prev_drivers). If a driver has moved up in position, an overtake is
-        detected and appropriate commentary is generated. The camera will also
-        focus on the overtaking driver.
+    #     This method iterates through the current list of drivers and compares
+    #     their positions with their positions from a previous snapshot
+    #     (prev_drivers). If a driver has moved up in position, an overtake is
+    #     detected and appropriate commentary is generated. The camera will also
+    #     focus on the overtaking driver.
+
+    #     Args:
+    #         prev_drivers (list): A list of dictionaries containing the previous
+    #             state of each driver.
+                
+    #     Note:
+    #         Overtakes are not reported under specific conditions, like if a
+    #         driver is in the pits, has a DNF status, or if the overtaken driver
+    #         is not found in the current list.
+    #     """
+    #     # Go through all the drivers
+    #     for driver in common.drivers:
+    #         # Get this driver's previous information
+    #         prev_driver = None
+    #         for item in prev_drivers:
+    #             if item["name"] == driver["name"]:
+    #                 prev_driver = item
+    #                 break
+
+    #         # If a driver's position has decreased, they have overtaken someone
+    #         if prev_driver and driver["position"] < prev_driver["position"]:
+    #             # Find the driver whose position is 1 higher than this driver's
+    #             overtaken = None
+    #             for item in common.drivers:
+    #                 if item["position"] == driver["position"] + 1:
+    #                     overtaken = item
+    #                     break
+                
+    #             # If no driver was found, don't report overtake
+    #             if not overtaken:
+    #                 continue
+
+    #             # If either driver is in the pits, don't report overtake
+    #             if driver["in_pits"] or overtaken["in_pits"]:
+    #                 continue
+
+    #             # If laps completed is negative (DNF), don't report overtake
+    #             if driver["laps_completed"] < 0:
+    #                 continue
+    #             if overtaken["laps_completed"] < 0:
+    #                 continue
+
+    #             # If an legitimate overtake was found, generate the commentary
+    #             driver_name = self.remove_numbers(driver["name"])
+    #             overtaken_name = self.remove_numbers(overtaken["name"])
+    #             output = (
+    #                 f"{driver_name} has overtaken "
+    #                 f"{overtaken_name} for "
+    #                 f"P{driver['position']}"
+    #             )
+        
+    #             # Move the camera to focus on the overtaking driver
+    #             self.camera.change_camera(driver["number"], "TV1")
+
+    #             # Generate the commentary
+    #             self.commentary.generate(
+    #                 output,
+    #                 "play-by-play",
+    #                 "neutral",
+    #                 "Be sure to include the position of the overtaking driver.",
+    #                 yelling=True,
+    #                 rec_start_time=self.recording_start_time
+    #             )
+
+    #             # Occassionally, generate color commentary
+    #             chance = float(common.settings["commentary"]["color_chance"])
+    #             if random.random() < chance:
+    #                 self.commentary.generate(
+    #                     "Add color commentary to the previous overtake.",
+    #                     "color",
+    #                     "neutral",
+    #                     yelling=True,
+    #                     rec_start_time=self.recording_start_time
+    #                 )
+
+    #             # End this iteration of the loop
+    #             break
+
+    def report_event(self, event):
+        """Report an event.
+
+        This method reports an event by generating commentary and changing the
+        camera focus.
 
         Args:
-            prev_drivers (list): A list of dictionaries containing the previous
-                state of each driver.
-                
-        Note:
-            Overtakes are not reported under specific conditions, like if a
-            driver is in the pits, has a DNF status, or if the overtaken driver
-            is not found in the current list.
+            event (dict): A dictionary containing information about the event.
         """
-        # Go through all the drivers
-        for driver in common.drivers:
-            # Get this driver's previous information
-            prev_driver = None
-            for item in prev_drivers:
-                if item["name"] == driver["name"]:
-                    prev_driver = item
-                    break
+        # Move the camera to focus on the event
+        self.camera.change_camera(event["focus"], "TV1")
 
-            # If a driver's position has decreased, they have overtaken someone
-            if prev_driver and driver["position"] < prev_driver["position"]:
-                # Find the driver whose position is 1 higher than this driver's
-                overtaken = None
-                for item in common.drivers:
-                    if item["position"] == driver["position"] + 1:
-                        overtaken = item
-                        break
-                
-                # If no driver was found, don't report overtake
-                if not overtaken:
-                    continue
+        # Get how long ago the event happened
+        time_since_event = time.time() - event["timestamp"]
 
-                # If either driver is in the pits, don't report overtake
-                if driver["in_pits"] or overtaken["in_pits"]:
-                    continue
+        # Generate the commentary
+        self.commentary.generate(
+            event["description"] + f" {time_since_event} seconds ago.",
+            "play-by-play",
+            "neutral",
+            "Be sure to include the position of the driver.",
+            yelling=True,
+            rec_start_time=self.recording_start_time
+        )
 
-                # If laps completed is negative (DNF), don't report overtake
-                if driver["laps_completed"] < 0:
-                    continue
-                if overtaken["laps_completed"] < 0:
-                    continue
-
-                # If an legitimate overtake was found, generate the commentary
-                driver_name = self.remove_numbers(driver["name"])
-                overtaken_name = self.remove_numbers(overtaken["name"])
-                output = (
-                    f"{driver_name} has overtaken "
-                    f"{overtaken_name} for "
-                    f"P{driver['position']}"
-                )
-        
-                # Move the camera to focus on the overtaking driver
-                self.camera.change_camera(driver["number"], "TV1")
-
-                # Generate the commentary
-                self.commentary.generate(
-                    output,
-                    "play-by-play",
-                    "neutral",
-                    "Be sure to include the position of the overtaking driver.",
-                    yelling=True,
-                    rec_start_time=self.recording_start_time
-                )
-
-                # Occassionally, generate color commentary
-                chance = float(common.settings["commentary"]["color_chance"])
-                if random.random() < chance:
-                    self.commentary.generate(
-                        "Add color commentary to the previous overtake.",
-                        "color",
-                        "neutral",
-                        yelling=True,
-                        rec_start_time=self.recording_start_time
-                    )
-
-                # End this iteration of the loop
-                break
+        # Occassionally, generate color commentary
+        chance = float(common.settings["commentary"]["color_chance"])
+        if random.random() < chance:
+            self.commentary.generate(
+                "Add color commentary to the previous commentary.",
+                "color",
+                "neutral",
+                yelling=True,
+                rec_start_time=self.recording_start_time
+            )
 
     def run(self):
         """The main loop for the Director class.
@@ -297,11 +333,12 @@ class Director:
 
             # If the race has started, generate commentary
             if self.race_started and self.all_cars_started:
-                # Detect race events
-                self.events.detect_events(common.drivers, common.prev_drivers)
+                # Get the next event to generate commentary for
+                event = self.events.get_next_event()
 
-                # Pick the next event to report
-                event = self.events.pick_next_event()
+                # If an event was found, report it
+                if event:
+                    self.report_event(event)
             
             # Wait the amount of time specified in the settings
             time.sleep(float(common.settings["director"]["update_frequency"]))
