@@ -65,3 +65,7 @@ context = None
 
 # The IRSDK object
 ir = None
+
+# Dictionaries to track the status of the drivers
+drivers = []
+prev_drivers = []

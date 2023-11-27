@@ -24,7 +24,6 @@ class Director:
         """Initialize the Director class with necessary settings and utilities.
 
         Attributes:
-            drivers (list): List of dictionaries to track drivers in the race.
             race_started (bool): Flag to indicate if the race has started.
             race_start_time (float): Stores the time the race starts.
             race_time (float): Stores the elapsed time since the race started.
@@ -35,8 +34,6 @@ class Director:
                 generator.
             running (bool): Flag to control the run loop for the director.
         """
-        # Create an empty list to track drivers
-        self.drivers = []
 
         # Track race start status
         self.race_started = False
@@ -70,13 +67,13 @@ class Director:
             bool: True if all cars have started, False otherwise.
         """
         # If drivers list is empty, return False
-        if self.drivers == []:
+        if common.drivers == []:
             return False
 
         # Check if race recently started
         if self.race_time <= 20:
             # Check if each car has crossed the line
-            for driver in self.drivers:           
+            for driver in common.drivers:           
                 d = driver["laps_completed"] + driver["lap_percent"]
                 # If between 0.8 and 1, car hasn't started first lap
                 if 0.8 < d < 1:
@@ -168,7 +165,7 @@ class Director:
             is not found in the current list.
         """
         # Go through all the drivers
-        for driver in self.drivers:
+        for driver in common.drivers:
             # Get this driver's previous information
             prev_driver = None
             for item in prev_drivers:
@@ -180,7 +177,7 @@ class Director:
             if prev_driver and driver["position"] < prev_driver["position"]:
                 # Find the driver whose position is 1 higher than this driver's
                 overtaken = None
-                for item in self.drivers:
+                for item in common.drivers:
                     if item["position"] == driver["position"] + 1:
                         overtaken = item
                         break
@@ -242,7 +239,7 @@ class Director:
         handles all of the logic for generating commentary.
         """
         # Create the drivers dict
-        self.drivers = self.create_drivers()
+        common.drivers = self.create_drivers()
 
         # Create the camera manager
         self.camera = camera.Camera()
@@ -259,7 +256,7 @@ class Director:
                 self.race_time = common.ir["SessionTime"] - self.race_start_time
 
             # Store the previous state of the drivers
-            prev_drivers = deepcopy(self.drivers)
+            common.prev_drivers = deepcopy(common.drivers)
 
             # Update the drivers list
             self.update_drivers()
@@ -309,7 +306,7 @@ class Director:
             # If the race has started, generate commentary
             if self.race_started and self.all_cars_started:
                 # Detect race events
-                self.events.detect_events(self.drivers, prev_drivers)
+                self.events.detect_events(common.drivers, common.prev_drivers)
 
                 # Pick the next event to report
                 event = self.events.pick_next_event()
@@ -395,62 +392,62 @@ class Director:
                     continue
 
                 # Find the driver in the drivers list at this index
-                for j, driver in enumerate(self.drivers):
+                for j, driver in enumerate(common.drivers):
                     if driver["idx"] == i:
                         # Get the driver's last lap time
                         last_lap = common.ir["CarIdxLastLapTime"][i]
-                        self.drivers[j]["last_lap"] = last_lap
+                        common.drivers[j]["last_lap"] = last_lap
 
                         # If there's no fastest lap, set it to the last lap
                         if driver["fastest_lap"] == None:
-                            self.drivers[j]["fastest_lap"] = last_lap
+                            common.drivers[j]["fastest_lap"] = last_lap
                         
                         # If the last lap is faster than the fastest lap, update
                         elif last_lap < driver["fastest_lap"]:
-                            self.drivers[j]["fastest_lap"] = last_lap
+                            common.drivers[j]["fastest_lap"] = last_lap
 
                         # Update percentage of lap completed
                         lap_percent = common.ir["CarIdxLapDistPct"][i]
-                        self.drivers[j]["lap_percent"] = lap_percent
+                        common.drivers[j]["lap_percent"] = lap_percent
 
                         # Update laps started and completed
                         started = common.ir["CarIdxLap"][i]
                         completed = common.ir["CarIdxLapCompleted"][i]
-                        self.drivers[j]["laps_started"] = started
-                        self.drivers[j]["laps_completed"] = completed
+                        common.drivers[j]["laps_started"] = started
+                        common.drivers[j]["laps_completed"] = completed
 
                         # Update gap to leader
                         gap_to_leader = common.ir["CarIdxF2Time"][i]
-                        self.drivers[j]["gap_to_leader"] = gap_to_leader
+                        common.drivers[j]["gap_to_leader"] = gap_to_leader
 
                         # Update pits status
                         in_pits = common.ir["CarIdxOnPitRoad"][i]
-                        self.drivers[j]["in_pits"] = in_pits
+                        common.drivers[j]["in_pits"] = in_pits
 
                         # Update on track status
                         if common.ir["CarIdxLapDistPct"][i] > 0:
-                            self.drivers[j]["on_track"] = True
+                            common.drivers[j]["on_track"] = True
                         else:
-                            self.drivers[j]["on_track"] = False
+                            common.drivers[j]["on_track"] = False
 
                         # Update incidents
                         incidents = driver_data[i]["CurDriverIncidentCount"]
-                        self.drivers[j]["incidents"] = incidents
+                        common.drivers[j]["incidents"] = incidents
 
         # Sort the list by current position if race has started
         if self.race_started:
-            self.drivers.sort(
+            common.drivers.sort(
                 key=lambda x: x["laps_completed"] + x["lap_percent"],
                 reverse=True
             )
 
             # Update the positions
-            for i, driver in enumerate(self.drivers):
-                self.drivers[i]["position"] = i + 1
+            for i, driver in enumerate(common.drivers):
+                common.drivers[i]["position"] = i + 1
                 
         # Otherwise, sort by grid position
         else:
-            self.drivers.sort(key=lambda x: x["grid_position"])
+            common.drivers.sort(key=lambda x: x["grid_position"])
             
     def update_iracing_settings(self):
         """Update iRacing settings to enable video capture.
