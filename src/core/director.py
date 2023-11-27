@@ -339,6 +339,9 @@ class Director:
         # Set running to True
         common.running = True
 
+        # Start the events thread
+        threading.Thread(target=self.events.run).start()
+
         # Start the director thread
         threading.Thread(target=self.run).start()
 
