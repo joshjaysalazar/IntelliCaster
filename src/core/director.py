@@ -80,66 +80,6 @@ class Director:
         # If all cars have started, return True
         return True
 
-    def create_drivers(self):
-        """Create a list of drivers.
-
-        This method creates a list of drivers from the iRacing SDK. It is called
-        when the Director class is initialized.
-
-        Returns:
-            list: A list of dictionaries containing driver data.
-        """
-        # Create an empty list to track drivers
-        driver_dict = []
-
-        # Get driver data from iRacing SDK
-        driver_data = common.ir["DriverInfo"]["Drivers"]
-
-        # Get quali results
-        for session in common.ir["SessionInfo"]["Sessions"]:
-            if session["SessionName"] == "QUALIFY":
-                quali = session["ResultsPositions"]
-
-        # Create a dictionary for each driver
-        for driver in driver_data:
-            # Skip the pace car
-            if driver["CarIdx"] == 0:
-                continue
-
-            # Get the driver's quali position
-            for car in quali:
-                if car["CarIdx"] == driver["CarIdx"]:
-                    quali_pos = car["Position"]
-
-            # Add the driver to the list
-            driver_dict.append(
-                {
-                    "car_name": driver["CarScreenNameShort"],
-                    "fastest_lap": None,
-                    "gap_to_leader": None,
-                    "grid_position": quali_pos,
-                    "idx": driver["CarIdx"],
-                    "in_pits": False,
-                    "incidents": driver["CurDriverIncidentCount"],
-                    "irating": driver["IRating"],
-                    "lap_percent": 0,
-                    "laps_completed": 0,
-                    "laps_started": 0,
-                    "last_lap": None,
-                    "license": driver["LicString"],
-                    "name": driver["UserName"],
-                    "number": driver["CarNumberRaw"],
-                    "on_track": False,
-                    "position": quali_pos
-                }
-            )
-
-        # Sort the list by grid position
-        driver_dict.sort(key=lambda x: x["grid_position"])
-
-        # Return the list of drivers
-        return driver_dict
-
     def report_event(self, event):
         """Report an event.
 
@@ -182,9 +122,6 @@ class Director:
         This method keeps running as long as the director is set to run. It
         handles all of the logic for generating commentary.
         """
-        # Create the drivers dict
-        common.drivers = self.create_drivers()
-
         # Create the camera manager
         self.camera = camera.Camera()
 
