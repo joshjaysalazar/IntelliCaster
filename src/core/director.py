@@ -10,8 +10,7 @@ from core import events
 
 
 class Director:
-    """
-    Manages the overall direction of race broadcast.
+    """Manages the overall direction of race broadcast.
     
     The Director class orchestrates the broadcast by monitoring the state of 
     the race and generating commentary. It interfaces with the iRacing SDK to 
