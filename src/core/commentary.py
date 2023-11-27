@@ -13,8 +13,7 @@ from core import common
 
 
 class Commentary:
-    """
-    Manages the TextGenerator and VoiceGenerator classes.
+    """Manages the TextGenerator and VoiceGenerator classes.
 
     The Commentary class is responsible for generating text commentary based
     on events, roles, tones, and additional information. It is then responsible
@@ -99,8 +98,7 @@ class Commentary:
         )
 
 class TextGenerator:
-    """
-    Handles text generation for race commentary.
+    """Handles text generation for race commentary.
 
     Uses OpenAI's GPT to generate text commentary based on events, roles,
     tones, and additional information. Maintains a list of previous responses
@@ -372,8 +370,7 @@ class TextGenerator:
         return answer
     
 class VoiceGenerator:
-    """
-    Handles text-to-speech functionality for race commentary.
+    """Handles text-to-speech functionality for race commentary.
 
     Utilizes the ElevenLabs API to convert text into audio. Handles the
     generation and saving of audio files.
