@@ -232,4 +232,4 @@ class Events:
             common.prev_drivers = deepcopy(common.drivers)
 
             # Wait the amount of time specified in the settings
-            time.sleep(float(common.settings["director"]["update_frequency"]))
+            time.sleep(float(common.settings["system"]["events_update_freq"]))

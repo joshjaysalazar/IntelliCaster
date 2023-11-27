@@ -49,10 +49,6 @@ def create_settings_file(file_name):
         config.set("iracing", "video_framerate", "60")
         config.set("iracing", "video_resolution", "1920x1080")
 
-        # Set up director section
-        config.add_section("director")
-        config.set("director", "update_frequency", "1")
-
         # Set up commentary section
         config.add_section("commentary")
         config.set("commentary", "pbp_voice", "Harry")
@@ -63,6 +59,8 @@ def create_settings_file(file_name):
         # Set up system section
         config.add_section("system")
         config.set("system", "context_file", "context.json")
+        config.set("system", "director_update_freq", "2")
+        config.set("system", "events_update_freq", "1")
 
         # Write to file
         with open(file_name, "w") as config_file:

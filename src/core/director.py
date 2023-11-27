@@ -251,7 +251,7 @@ class Director:
                     self.report_event(event)
             
             # Wait the amount of time specified in the settings
-            time.sleep(float(common.settings["director"]["update_frequency"]))
+            time.sleep(float(common.settings["system"]["director_update_freq"]))
 
     def start(self):
         """Start the director.
