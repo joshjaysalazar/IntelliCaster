@@ -70,7 +70,7 @@ class Events:
                 driver_name = common.remove_numbers(driver["name"])
                 overtaken_name = common.remove_numbers(overtaken["name"])
                 description = (
-                    f"{driver_name} has overtaken "
+                    f"{driver_name} overtook "
                     f"{overtaken_name} for "
                     f"P{driver['position']}"
                 )
