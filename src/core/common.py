@@ -1,6 +1,6 @@
 """
 This module contains global variables used throughout the application. It also
-contains a function to check if iRacing is running.
+contains functions that are used by multiple modules.
 """
 
 def check_iracing():
@@ -31,6 +31,28 @@ def check_iracing():
     except:
         ir.shutdown()
         return False
+    
+def remove_numbers(name):
+    """Remove digits from a driver's name string.
+
+    This method takes a name string that may contain digits and removes
+    those digits.
+
+    Args:
+        name (str): The driver's name possibly containing digits.
+
+    Returns:
+        str: The driver's name without any digits.
+    """
+    # Create a list of digits
+    digits = [str(i) for i in range(10)]
+
+    # Remove any digits from the name
+    for digit in digits:
+        name = name.replace(digit, "")
+    
+    # Return the name
+    return name
 
 # Contains the pointer to the root application window
 app = None

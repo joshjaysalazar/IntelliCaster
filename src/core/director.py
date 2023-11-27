@@ -231,28 +231,6 @@ class Director:
                 # End this iteration of the loop
                 break
 
-    def remove_numbers(self, name):
-        """Remove digits from a driver's name string.
-
-        This method takes a name string that may contain digits and removes
-        those digits.
-
-        Args:
-            name (str): The driver's name possibly containing digits.
-
-        Returns:
-            str: The driver's name without any digits.
-        """
-        # Create a list of digits
-        digits = [str(i) for i in range(10)]
-
-        # Remove any digits from the name
-        for digit in digits:
-            name = name.replace(digit, "")
-        
-        # Return the name
-        return name
-
     def run(self):
         """The main loop for the Director class.
 
