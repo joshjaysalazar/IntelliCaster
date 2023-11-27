@@ -34,8 +34,8 @@ class Director:
                 generator.
             running (bool): Flag to control the run loop for the director.
         """
-        # Create the drivers dict
-        self.drivers = self.create_drivers()
+        # Create an empty list to track drivers
+        self.drivers = []
 
         # Track race start status
         self.race_started = False
@@ -49,8 +49,8 @@ class Director:
         # Create the commentary generator
         self.commentary = commentary.Commentary()
 
-        # Create the camera manager
-        self.camera = camera.Camera()
+        # Create a variable for the camera manager (initialized when run)
+        self.camera = None
 
         # Set running to False
         self.running = False
@@ -259,6 +259,13 @@ class Director:
         This method keeps running as long as the director is set to run. It
         handles all of the logic for generating commentary.
         """
+        # Create the drivers dict
+        self.drivers = self.create_drivers()
+
+        # Create the camera manager
+        self.camera = camera.Camera()
+
+        # Keep running until told to stop
         while self.running:
             # Detect if the race has started
             if common.ir["RaceLaps"] > 0 and not self.race_started:
@@ -333,33 +340,39 @@ class Director:
         replay, and starting iRacing video capture. It then sets the running
         flag to True and starts the director thread.
         """
-        # Update iRacing settings
-        self.update_iracing_settings()
+        # Check if iRacing is running
+        if common.check_iracing():
+            # Update iRacing settings
+            self.update_iracing_settings()
 
-        # Jump the beginning of current session, wait for iRacing to catch up
-        common.ir.replay_search(2)
-        time.sleep(1)
+            # Jump to beginning of current session, wait for iRacing to catch up
+            common.ir.replay_search(2)
+            time.sleep(1)
 
-        # Hide UI
-        common.ir.cam_set_state(8)
+            # Hide UI
+            common.ir.cam_set_state(8)
 
-        # Start replay
-        common.ir.replay_set_play_speed(1)
+            # Start replay
+            common.ir.replay_set_play_speed(1)
 
-        # Start iRacing video capture
-        common.ir.video_capture(1)
+            # Start iRacing video capture
+            common.ir.video_capture(1)
 
-        # Set recording start time
-        self.recording_start_time = time.time()
+            # Set recording start time
+            self.recording_start_time = time.time()
 
-        # Wait for iRacing to catch up
-        time.sleep(1)
+            # Wait for iRacing to catch up
+            time.sleep(1)
 
-        # Set running to True
-        self.running = True
+            # Set running to True
+            self.running = True
 
-        # Start the director thread
-        threading.Thread(target=self.run).start()
+            # Start the director thread
+            threading.Thread(target=self.run).start()
+
+        # If iRacing is not running, print a message
+        else:
+            print("iRacing is not running.")
 
     def stop(self):
         """Stop the director.

@@ -53,7 +53,6 @@ class App(ctk.CTk):
 
         # Set up the iRacing SDK
         common.ir = irsdk.IRSDK()
-        common.ir.startup()
 
         # Set window properties
         ctk.set_appearance_mode("Dark")
