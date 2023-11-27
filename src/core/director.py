@@ -1,4 +1,3 @@
-from copy import deepcopy
 import os
 import random
 import threading
@@ -255,12 +254,6 @@ class Director:
             elif self.race_started:
                 self.race_time = common.ir["SessionTime"] - self.race_start_time
 
-            # Store the previous state of the drivers
-            common.prev_drivers = deepcopy(common.drivers)
-
-            # Update the drivers list
-            self.update_drivers()
-
             # If the race hasn't started yet, focus on the front of the grid
             if not self.race_started:
                 # Get all the current track positions
@@ -367,87 +360,6 @@ class Director:
 
         # Shut down the IRSDK object
         common.ir.shutdown()
-
-    def update_drivers(self):
-        """Update the drivers list.
-
-        This method updates the drivers list by getting the latest data from the
-        iRacing SDK and updating the drivers list accordingly.
-        """
-        # Get driver data from iRacing SDK
-        driver_data = common.ir["DriverInfo"]["Drivers"]
-
-        # Update the drivers list
-        if common.ir["CarIdxPosition"] != []:
-            for i, pos in enumerate(common.ir["CarIdxPosition"]):
-                # Exclude the pace car and cars that don't exist
-                if pos == 0: 
-                    continue
-                # Exclude disconnected drivers
-                try:
-                    if not driver_data[i]["UserName"]:
-                        continue
-                # If i is out of range, continue
-                except:
-                    continue
-
-                # Find the driver in the drivers list at this index
-                for j, driver in enumerate(common.drivers):
-                    if driver["idx"] == i:
-                        # Get the driver's last lap time
-                        last_lap = common.ir["CarIdxLastLapTime"][i]
-                        common.drivers[j]["last_lap"] = last_lap
-
-                        # If there's no fastest lap, set it to the last lap
-                        if driver["fastest_lap"] == None:
-                            common.drivers[j]["fastest_lap"] = last_lap
-                        
-                        # If the last lap is faster than the fastest lap, update
-                        elif last_lap < driver["fastest_lap"]:
-                            common.drivers[j]["fastest_lap"] = last_lap
-
-                        # Update percentage of lap completed
-                        lap_percent = common.ir["CarIdxLapDistPct"][i]
-                        common.drivers[j]["lap_percent"] = lap_percent
-
-                        # Update laps started and completed
-                        started = common.ir["CarIdxLap"][i]
-                        completed = common.ir["CarIdxLapCompleted"][i]
-                        common.drivers[j]["laps_started"] = started
-                        common.drivers[j]["laps_completed"] = completed
-
-                        # Update gap to leader
-                        gap_to_leader = common.ir["CarIdxF2Time"][i]
-                        common.drivers[j]["gap_to_leader"] = gap_to_leader
-
-                        # Update pits status
-                        in_pits = common.ir["CarIdxOnPitRoad"][i]
-                        common.drivers[j]["in_pits"] = in_pits
-
-                        # Update on track status
-                        if common.ir["CarIdxLapDistPct"][i] > 0:
-                            common.drivers[j]["on_track"] = True
-                        else:
-                            common.drivers[j]["on_track"] = False
-
-                        # Update incidents
-                        incidents = driver_data[i]["CurDriverIncidentCount"]
-                        common.drivers[j]["incidents"] = incidents
-
-        # Sort the list by current position if race has started
-        if self.race_started:
-            common.drivers.sort(
-                key=lambda x: x["laps_completed"] + x["lap_percent"],
-                reverse=True
-            )
-
-            # Update the positions
-            for i, driver in enumerate(common.drivers):
-                common.drivers[i]["position"] = i + 1
-                
-        # Otherwise, sort by grid position
-        else:
-            common.drivers.sort(key=lambda x: x["grid_position"])
             
     def update_iracing_settings(self):
         """Update iRacing settings to enable video capture.
