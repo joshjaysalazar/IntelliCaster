@@ -377,14 +377,14 @@ class Director:
         # Set running to False
         self.running = False
 
-        # Shut down the IRSDK object
-        common.ir.shutdown()
-
         # Stop iRacing video capture
         common.ir.video_capture(2)
 
         # Stop replay
         common.ir.replay_set_play_speed(0)
+
+        # Shut down the IRSDK object
+        common.ir.shutdown()
 
     def update_drivers(self):
         """Update the drivers list.
