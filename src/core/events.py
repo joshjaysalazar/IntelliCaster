@@ -29,3 +29,14 @@ class Events:
 
         # Increment the id counter
         self.id_counter += 1
+
+    def remove(self, id):
+        """Remove an event from the list.
+        
+        Args:
+            id (int): The id of the event to remove
+        """
+        # Remove the event from the list
+        for event in self.events:
+            if event["id"] == id:
+                self.events.remove(event)
