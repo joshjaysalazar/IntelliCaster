@@ -32,18 +32,7 @@ class Events:
         # Increment the id counter
         self.id_counter += 1
 
-    def _remove(self, id):
-        """Remove an event from the list.
-        
-        Args:
-            id (int): The id of the event to remove
-        """
-        # Remove the event from the list
-        for event in self.events:
-            if event["id"] == id:
-                self.events.remove(event)
-
-    def detect_overtakes(self, drivers, prev_drivers):
+    def _detect_overtakes(self, drivers, prev_drivers):
         # Go through all the drivers
         for driver in drivers:
             # Get this driver's previous information
@@ -88,3 +77,25 @@ class Events:
 
                 # End this iteration of the loop
                 break
+
+    def _remove(self, id):
+        """Remove an event from the list.
+        
+        Args:
+            id (int): The id of the event to remove
+        """
+        # Remove the event from the list
+        for event in self.events:
+            if event["id"] == id:
+                self.events.remove(event)
+
+    def detect_events(self, drivers, prev_drivers):
+        """Detect events that have occurred.
+        
+        Args:
+            drivers (list): A list of all the drivers
+            prev_drivers (list): A list of all the drivers from the previous
+                iteration
+        """
+        # Detect overtakes
+        self._detect_overtakes(drivers, prev_drivers)
