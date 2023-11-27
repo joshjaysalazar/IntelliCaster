@@ -80,11 +80,29 @@ class Director:
         # If all cars have started, return True
         return True
 
-    def report_event(self, event):
-        """Report an event.
+    def generate_color_commentary(self):
+        """Generate color commentary.
 
-        This method reports an event by generating commentary and changing the
-        camera focus.
+        This method generates color commentary with a specified chance.
+        """
+        # Get the chance of generating color commentary
+        chance = float(common.settings["commentary"]["color_chance"])
+
+        # Generate color commentary with the specified chance
+        if random.random() < chance:
+            self.commentary.generate(
+                "Add color commentary to the previous commentary.",
+                "color",
+                "neutral",
+                yelling=True,
+                rec_start_time=common.recording_start_time
+            )
+
+    def generate_event_commentary(self, event):
+        """Generate commentary for an event.
+
+        This method generates commentary for a specified event. It also changes
+        the camera to focus on the event.
 
         Args:
             event (dict): A dictionary containing information about the event.
@@ -104,17 +122,6 @@ class Director:
             yelling=True,
             rec_start_time=common.recording_start_time
         )
-
-        # Occassionally, generate color commentary
-        chance = float(common.settings["commentary"]["color_chance"])
-        if random.random() < chance:
-            self.commentary.generate(
-                "Add color commentary to the previous commentary.",
-                "color",
-                "neutral",
-                yelling=True,
-                rec_start_time=common.recording_start_time
-            )
 
     def run(self):
         """The main loop for the Director class.
@@ -185,7 +192,10 @@ class Director:
 
                 # If an event was found, report it
                 if event:
-                    self.report_event(event)
+                    self.generate_event_commentary(event)
+
+                # Occasionally generate color commentary
+                self.generate_color_commentary()
             
             # Wait the amount of time specified in the settings
             time.sleep(float(common.settings["system"]["director_update_freq"]))
