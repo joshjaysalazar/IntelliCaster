@@ -29,19 +29,3 @@ class Events:
 
         # Increment the id counter
         self.id_counter += 1
-
-    def clear(self, *types):
-        """Clear events from the list.
-        
-        Args:
-            *types (str): The types of events to clear
-        """
-        # If no type is given, clear all events
-        if len(types) == 0:
-            self.events = []
-            return
-
-        # If types are given, clear only those types
-        for event in self.events:
-            if event["type"] in types:
-                self.events.remove(event)
