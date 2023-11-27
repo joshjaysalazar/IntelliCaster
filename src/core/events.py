@@ -7,7 +7,7 @@ class Events:
         self.events = []
         self.id_counter = 0
 
-    def _add(self, type, description, focus=None):
+    def _add_event(self, type, description, focus=None):
         """Add a new event to the list.
         
         Args:
@@ -30,7 +30,7 @@ class Events:
         # Increment the id counter
         self.id_counter += 1
 
-    def _remove(self, id):
+    def _remove_event(self, id):
         """Remove an event from the list.
         
         Args:
