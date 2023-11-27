@@ -70,6 +70,15 @@ ir = None
 drivers = []
 prev_drivers = []
 
+# Race status variables
+race_started = False
+start_time = None
+race_time = 0
+all_cars_started = False
+
+# Recording start time
+recording_start_time = None
+
 # Flag to track whether or not commentary is running
 running = False
 

@@ -23,24 +23,20 @@ class Director:
         """Initialize the Director class with necessary settings and utilities.
 
         Attributes:
-            race_started (bool): Flag to indicate if the race has started.
-            race_start_time (float): Stores the time the race starts.
-            race_time (float): Stores the elapsed time since the race started.
-            all_cars_started (bool): Flag to indicate if all cars have started.
             recording_start_time (float): Stores the time recording starts.
             events (Events): The events manager.
             commentary (Commentary): The commentary generator.
             camera (Camera): The camera manager.
         """
 
-        # Track race start status
-        self.race_started = False
-        self.race_start_time = None
-        self.race_time = 0
-        self.all_cars_started = False
+        # Reset race status variables
+        common.race_started = False
+        common.start_time = None
+        common.race_time = 0
+        common.all_cars_started = False
 
-        # Track recording start time
-        self.recording_start_time = None
+        # Reset recording start time
+        common.recording_start_time = None
 
         # Create the events manager
         self.events = events.Events()
@@ -69,7 +65,7 @@ class Director:
             return False
 
         # Check if race recently started
-        if self.race_time <= 20:
+        if common.race_time <= 20:
             # Check if each car has crossed the line
             for driver in common.drivers:           
                 d = driver["laps_completed"] + driver["lap_percent"]
@@ -213,7 +209,7 @@ class Director:
     #                 "neutral",
     #                 "Be sure to include the position of the overtaking driver.",
     #                 yelling=True,
-    #                 rec_start_time=self.recording_start_time
+    #                 rec_start_time=common.recording_start_time
     #             )
 
     #             # Occassionally, generate color commentary
@@ -224,7 +220,7 @@ class Director:
     #                     "color",
     #                     "neutral",
     #                     yelling=True,
-    #                     rec_start_time=self.recording_start_time
+    #                     rec_start_time=common.recording_start_time
     #                 )
 
     #             # End this iteration of the loop
@@ -252,7 +248,7 @@ class Director:
             "neutral",
             common.instructions[event["type"]],
             yelling=True,
-            rec_start_time=self.recording_start_time
+            rec_start_time=common.recording_start_time
         )
 
         # Occassionally, generate color commentary
@@ -263,7 +259,7 @@ class Director:
                 "color",
                 "neutral",
                 yelling=True,
-                rec_start_time=self.recording_start_time
+                rec_start_time=common.recording_start_time
             )
 
     def run(self):
@@ -281,16 +277,16 @@ class Director:
         # Keep running until told to stop
         while common.running:
             # Detect if the race has started
-            if common.ir["RaceLaps"] > 0 and not self.race_started:
-                self.race_started = True
-                self.race_start_time = common.ir["SessionTime"]
+            if common.ir["RaceLaps"] > 0 and not common.race_started:
+                common.race_started = True
+                common.start_time = common.ir["SessionTime"]
 
             # If the race has already started, update the race length
-            elif self.race_started:
-                self.race_time = common.ir["SessionTime"] - self.race_start_time
+            elif common.race_started:
+                common.race_time = common.ir["SessionTime"] - common.start_time
 
             # If the race hasn't started yet, focus on the front of the grid
-            if not self.race_started:
+            if not common.race_started:
                 # Get all the current track positions
                 positions = common.ir["CarIdxLapDistPct"]
 
@@ -328,11 +324,11 @@ class Director:
                 self.camera.change_camera(driver, "TV1")
 
             # Check if all cars have crossed the start line if needed
-            if not self.all_cars_started:
-                self.all_cars_started = self.check_all_cars_started()
+            if not common.all_cars_started:
+                common.all_cars_started = self.check_all_cars_started()
 
             # If the race has started, generate commentary
-            if self.race_started and self.all_cars_started:
+            if common.race_started and common.all_cars_started:
                 # Get the next event to generate commentary for
                 event = self.events.get_next_event()
 
@@ -368,7 +364,7 @@ class Director:
         common.ir.video_capture(1)
 
         # Set recording start time
-        self.recording_start_time = time.time()
+        common.recording_start_time = time.time()
 
         # Wait for iRacing to catch up
         time.sleep(1)
