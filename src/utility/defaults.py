@@ -59,7 +59,7 @@ def create_settings_file(file_name):
         # Set up system section
         config.add_section("system")
         config.set("system", "context_file", "context.json")
-        config.set("system", "director_update_freq", "2")
+        config.set("system", "director_update_freq", "1")
         config.set("system", "events_update_freq", "1")
 
         # Write to file
