@@ -1,5 +1,7 @@
 import time
 
+from core import common
+
 
 class Events:
     def __init__(self):
@@ -7,13 +9,13 @@ class Events:
         self.events = []
         self.id_counter = 0
 
-    def _add_event(self, type, description, focus=None):
+    def _add(self, type, description, focus=None):
         """Add a new event to the list.
         
         Args:
             type (str): The type of event
             description (str): A description of the event
-            focus (str): The driver that the event is focused on
+            focus (int): The number of the driver to focus on
         """
         # Create a new event
         new_event = {
@@ -30,7 +32,7 @@ class Events:
         # Increment the id counter
         self.id_counter += 1
 
-    def _remove_event(self, id):
+    def _remove(self, id):
         """Remove an event from the list.
         
         Args:
@@ -74,14 +76,15 @@ class Events:
                 if overtaken["laps_completed"] < 0:
                     continue
 
-                # # If an legitimate overtake was found, generate the commentary
-                # driver_name = self.remove_numbers(driver["name"])
-                # overtaken_name = self.remove_numbers(overtaken["name"])
-                # output = (
-                #     f"{driver_name} has overtaken "
-                #     f"{overtaken_name} for "
-                #     f"P{driver['position']}"
-                # )
+                # If an legitimate overtake was found, add it to the events list
+                driver_name = common.remove_numbers(driver["name"])
+                overtaken_name = common.remove_numbers(overtaken["name"])
+                description = (
+                    f"{driver_name} has overtaken "
+                    f"{overtaken_name} for "
+                    f"P{driver['position']}"
+                )
+                self._add("overtake", description, driver["number"])
 
                 # End this iteration of the loop
                 break

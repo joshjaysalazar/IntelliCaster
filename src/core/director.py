@@ -7,6 +7,7 @@ import time
 from core import camera
 from core import common
 from core import commentary
+from core import events
 
 
 class Director:
@@ -45,6 +46,9 @@ class Director:
 
         # Track recording start time
         self.recording_start_time = None
+
+        # Create the events manager
+        self.events = events.Events()
 
         # Create the commentary generator
         self.commentary = commentary.Commentary()
