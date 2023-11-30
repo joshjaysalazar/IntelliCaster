@@ -6,6 +6,7 @@ import threading
 import customtkinter as ctk
 from elevenlabs import voices
 import irsdk
+from PIL import Image
 
 from core import common
 from core import director
@@ -22,28 +23,19 @@ class App(ctk.CTk):
     frames such as 'Home' and 'Settings', and adjusting various settings.
     """
 
-    def __init__(self, splash_screen=None):
+    def __init__(self):
         """Initialize the App class.
 
         Initializes the application window and its various components such as
         navigation and settings. Also creates an instance of the Director class
         and the Editor class.
 
-        Args:
-            splash_screen (SplashScreen object): Instance of the SplashScreen
-                class to display while the application is starting up.
-
         Attributes:
-            splash_screen (SplashScreen object): Instance of the SplashScreen
-                class to display while the application is starting up.
             director (Director object): Instance of the Director class to manage
                 race commentary.
             editor (Editor object): Instance of the Editor class to manage
         """
         super().__init__()
-
-        # Member variables
-        self.splash_screen = splash_screen
 
         # Create default files if they don't exist
         defaults.create_context_file("context.json")
@@ -89,10 +81,6 @@ class App(ctk.CTk):
 
         # Add ready message
         self.add_message("Ready to start commentary...")
-
-        # Destroy the splash screen
-        if self.splash_screen:
-            self.splash_screen.destroy()
     
     def add_message(self, message):
         """Add a new message to the messages text box widget.
@@ -404,12 +392,17 @@ class App(ctk.CTk):
         self.frm_navigation.grid(row=0, column=0, sticky="nsew")
         self.frm_navigation.grid_rowconfigure(4, weight=1)
 
-        # Create title label
+        # Create title label using logo_small.png
+        logo_image_raw = Image.open("assets/logo.png")
+        logo_image = ctk.CTkImage(
+            light_image=logo_image_raw,
+            dark_image=logo_image_raw,
+            size=(200, 24)
+        )
         self.lbl_title = ctk.CTkLabel(
             master=self.frm_navigation,
-            text="IntelliCaster",
-            font=ctk.CTkFont(size=32, weight="bold"),
-            text_color="lightskyblue1"
+            image=logo_image,
+            text=""
         )
         self.lbl_title.grid(row=0, column=0, padx=30, pady=30)
 

@@ -1,8 +1,8 @@
-import tkinter as tk
-from tkinter import PhotoImage
+import customtkinter as ctk
+from PIL import Image
 
 
-class SplashScreen(tk.Tk):
+class SplashScreen(ctk.CTk):
     """A splash screen for the application.
     
     This class creates a splash screen for the application. It can also
@@ -31,10 +31,15 @@ class SplashScreen(tk.Tk):
         self.attributes('-topmost', True)
 
         # Load the image
-        self.image = PhotoImage(file=image_path)
+        self.image_raw = Image.open(image_path)
+        self.image = ctk.CTkImage(
+            light_image=self.image_raw,
+            dark_image=self.image_raw,
+            size=(500, 500)
+        )
 
         # Create a label with the image
-        self.image_label = tk.Label(self, image=self.image)
+        self.image_label = ctk.CTkLabel(self, image=self.image, text="")
         self.image_label.pack()
 
         # Centering the window
@@ -52,8 +57,8 @@ class SplashScreen(tk.Tk):
         the window accordingly.
         """
         # Get image size
-        image_width = self.image.width()
-        image_height = self.image.height()
+        image_width = self.image_raw.width
+        image_height = self.image_raw.height
 
         # Centering the window with image size
         screen_width = self.winfo_screenwidth()
