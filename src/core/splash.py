@@ -3,7 +3,27 @@ from tkinter import PhotoImage
 
 
 class SplashScreen(tk.Tk):
+    """A splash screen for the application.
+    
+    This class creates a splash screen for the application. It can also
+    auto-close after a given timeout.
+    """
     def __init__(self, image_path, timeout=None):
+        """Initialize the splash screen.
+
+        This function initializes the splash screen by loading the image and
+        creating a label with the image. It also hides the window decorations
+        and centers the window on the screen.
+        
+        Args:
+            image_path (str): The path to the image to be displayed.
+            timeout (int, optional): The timeout in milliseconds. Defaults to
+                None.
+                
+        Attributes:
+            image (PhotoImage): The image to be displayed.
+            image_label (tk.Label): The label containing the image.
+        """
         super().__init__()
 
         # Hide the window decorations
@@ -25,6 +45,12 @@ class SplashScreen(tk.Tk):
             self.after(timeout, self.destroy)
 
     def center_window(self):
+        """Center the window on the screen.
+
+        This function centers the window on the screen by calculating the
+        center of the screen and the center of the image and then positioning
+        the window accordingly.
+        """
         # Get image size
         image_width = self.image.width()
         image_height = self.image.height()
