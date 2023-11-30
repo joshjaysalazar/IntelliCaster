@@ -12,11 +12,11 @@ def main():
     and starts the main loop.
     """
     # Create the splash screen on a separate thread
-    splash_screen = splash.SplashScreen("assets/splash.png", timeout=3000)
+    splash_screen = splash.SplashScreen("assets/splash.png")
     threading.Thread(target=splash_screen.mainloop)
 
     # Create the app
-    common.app = App()
+    common.app = App(splash_screen)
     common.app.mainloop()
 
 if __name__ == "__main__":

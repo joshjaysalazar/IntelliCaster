@@ -22,19 +22,28 @@ class App(ctk.CTk):
     frames such as 'Home' and 'Settings', and adjusting various settings.
     """
 
-    def __init__(self):
+    def __init__(self, splash_screen=None):
         """Initialize the App class.
 
         Initializes the application window and its various components such as
         navigation and settings. Also creates an instance of the Director class
         and the Editor class.
 
+        Args:
+            splash_screen (SplashScreen object): Instance of the SplashScreen
+                class to display while the application is starting up.
+
         Attributes:
+            splash_screen (SplashScreen object): Instance of the SplashScreen
+                class to display while the application is starting up.
             director (Director object): Instance of the Director class to manage
                 race commentary.
             editor (Editor object): Instance of the Editor class to manage
         """
         super().__init__()
+
+        # Member variables
+        self.splash_screen = splash_screen
 
         # Create default files if they don't exist
         defaults.create_context_file("context.json")
@@ -80,6 +89,10 @@ class App(ctk.CTk):
 
         # Add ready message
         self.add_message("Ready to start commentary...")
+
+        # Destroy the splash screen
+        if self.splash_screen:
+            self.splash_screen.destroy()
     
     def add_message(self, message):
         """Add a new message to the messages text box widget.
