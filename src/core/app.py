@@ -392,7 +392,7 @@ class App(ctk.CTk):
         self.frm_navigation.grid(row=0, column=0, sticky="nsew")
         self.frm_navigation.grid_rowconfigure(4, weight=1)
 
-        # Create title label using logo_small.png
+        # Create title logo
         logo_image_raw = Image.open("assets/logo.png")
         logo_image = ctk.CTkImage(
             light_image=logo_image_raw,
