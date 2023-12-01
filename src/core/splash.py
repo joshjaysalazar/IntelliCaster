@@ -38,7 +38,7 @@ class SplashScreen(tk.Tk):
         self.image_label.pack()
 
         # Centering the window
-        self.center_window()
+        self._center_window()
 
         # Auto-close feature if timeout is set
         if timeout:
@@ -47,7 +47,7 @@ class SplashScreen(tk.Tk):
         # Start the main loop
         self.mainloop()
 
-    def center_window(self):
+    def _center_window(self):
         """Center the window on the screen.
 
         This function centers the window on the screen by calculating the

@@ -12,18 +12,9 @@ class Camera:
         """
 
         # Camera Dictionary
-        self.cameras = self.get_cameras()
+        self.cameras = self._get_cameras()
 
-    def change_camera(self, car_idx, camera_name):
-        """Changes the camera for a specific car
-        
-        Args:
-            car_idx (int): Index of the car
-            camera_name (str): Name of the camera
-        """
-        common.ir.cam_switch_num(car_idx, self.cameras[camera_name])
-
-    def get_cameras(self):
+    def _get_cameras(self):
         """Returns a dictionary of camera names and numbers
         
         Returns:
@@ -38,3 +29,12 @@ class Camera:
 
         # Return the dictionary
         return cameras
+    
+    def change_camera(self, car_idx, camera_name):
+        """Changes the camera for a specific car
+        
+        Args:
+            car_idx (int): Index of the car
+            camera_name (str): Name of the camera
+        """
+        common.ir.cam_switch_num(car_idx, self.cameras[camera_name])

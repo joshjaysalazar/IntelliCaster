@@ -49,7 +49,7 @@ class Director:
         # Set running to False
         common.running = False
 
-    def check_all_cars_started(self):
+    def _check_all_cars_started(self):
         """Check if all cars in the race have started.
 
         This method checks if all cars have crossed the starting line and 
@@ -79,7 +79,7 @@ class Director:
         # If all cars have started, return True
         return True
 
-    def generate_color_commentary(self):
+    def _generate_color_commentary(self):
         """Generate color commentary.
 
         A random chance is used to determine if color commentary should be
@@ -99,7 +99,7 @@ class Director:
                 rec_start_time=common.recording_start_time
             )
 
-    def generate_event_commentary(self, event):
+    def _generate_event_commentary(self, event):
         """Generate commentary for an event.
 
         This method generates commentary for a specified event. It also changes
@@ -123,6 +123,68 @@ class Director:
             yelling=True,
             rec_start_time=common.recording_start_time
         )
+
+    def _update_iracing_settings(self):
+        """Update iRacing settings to enable video capture.
+
+        This method updates the iRacing app.ini file to enable video capture
+        and set the video format, framerate, and resolution.
+        """
+        # Get the iRacing directory
+        path = common.settings["general"]["iracing_path"]
+
+        # Read app.ini
+        with open(os.path.join(path, "app.ini"), "r") as f:
+            app_ini = f.read()
+
+        # Enable video capture if it's not already enabled
+        app_ini = app_ini.replace("vidCaptureEnable=0", "vidCaptureEnable=1")
+
+        # Disable microphone capture if it's not already disabled
+        app_ini = app_ini.replace("videoCaptureMic=1", "videoCaptureMic=0")
+
+        # Set the video file format
+        if common.settings["general"]["video_format"] == "mp4":
+            format = 0
+        elif common.settings["general"]["video_format"] == "wmv":
+            format = 1
+        elif common.settings["general"]["video_format"] == "avi2":
+            format = 2
+        elif common.settings["general"]["video_format"] == "avi":
+            format = 3
+        for i in range(4):
+            app_ini = app_ini.replace(
+                f"videoFileFrmt={i}",
+                f"videoFileFrmt={format}"
+            )
+
+        # Set the video framerate
+        if common.settings["general"]["video_framerate"] == "60":
+            framerate = 0
+        elif common.settings["general"]["video_framerate"] == "30":
+            framerate = 1
+        for i in range(2):
+            app_ini = app_ini.replace(
+                f"videoFramerate={i}",
+                f"videoFramerate={framerate}"
+            )
+
+        # Set the video resolution
+        if common.settings["general"]["video_resolution"] == "1920x1080":
+            resolution = 1
+        elif common.settings["general"]["video_resolution"] == "1280x720":
+            resolution = 2
+        elif common.settings["general"]["video_resolution"] == "854x480":
+            resolution = 3
+        for i in range(4):
+            app_ini = app_ini.replace(
+                f"videoImgSize={i}",
+                f"videoImgSize={resolution}"
+            )
+
+        # Write the new app.ini
+        with open(os.path.join(path, "app.ini"), "w") as f:
+            f.write(app_ini)
 
     def run(self):
         """The main loop for the Director class.
@@ -184,7 +246,7 @@ class Director:
 
             # Check if all cars have crossed the start line if needed
             if not common.all_cars_started:
-                common.all_cars_started = self.check_all_cars_started()
+                common.all_cars_started = self._check_all_cars_started()
 
             # If the race has started, generate commentary
             if common.race_started and common.all_cars_started:
@@ -193,10 +255,10 @@ class Director:
 
                 # If an event was found, report it
                 if event:
-                    self.generate_event_commentary(event)
+                    self._generate_event_commentary(event)
 
                 # Occasionally generate color commentary
-                self.generate_color_commentary()
+                self._generate_color_commentary()
             
             # Wait the amount of time specified in the settings
             time.sleep(float(common.settings["system"]["director_update_freq"]))
@@ -210,7 +272,7 @@ class Director:
         flag to True and starts the director thread.
         """
         # Update iRacing settings
-        self.update_iracing_settings()
+        self._update_iracing_settings()
 
         # Jump to beginning of current session, wait for iRacing to catch up
         common.ir.replay_search(2)
@@ -257,65 +319,3 @@ class Director:
 
         # Shut down the IRSDK object
         common.ir.shutdown()
-            
-    def update_iracing_settings(self):
-        """Update iRacing settings to enable video capture.
-
-        This method updates the iRacing app.ini file to enable video capture
-        and set the video format, framerate, and resolution.
-        """
-        # Get the iRacing directory
-        path = common.settings["general"]["iracing_path"]
-
-        # Read app.ini
-        with open(os.path.join(path, "app.ini"), "r") as f:
-            app_ini = f.read()
-
-        # Enable video capture if it's not already enabled
-        app_ini = app_ini.replace("vidCaptureEnable=0", "vidCaptureEnable=1")
-
-        # Disable microphone capture if it's not already disabled
-        app_ini = app_ini.replace("videoCaptureMic=1", "videoCaptureMic=0")
-
-        # Set the video file format
-        if common.settings["general"]["video_format"] == "mp4":
-            format = 0
-        elif common.settings["general"]["video_format"] == "wmv":
-            format = 1
-        elif common.settings["general"]["video_format"] == "avi2":
-            format = 2
-        elif common.settings["general"]["video_format"] == "avi":
-            format = 3
-        for i in range(4):
-            app_ini = app_ini.replace(
-                f"videoFileFrmt={i}",
-                f"videoFileFrmt={format}"
-            )
-
-        # Set the video framerate
-        if common.settings["general"]["video_framerate"] == "60":
-            framerate = 0
-        elif common.settings["general"]["video_framerate"] == "30":
-            framerate = 1
-        for i in range(2):
-            app_ini = app_ini.replace(
-                f"videoFramerate={i}",
-                f"videoFramerate={framerate}"
-            )
-
-        # Set the video resolution
-        if common.settings["general"]["video_resolution"] == "1920x1080":
-            resolution = 1
-        elif common.settings["general"]["video_resolution"] == "1280x720":
-            resolution = 2
-        elif common.settings["general"]["video_resolution"] == "854x480":
-            resolution = 3
-        for i in range(4):
-            app_ini = app_ini.replace(
-                f"videoImgSize={i}",
-                f"videoImgSize={resolution}"
-            )
-
-        # Write the new app.ini
-        with open(os.path.join(path, "app.ini"), "w") as f:
-            f.write(app_ini)

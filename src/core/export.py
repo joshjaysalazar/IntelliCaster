@@ -33,12 +33,12 @@ class Export(ctk.CTkToplevel):
         self.geometry(f"{w}x{h}+{x}+{y}")
 
         # Create widgets
-        self.create_widgets()
+        self._create_widgets()
 
         # Create progress tracker object
         self.progress_tracker = ProgressTracker(self.lbl_message, self.prg_bar)
 
-    def create_widgets(self):
+    def _create_widgets(self):
         """Create widgets for the window
         
         Creates the widgets for the window and places them in the window. This
@@ -81,38 +81,7 @@ class ProgressTracker(ProgressBarLogger):
         self.message = message
         self.progress = progress
 
-    def bars_callback(self, bar, attr, value, old_value=None):
-        """Callback method for the progress tracker
-
-        This method is called by the progress tracker when the progress of the
-        export changes. It updates the progress bar with the current progress.
-
-        Args:
-            bar (str): The name of the progress bar
-            attr (str): The attribute that changed
-            value (int): The new value of the attribute
-            old_value (int, optional): The old value of the attribute. Defaults
-                to None.
-        """
-        # Update progress bar
-        self.progress.set(value / self.bars[bar]["total"])
-
-    def callback(self, **changes):
-        """Callback method for the progress tracker
-
-        This method is called by the progress tracker when the progress of the
-        export changes. It updates the message label with the current progress.
-        
-        Args:
-            **changes (dict): A dictionary of changes
-        """
-        for k, v in changes.items():
-            text = self.format_text(v)
-
-            # Update message label
-            self.message.configure(text=text)
-
-    def format_text(self, text):
+    def _format_text(self, text):
         """Format text for the message label
         
         Formats the text for the message label. This method is called by the
@@ -153,3 +122,34 @@ class ProgressTracker(ProgressBarLogger):
 
         # Return the text
         return text
+
+    def bars_callback(self, bar, attr, value, old_value=None):
+        """Callback method for the progress tracker
+
+        This method is called by the progress tracker when the progress of the
+        export changes. It updates the progress bar with the current progress.
+
+        Args:
+            bar (str): The name of the progress bar
+            attr (str): The attribute that changed
+            value (int): The new value of the attribute
+            old_value (int, optional): The old value of the attribute. Defaults
+                to None.
+        """
+        # Update progress bar
+        self.progress.set(value / self.bars[bar]["total"])
+
+    def callback(self, **changes):
+        """Callback method for the progress tracker
+
+        This method is called by the progress tracker when the progress of the
+        export changes. It updates the message label with the current progress.
+        
+        Args:
+            **changes (dict): A dictionary of changes
+        """
+        for k, v in changes.items():
+            text = self._format_text(v)
+
+            # Update message label
+            self.message.configure(text=text)

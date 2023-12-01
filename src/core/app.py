@@ -46,7 +46,7 @@ class App(ctk.CTk):
         common.settings.read("settings.ini")
         
         # Load context from file
-        self.load_context(
+        self._load_context(
             file=common.settings["system"]["context_file"],
             startup=True
         )
@@ -65,10 +65,10 @@ class App(ctk.CTk):
         self.grid_columnconfigure(1, weight=1)
 
         # Create widgets
-        self.create_navigation()
-        self.create_home()
-        self.create_context()
-        self.create_settings()
+        self._create_navigation()
+        self._create_home()
+        self._create_context()
+        self._create_settings()
 
         # Select home frame
         self.show_frame(frame="home")
@@ -81,25 +81,8 @@ class App(ctk.CTk):
 
         # Add ready message
         self.add_message("Ready to start commentary...")
-    
-    def add_message(self, message):
-        """Add a new message to the messages text box widget.
-    
-        Appends the given message at the bottom of the text box and disables 
-        editing afterward.
-        
-        Args:
-            message (str): The message to append to the text box.
-        """
-        # Insert message at the bottom of the text box
-        self.txt_messages.configure(state="normal")
-        self.txt_messages.insert("end", message + "\n")
-        self.txt_messages.configure(state="disabled")
 
-        # Scroll to the bottom of the text box
-        self.txt_messages.yview_moveto(1)
-
-    def create_home(self):
+    def _create_home(self):
         """Create the home frame and its components.
     
         Initializes a frame designated for the 'Home' tab. The frame contains
@@ -134,7 +117,7 @@ class App(ctk.CTk):
         )
         self.btn_start_stop.pack(padx=20, pady=20)
 
-    def create_context(self):
+    def _create_context(self):
         """Create the context frame and its components.
 
         Sets up a frame for the 'Context' tab that allows users to input
@@ -157,7 +140,7 @@ class App(ctk.CTk):
         self.frm_context.grid_columnconfigure(1, weight=1)
 
         # Create league section
-        self.create_section(
+        self._create_section(
             self.frm_context,
             "league",
             "League",
@@ -166,7 +149,7 @@ class App(ctk.CTk):
 
         # Create league name entry box
         default = common.context["league"]["name"]
-        self.create_entry(
+        self._create_entry(
             self.frm_context,
             "name",
             "Name",
@@ -176,7 +159,7 @@ class App(ctk.CTk):
 
         # Create league short name entry box
         default = common.context["league"]["short_name"]
-        self.create_entry(
+        self._create_entry(
             self.frm_context,
             "short_name",
             "Short Name",
@@ -190,7 +173,7 @@ class App(ctk.CTk):
             text="Load Context",
             height=50,
             font=ctk.CTkFont(size=18, weight="bold"),
-            command=self.load_context
+            command=self._load_context
         )
         self.btn_load_context.grid(
             row=self.row,
@@ -207,7 +190,7 @@ class App(ctk.CTk):
             text="Save Context",
             height=50,
             font=ctk.CTkFont(size=18, weight="bold"),
-            command=self.save_context
+            command=self._save_context
         )
         self.btn_save_context.grid(
             row=self.row,
@@ -222,7 +205,7 @@ class App(ctk.CTk):
         del self.row
         del self.current_section
 
-    def create_dropdown(
+    def _create_dropdown(
         self,
         master,
         name,
@@ -287,7 +270,7 @@ class App(ctk.CTk):
         # Add dropdown to current settings
         variable[self.current_section][name] = drp
 
-    def create_entry(
+    def _create_entry(
         self,
         master,
         name,
@@ -380,7 +363,7 @@ class App(ctk.CTk):
         # Add entry box to current settings
         variable[self.current_section][name] = ent
 
-    def create_navigation(self):
+    def _create_navigation(self):
         """Create the navigation frame and its components.
     
         Creates a frame that holds the navigation buttons and title label.
@@ -454,7 +437,7 @@ class App(ctk.CTk):
         )
         self.btn_settings.grid(row=3, column=0, sticky="ew")
     
-    def create_section(self, master, name, text, variable={}):
+    def _create_section(self, master, name, text, variable={}):
         """Create a section header for the frame.
         
         Creates a section header for the frame that is used to separate
@@ -492,7 +475,7 @@ class App(ctk.CTk):
         # Update current section
         self.current_section = name
 
-    def create_settings(self):
+    def _create_settings(self):
         """Create the settings frame and its components.
     
         Sets up a frame for the 'Settings' tab that allows users to input
@@ -515,7 +498,7 @@ class App(ctk.CTk):
         self.frm_settings.grid_columnconfigure(1, weight=1)
 
         # Create API keys section
-        self.create_section(
+        self._create_section(
             self.frm_settings,
             "keys",
             "API Keys",
@@ -524,7 +507,7 @@ class App(ctk.CTk):
 
         # Create API key entry box for OpenAI
         default = common.settings["keys"]["openai_api_key"]
-        self.create_entry(
+        self._create_entry(
             self.frm_settings,
             "openai_api_key",
             "OpenAI API Key",
@@ -534,7 +517,7 @@ class App(ctk.CTk):
 
         # Create API key entry box for ElevenLabs
         default = common.settings["keys"]["elevenlabs_api_key"]
-        self.create_entry(
+        self._create_entry(
             self.frm_settings,
             "elevenlabs_api_key",
             "ElevenLabs API Key",
@@ -543,7 +526,7 @@ class App(ctk.CTk):
         )
 
         # Create iRacing section
-        self.create_section(
+        self._create_section(
             self.frm_settings,
             "general",
             "General",
@@ -552,7 +535,7 @@ class App(ctk.CTk):
 
         # Create iRacing directory entry box
         default = common.settings["general"]["iracing_path"]
-        self.create_entry(
+        self._create_entry(
             self.frm_settings,
             "iracing_path",
             "iRacing Documents Directory",
@@ -563,7 +546,7 @@ class App(ctk.CTk):
 
         # Create the video format dropdown
         default = common.settings["general"]["video_format"]
-        self.create_dropdown(
+        self._create_dropdown(
             self.frm_settings,
             "video_format",
             "Video Format",
@@ -574,7 +557,7 @@ class App(ctk.CTk):
 
         # Create the video framerate dropdown
         default = common.settings["general"]["video_framerate"]
-        self.create_dropdown(
+        self._create_dropdown(
             self.frm_settings,
             "video_framerate",
             "Video Framerate",
@@ -585,7 +568,7 @@ class App(ctk.CTk):
 
         # Create the video resolution dropdown
         default = common.settings["general"]["video_resolution"]
-        self.create_dropdown(
+        self._create_dropdown(
             self.frm_settings,
             "video_resolution",
             "Video Resolution",
@@ -595,7 +578,7 @@ class App(ctk.CTk):
         )
 
         # Create commentary section
-        self.create_section(
+        self._create_section(
             self.frm_settings, 
             "commentary",
             "Commentary",
@@ -604,7 +587,7 @@ class App(ctk.CTk):
 
         # Create GPT model dropdown
         default = common.settings["commentary"]["gpt_model"]
-        self.create_dropdown(
+        self._create_dropdown(
             self.frm_settings,
             "gpt_model",
             "GPT Model",
@@ -618,7 +601,7 @@ class App(ctk.CTk):
 
         # Create play-by-play voice dropdown
         default = common.settings["commentary"]["pbp_voice"]
-        self.create_dropdown(
+        self._create_dropdown(
             self.frm_settings,
             "pbp_voice",
             "Play-by-Play Voice",
@@ -629,7 +612,7 @@ class App(ctk.CTk):
 
         # Create color commentary voice dropdown
         default = common.settings["commentary"]["color_voice"]
-        self.create_dropdown(
+        self._create_dropdown(
             self.frm_settings,
             "color_voice",
             "Color Commentary Voice",
@@ -640,7 +623,7 @@ class App(ctk.CTk):
 
         # Create color commentary chance entry box
         default = common.settings["commentary"]["color_chance"]
-        self.create_entry(
+        self._create_entry(
             self.frm_settings,
             "color_chance",
             "Color Commentary Chance (%)",
@@ -650,7 +633,7 @@ class App(ctk.CTk):
 
         # Create memory limit entry box
         default = common.settings["commentary"]["memory_limit"]
-        self.create_entry(
+        self._create_entry(
             self.frm_settings,
             "memory_limit",
             "Memory Limit (messages)",
@@ -664,7 +647,7 @@ class App(ctk.CTk):
             text="Save Settings",
             height=50,
             font=ctk.CTkFont(size=18, weight="bold"),
-            command=self.save_settings
+            command=self._save_settings
         )
         self.btn_save_settings.grid(
             row=self.row,
@@ -679,7 +662,7 @@ class App(ctk.CTk):
         del self.row
         del self.current_section
     
-    def load_context(self, event=None, file=None, startup=False):
+    def _load_context(self, event=None, file=None, startup=False):
         """Load context from a context.json file.
 
         This method opens a file dialog to allow users to select a JSON file
@@ -751,7 +734,7 @@ class App(ctk.CTk):
             )
         )
 
-    def save_context(self, event=None):
+    def _save_context(self, event=None):
         """Save context from entry boxes to a JSON file.
         
         This method gathers the context from various entry boxes, updates the
@@ -810,7 +793,7 @@ class App(ctk.CTk):
             )
         )
 
-    def save_settings(self, event=None):
+    def _save_settings(self, event=None):
         """Save settings from entry boxes to a settings.ini file.
 
         This method gathers the settings from various entry boxes, updates the
@@ -852,6 +835,23 @@ class App(ctk.CTk):
                 hover_color=original_hover_color
             )
         )
+
+    def add_message(self, message):
+        """Add a new message to the messages text box widget.
+    
+        Appends the given message at the bottom of the text box and disables 
+        editing afterward.
+        
+        Args:
+            message (str): The message to append to the text box.
+        """
+        # Insert message at the bottom of the text box
+        self.txt_messages.configure(state="normal")
+        self.txt_messages.insert("end", message + "\n")
+        self.txt_messages.configure(state="disabled")
+
+        # Scroll to the bottom of the text box
+        self.txt_messages.yview_moveto(1)
 
     def show_frame(self, event=None, frame="home"):
         """Switch between frames and update button colors.
