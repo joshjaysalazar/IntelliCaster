@@ -6,6 +6,7 @@ import threading
 import customtkinter as ctk
 from elevenlabs import voices
 import irsdk
+from PIL import Image
 
 from core import common
 from core import director
@@ -391,12 +392,17 @@ class App(ctk.CTk):
         self.frm_navigation.grid(row=0, column=0, sticky="nsew")
         self.frm_navigation.grid_rowconfigure(4, weight=1)
 
-        # Create title label
+        # Create title logo
+        logo_image_raw = Image.open("assets/logo.png")
+        logo_image = ctk.CTkImage(
+            light_image=logo_image_raw,
+            dark_image=logo_image_raw,
+            size=(200, 24)
+        )
         self.lbl_title = ctk.CTkLabel(
             master=self.frm_navigation,
-            text="IntelliCaster",
-            font=ctk.CTkFont(size=32, weight="bold"),
-            text_color="lightskyblue1"
+            image=logo_image,
+            text=""
         )
         self.lbl_title.grid(row=0, column=0, padx=30, pady=30)
 
