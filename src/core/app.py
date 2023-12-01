@@ -277,6 +277,7 @@ class App(ctk.CTk):
         text,
         default=None,
         browse=False,
+        password=False,
         variable={}
     ):
         """Create an entry box for the frame.
@@ -291,6 +292,7 @@ class App(ctk.CTk):
             text (str): The text to display next to the entry box.
             default (str): The default value to insert into the entry box.
             browse (bool): Whether or not to create a 'Browse' button.
+            password (bool): Whether or not to create a password entry box.
             variable (dict): The dictionary to add the entry box to.
         """
         def browse_dir():
@@ -323,6 +325,18 @@ class App(ctk.CTk):
             master=master,
             font=ctk.CTkFont(size=14)
         )
+        
+        # Check if password flag is set
+        if password:
+            # If so, configure entry box to hide characters
+            ent.configure(show="•")
+
+            # Show/hide password when user clicks on the entry box
+            ent.bind("<FocusIn>", lambda e: ent.configure(show=""))
+            ent.bind("<FocusOut>", lambda e: ent.configure(show="•"))
+
+            # Also hide password when user presses enter
+            ent.bind("<Return>", lambda e: ent.configure(show="•"))
 
         # If default value is provided, insert it into the entry box
         if default:
@@ -512,7 +526,8 @@ class App(ctk.CTk):
             "openai_api_key",
             "OpenAI API Key",
             default,
-            variable=self.current_settings
+            variable=self.current_settings,
+            password=True
         )
 
         # Create API key entry box for ElevenLabs
@@ -522,7 +537,8 @@ class App(ctk.CTk):
             "elevenlabs_api_key",
             "ElevenLabs API Key",
             default,
-            variable=self.current_settings
+            variable=self.current_settings,
+            password=True
         )
 
         # Create iRacing section
