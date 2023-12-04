@@ -171,7 +171,7 @@ class TextGenerator:
             new_msg += f"Your co-commentator is {color_name}. "
 
             # Add play-by-play instructions
-            new_msg += "You will respond with a single short sentence. "
+            new_msg += "You will respond with only one sentence. "
             new_msg += "Do not provide too much detail. Focus on the action. "
 
         elif role == "color":
@@ -189,8 +189,8 @@ class TextGenerator:
         new_msg += "Almost always refer to drivers by only their surname. "
         new_msg += f"Use a {tone} tone. "
         new_msg += "Occasionally mention your co-commentator by name, but " \
-            "never refer to yourself by name. "
-        new_msg += "Never ask your co-commentator a question. "
+            "never ask them a question. "
+        new_msg += "Never say your own name. "
 
         # Add additional info to the end of the system message
         new_msg += other_info
