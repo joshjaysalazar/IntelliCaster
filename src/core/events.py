@@ -117,75 +117,78 @@ class Events:
         if not common.race_started:
             return
         
-        # Create an empty list of collisions
-        collisions = []
+        # for driver in common.ir["DriverInfo"]["Drivers"]:
+        #     print(driver["UserName"], driver["CurDriverIncidentCount"])
 
-        # Go through all the drivers
-        for driver in common.drivers:
-            # Get this driver's previous information
-            prev_d = None
-            for item in common.prev_drivers:
-                if item["name"] == driver["name"]:
-                    prev_d = item
-                    break
+        # # Create an empty list of collisions
+        # collisions = []
 
-            # Check if driver's incidents have increased by at least 4
-            if prev_d and driver["incidents"] - prev_d["incidents"] >= 4:
-                # If they have, add them to the list along with lap percent
-                collisions.append(
-                    {
-                        "name": driver["name"],
-                        "lap_percent": driver["lap_percent"],
-                        "number": driver["number"]
-                    }
-                )
+        # # Go through all the drivers
+        # for driver in common.drivers:
+        #     # Get this driver's previous information
+        #     prev_d = None
+        #     for item in common.prev_drivers:
+        #         if item["name"] == driver["name"]:
+        #             prev_d = item
+        #             break
 
-        # If there are no collisions, return
-        if not collisions:
-            return
+        #     # Check if driver's incidents have increased by at least 4
+        #     if prev_d and driver["incidents"] - prev_d["incidents"] >= 4:
+        #         # If they have, add them to the list along with lap percent
+        #         collisions.append(
+        #             {
+        #                 "name": driver["name"],
+        #                 "lap_percent": driver["lap_percent"],
+        #                 "number": driver["number"]
+        #             }
+        #         )
 
-        # Sort the list by lap percent
-        collisions.sort(key=lambda x: x["lap_percent"])
+        # # If there are no collisions, return
+        # if not collisions:
+        #     return
 
-        # Create a list of collisions to report
-        collisions_to_report = []
+        # # Sort the list by lap percent
+        # collisions.sort(key=lambda x: x["lap_percent"])
 
-        # Go through the collisions list to find collisions to report
-        for i, collision in enumerate(collisions):
-            # If this is the first collision, add the name and number
-            if i == 0:
-                collisions_to_report.append(
-                    [
-                        {
-                            "name": collision["name"],
-                            "number": collision["number"]
-                        }
-                    ]
-                )
+        # # Create a list of collisions to report
+        # collisions_to_report = []
 
-            # Otherwise, check if the collision is close enough to the last one
-            else:
-                # If it is, add the name to the last list
-                lap_pct = collision["lap_percent"]
-                prev_lap_pct = collisions[i - 1]["lap_percent"]
-                if lap_pct - prev_lap_pct < 0.02:
-                    collisions_to_report[-1].append(
-                        {
-                            "name": collision["name"],
-                            "number": collision["number"]
-                        }
-                    )
+        # # Go through the collisions list to find collisions to report
+        # for i, collision in enumerate(collisions):
+        #     # If this is the first collision, add the name and number
+        #     if i == 0:
+        #         collisions_to_report.append(
+        #             [
+        #                 {
+        #                     "name": collision["name"],
+        #                     "number": collision["number"]
+        #                 }
+        #             ]
+        #         )
 
-                # Otherwise, add the name to a new list
-                else:
-                    collisions_to_report.append(
-                        [
-                            {
-                                "name": collision["name"],
-                                "number": collision["number"]
-                            }
-                        ]
-                    )
+        #     # Otherwise, check if the collision is close enough to the last one
+        #     else:
+        #         # If it is, add the name to the last list
+        #         lap_pct = collision["lap_percent"]
+        #         prev_lap_pct = collisions[i - 1]["lap_percent"]
+        #         if lap_pct - prev_lap_pct < 0.02:
+        #             collisions_to_report[-1].append(
+        #                 {
+        #                     "name": collision["name"],
+        #                     "number": collision["number"]
+        #                 }
+        #             )
+
+        #         # Otherwise, add the name to a new list
+        #         else:
+        #             collisions_to_report.append(
+        #                 [
+        #                     {
+        #                         "name": collision["name"],
+        #                         "number": collision["number"]
+        #                     }
+        #                 ]
+        #             )
 
         # # Go through the collisions to report list
         # for collision in collisions_to_report:
