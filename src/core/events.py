@@ -163,6 +163,49 @@ class Events:
                 # End this iteration of the loop
                 break
 
+    def _detect_stopped(self):
+        """Detect stopped cars and add them to the events list.
+        
+        This method detects stopped cars by comparing the current drivers list
+        to the previous drivers list. If a driver's lap distance has not
+        increased enough, they have stopped. If this is the case, an incident
+        event is added to the events list.
+        """
+        # If the race hasn't started, don't detect stopped cars
+        if not common.race_started:
+            return
+        
+        # If not all cars have started, don't detect stopped cars
+        if not common.all_cars_started:
+            return
+        
+        # Go through all the drivers
+        for driver in common.drivers:
+            # Get this driver's previous information
+            prev_d = None
+            for d in common.prev_drivers:
+                if d["name"] == driver["name"]:
+                    prev_d = d
+                    break
+
+            # If lap distance has not increased by at least 1m, they are stopped
+            if prev_d and driver["lap_distance"] - prev_d["lap_distance"] < 1:
+                # If the driver is in the pits, don't report it
+                if driver["in_pits"]:
+                    continue
+
+                # If laps completed is negative (DNF), don't report it
+                if driver["laps_completed"] < 0:
+                    continue
+
+                # If a legitimate stopped car was found, add it to events list
+                driver_name = common.remove_numbers(driver["name"])
+                description = f"{driver_name} is stopped on track"
+                self._add("stopped", description, driver["number"])
+
+                # End this iteration of the loop
+                break
+
     def _remove(self, id):
         """Remove an event from the list.
         
@@ -271,7 +314,19 @@ class Events:
         # Sort the events list by timestamp, with the most recent first
         self.events.sort(key=lambda x: x["timestamp"], reverse=True)
 
-        # Return the first event in the list and remove it
+        # Event priority list
+        priority = ["stopped", "overtake"]
+
+        # Go through the priority list
+        for p in priority:
+            # Go through the events list
+            for event in self.events:
+                # If the event type matches the priority, return it
+                if event["type"] == p:
+                    self._remove(event["id"])
+                    return event
+
+        # As a fallback, return the first event in the list and remove it
         event = self.events[0]
         self._remove(event["id"])
         return event
@@ -292,6 +347,7 @@ class Events:
             self._update_drivers()
 
             # Detect events
+            self._detect_stopped()
             self._detect_overtakes()
 
             # Update the previous drivers list
