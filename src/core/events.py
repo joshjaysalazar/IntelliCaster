@@ -88,7 +88,6 @@ class Events:
                     "grid_position": quali_pos,
                     "idx": driver["CarIdx"],
                     "in_pits": False,
-                    "incidents": driver["CurDriverIncidentCount"],
                     "irating": driver["IRating"],
                     "lap_percent": 0,
                     "laps_completed": 0,
@@ -337,10 +336,6 @@ class Events:
                             common.drivers[j]["on_track"] = True
                         else:
                             common.drivers[j]["on_track"] = False
-
-                        # Update incidents
-                        incidents = driver_data[i]["CurDriverIncidentCount"]
-                        common.drivers[j]["incidents"] = incidents
 
         # Sort the list by current position if race has started
         if common.race_started:
