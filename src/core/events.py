@@ -90,6 +90,7 @@ class Events:
                     "in_pits": False,
                     "irating": driver["IRating"],
                     "lap_percent": 0,
+                    "lap_distance": 0,
                     "laps_completed": 0,
                     "laps_started": 0,
                     "last_lap": None,
@@ -162,6 +163,9 @@ class Events:
                 # End this iteration of the loop
                 break
 
+    def _detect_stopped(self):
+        pass
+
     def _remove(self, id):
         """Remove an event from the list.
         
@@ -214,6 +218,13 @@ class Events:
                         # Update percentage of lap completed
                         lap_percent = common.ir["CarIdxLapDistPct"][i]
                         common.drivers[j]["lap_percent"] = lap_percent
+
+                        # Update lap distance completed
+                        track_length = common.ir["WeekendInfo"]["TrackLength"]
+                        track_length = float(track_length.split(" ")[0])
+                        track_length = track_length * 1000
+                        lap_distance = lap_percent * track_length
+                        common.drivers[j]["lap_distance"] = lap_distance
 
                         # Update laps started and completed
                         started = common.ir["CarIdxLap"][i]
@@ -284,7 +295,6 @@ class Events:
             self._update_drivers()
 
             # Detect events
-            self._detect_collisions()
             self._detect_overtakes()
 
             # Update the previous drivers list
