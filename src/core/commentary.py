@@ -166,7 +166,7 @@ class TextGenerator:
         # Add messages based on role
         if role == "play-by-play":
             # Add the name to the system message
-            new_msg += "You are a motorsport play-by-play commentator named "
+            new_msg += "You are an iRacing play-by-play commentator named "
             new_msg += f"{pbp_name}. "
             new_msg += f"Your co-commentator is {color_name}. "
 
@@ -176,7 +176,7 @@ class TextGenerator:
 
         elif role == "color":
             # Add the name to the system message
-            new_msg += "You are a motorsport color commentator named "
+            new_msg += "You are an iRacing color commentator named "
             new_msg += f"{color_name}. "
             new_msg += f"Your co-commentator is {pbp_name}. "
 
