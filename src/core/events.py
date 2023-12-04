@@ -111,12 +111,7 @@ class Events:
     def _detect_collisions(self):
         """Detect collisions and add them to the events list.
         
-        This method detects collisions by comparing the current drivers list to
-        the previous drivers list. If a driver's incidents have increased, they
-        have collided with someone. If this is the case, the driver who was
-        collided with is found and a collision event is added to the events
-        list. This method also checks a few other conditions to make sure the
-        collision is legitimate.
+        
         """
         # If the race hasn't started, return
         if not common.race_started:
