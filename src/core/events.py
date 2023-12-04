@@ -108,6 +108,114 @@ class Events:
         # Return the list of drivers
         return driver_dict
 
+    def _detect_collisions(self):
+        """Detect collisions and add them to the events list.
+        
+        This method detects collisions by comparing the current drivers list to
+        the previous drivers list. If a driver's incidents have increased, they
+        have collided with someone. If this is the case, the driver who was
+        collided with is found and a collision event is added to the events
+        list. This method also checks a few other conditions to make sure the
+        collision is legitimate.
+        """
+        # If the race hasn't started, return
+        if not common.race_started:
+            return
+        
+        # Create an empty list of collisions
+        collisions = []
+
+        # Go through all the drivers
+        for driver in common.drivers:
+            # Get this driver's previous information
+            prev_d = None
+            for item in common.prev_drivers:
+                if item["name"] == driver["name"]:
+                    prev_d = item
+                    break
+
+            # Check if driver's incidents have increased by at least 4
+            if prev_d and driver["incidents"] >= prev_d["incidents"] - 4:
+                # If they have, add them to the list along with lap percent
+                collisions.append(
+                    {
+                        "name": driver["name"],
+                        "lap_percent": driver["lap_percent"],
+                        "number": driver["number"]
+                    }
+                )
+
+        print(collisions)
+
+        # If there are no collisions, return
+        if not collisions:
+            return
+
+        # Sort the list by lap percent
+        collisions.sort(key=lambda x: x["lap_percent"])
+
+        # Create a list of collisions to report
+        collisions_to_report = []
+
+        # Go through the collisions list to find collisions to report
+        for i, collision in enumerate(collisions):
+            # If this is the first collision, add the name and number
+            if i == 0:
+                collisions_to_report.append(
+                    [
+                        {
+                            "name": collision["name"],
+                            "number": collision["number"]
+                        }
+                    ]
+                )
+
+            # Otherwise, check if the collision is close enough to the last one
+            else:
+                # If it is, add the name to the last list
+                lap_pct = collision["lap_percent"]
+                prev_lap_pct = collisions[i - 1]["lap_percent"]
+                if lap_pct - prev_lap_pct < 0.02:
+                    collisions_to_report[-1].append(
+                        {
+                            "name": collision["name"],
+                            "number": collision["number"]
+                        }
+                    )
+
+                # Otherwise, add the name to a new list
+                else:
+                    collisions_to_report.append(
+                        [
+                            {
+                                "name": collision["name"],
+                                "number": collision["number"]
+                            }
+                        ]
+                    )
+
+        print(collisions_to_report)
+
+        # # Go through the collisions to report list
+        # for collision in collisions_to_report:
+        #     # If there is only one driver in the collision, skip it
+        #     if len(collision) == 1:
+        #         continue
+
+        #     # Get the names of the drivers involved
+        #     names = []
+        #     for driver in collision:
+        #         names.append(common.remove_numbers(driver))
+
+        #     # Create the description
+        #     description = f"{', '.join(names)} collided"
+
+        #     # Add the event to the list
+        #     self._add("collision", description)
+
+
+
+
     def _detect_overtakes(self):
         """Detect overtakes and add them to the events list.
         
@@ -121,14 +229,14 @@ class Events:
         # Go through all the drivers
         for driver in common.drivers:
             # Get this driver's previous information
-            prev_driver = None
+            prev_d = None
             for item in common.prev_drivers:
                 if item["name"] == driver["name"]:
-                    prev_driver = item
+                    prev_d = item
                     break
 
             # If a driver's position has decreased, they have overtaken someone
-            if prev_driver and driver["position"] < prev_driver["position"]:
+            if prev_d and driver["position"] < prev_d["position"]:
                 # Find the driver whose position is 1 higher than this driver's
                 overtaken = None
                 for item in common.drivers:
@@ -289,6 +397,7 @@ class Events:
             self._update_drivers()
 
             # Detect events
+            self._detect_collisions()
             self._detect_overtakes()
 
             # Update the previous drivers list
