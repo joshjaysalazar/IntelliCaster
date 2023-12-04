@@ -89,8 +89,8 @@ class Events:
                     "idx": driver["CarIdx"],
                     "in_pits": False,
                     "irating": driver["IRating"],
-                    "lap_percent": 0,
                     "lap_distance": 0,
+                    "lap_percent": 0,
                     "laps_completed": 0,
                     "laps_started": 0,
                     "last_lap": None,
@@ -98,7 +98,8 @@ class Events:
                     "name": driver["UserName"],
                     "number": driver["CarNumberRaw"],
                     "on_track": False,
-                    "position": quali_pos
+                    "position": quali_pos,
+                    "total_dist": 0
                 }
             )
 
@@ -188,8 +189,8 @@ class Events:
                     prev_d = d
                     break
 
-            # If lap distance has not increased by at least 1m, they are stopped
-            if prev_d and driver["lap_distance"] - prev_d["lap_distance"] < 1:
+            # If total distance not increased by at least 1m, they are stopped
+            if prev_d and driver["total_dist"] - prev_d["total_dist"] < 1:
                 # If the driver is in the pits, don't report it
                 if driver["in_pits"]:
                     continue
@@ -259,18 +260,20 @@ class Events:
                         lap_percent = common.ir["CarIdxLapDistPct"][i]
                         common.drivers[j]["lap_percent"] = lap_percent
 
-                        # Update lap distance completed
-                        track_length = common.ir["WeekendInfo"]["TrackLength"]
-                        track_length = float(track_length.split(" ")[0])
-                        track_length = track_length * 1000
-                        lap_distance = lap_percent * track_length
-                        common.drivers[j]["lap_distance"] = lap_distance
-
                         # Update laps started and completed
                         started = common.ir["CarIdxLap"][i]
                         completed = common.ir["CarIdxLapCompleted"][i]
                         common.drivers[j]["laps_started"] = started
                         common.drivers[j]["laps_completed"] = completed
+
+                        # Update lap and total distance completed
+                        track_length = common.ir["WeekendInfo"]["TrackLength"]
+                        track_length = float(track_length.split(" ")[0])
+                        track_length = track_length * 1000
+                        lap_distance = lap_percent * track_length
+                        common.drivers[j]["lap_distance"] = lap_distance
+                        dist_comp = (completed * track_length) + lap_distance
+                        common.drivers[j]["total_dist"] = dist_comp
 
                         # Update gap to leader
                         gap_to_leader = common.ir["CarIdxF2Time"][i]
