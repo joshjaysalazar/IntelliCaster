@@ -122,9 +122,9 @@ class Events:
         for driver in common.drivers:
             # Get this driver's previous information
             prev_d = None
-            for item in common.prev_drivers:
-                if item["name"] == driver["name"]:
-                    prev_d = item
+            for d in common.prev_drivers:
+                if d["name"] == driver["name"]:
+                    prev_d = d
                     break
 
             # If a driver's position has decreased, they have overtaken someone
@@ -162,9 +162,6 @@ class Events:
 
                 # End this iteration of the loop
                 break
-
-    def _detect_stopped(self):
-        pass
 
     def _remove(self, id):
         """Remove an event from the list.
