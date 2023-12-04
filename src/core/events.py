@@ -135,7 +135,7 @@ class Events:
                     break
 
             # Check if driver's incidents have increased by at least 4
-            if prev_d and driver["incidents"] >= prev_d["incidents"] - 4:
+            if prev_d and driver["incidents"] - prev_d["incidents"] >= 4:
                 # If they have, add them to the list along with lap percent
                 collisions.append(
                     {
@@ -144,8 +144,6 @@ class Events:
                         "number": driver["number"]
                     }
                 )
-
-        print(collisions)
 
         # If there are no collisions, return
         if not collisions:
@@ -193,8 +191,6 @@ class Events:
                             }
                         ]
                     )
-
-        print(collisions_to_report)
 
         # # Go through the collisions to report list
         # for collision in collisions_to_report:
