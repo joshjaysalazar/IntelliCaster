@@ -104,6 +104,9 @@ class Editor:
             # Cut end of audio to avoid glitch
             audio = audio.subclip(0, audio.duration - 0.05)
 
+            # Normalize the audio
+            audio = audio_normalize(audio)
+
             # Add the audio clip to the list
             audio_clips.append(audio)
 
