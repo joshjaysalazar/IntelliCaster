@@ -111,12 +111,9 @@ class Director:
         # Move the camera to focus on the event
         self.camera.change_camera(event["focus"], "TV1")
 
-        # Get how long ago the event happened
-        time_since_event = time.time() - event["timestamp"]
-
         # Generate the commentary
         self.commentary.generate(
-            event["description"] + f" {time_since_event} seconds ago.",
+            event["description"],
             "play-by-play",
             "neutral",
             common.instructions[event["type"]],

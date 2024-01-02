@@ -84,5 +84,6 @@ running = False
 
 # Additional instructions to give to commentary generation depending on event
 instructions = {
+    "stopped": "Don't assume the reason for the stoppage.",
     "overtake": "Be sure to include the position of the driver."
 }
