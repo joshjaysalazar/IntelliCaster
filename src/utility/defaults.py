@@ -37,20 +37,21 @@ def create_settings_file(file_name):
 
         # Set up keys section
         config.add_section("keys")
-        config.set("keys", "openai_api_key", "YOUR_API_KEY")
-        config.set("keys", "elevenlabs_api_key", "YOUR_API_KEY")
+        config.set("keys", "openai_api_key", "")
+        config.set("keys", "elevenlabs_api_key", "")
 
         # Set up iRacing section
-        config.add_section("iracing")
+        config.add_section("general")
         config.set(
-            "iracing", "iracing_path", "path/to/your/iRacing/folder"
+            "general", "iracing_path", "path/to/your/iRacing/folder"
         )
-        config.set("iracing", "video_format", "mp4")
-        config.set("iracing", "video_framerate", "60")
-        config.set("iracing", "video_resolution", "1920x1080")
+        config.set("general", "video_format", "mp4")
+        config.set("general", "video_framerate", "60")
+        config.set("general", "video_resolution", "1920x1080")
 
         # Set up commentary section
         config.add_section("commentary")
+        config.set("commentary", "gpt_model", "GPT-4 Turbo")
         config.set("commentary", "pbp_voice", "Harry")
         config.set("commentary", "color_voice", "Elli")
         config.set("commentary", "color_chance", "0.5")
