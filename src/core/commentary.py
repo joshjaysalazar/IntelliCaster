@@ -167,6 +167,7 @@ class TextGenerator:
             # Add play-by-play instructions
             new_msg += "You will respond with only one sentence. "
             new_msg += "Do not provide too much detail. Focus on the action. "
+            new_msg += "Do not just say the word \"play-by-play\". "
 
         elif role == "color":
             # Add the name to the system message
@@ -176,6 +177,7 @@ class TextGenerator:
             new_msg += "You will respond with one to two short sentences. "
             new_msg += "Stick to providing insight or context that enhances "
             new_msg += "the viewer's understanding. "
+            new_msg += "Do not just say the word \"color\". "
 
         # Add common instructions
         new_msg += "Almost always refer to drivers by only their surname. "
