@@ -2,31 +2,46 @@
 
 IntelliCaster is an AI-powered tool for generating voice commentary on iRacing race replays. Leveraging OpenAI for text generation and ElevenLabs for voice synthesis, it adds dynamic and immersive commentary to your replays. Currently in early prerelease, IntelliCaster is under active development. Users should note that while the current version uses OpenAI and ElevenLabs, this may change as new technologies emerge and the project evolves. Early adopters should expect some instability and are encouraged to contribute feedback.
 
-## Example
+## Example Video
 
 To give you a better idea of what IntelliCaster is capable of, check out this example video. It showcases the AI-generated commentary in a typical iRacing replay, demonstrating both the quality of the commentary and the integration with race footage. This also shows that IntelliCaster is very much in an early prerelease state, as the commentary is not always accurate and the video rendering is not yet optimized. As the project matures, these issues will be addressed.
 
 [![IntelliCaster Example Video](https://img.youtube.com/vi/Gokr_ocneCw/0.jpg)](https://www.youtube.com/watch?v=Gokr_ocneCw)
 
+## Requirements
+
+Before you start with IntelliCaster, ensure that you meet the following requirements:
+
+- A clean Python 3.12+ installation
+- A stable internet connection for API communication
+- A valid OpenAI API key
+- A valid ElevenLabs API key
+- Adjust iRacing graphics settings to allow for smooth video capture
+
 ## Installation
 
 To get started with IntelliCaster in its current prerelease state, follow these steps:
 
-1. Ensure you have Python 3.12 installed on your system.
-2. Clone the IntelliCaster repository from GitHub.
-3. Navigate to the cloned directory and install the required libraries using `pip install -r requirements.txt`.
-4. Run `main.py` located in the src directory to start the application.
+1. Ensure all requirements are met.
+2. Clone the IntelliCaster repository from GitHub:
+    `git clone https://github.com/joshjaysalazar/IntelliCaster.git`
+3. Navigate to the cloned directory:
+    `cd IntelliCaster`
+4. Install the required libraries:
+    `pip install -r requirements.txt`
+5. Run `main.py` in the src directory to start IntelliCaster:
+    `python src/main.py`
 
 ## Usage
 
 Using IntelliCaster is straightforward:
 
-1. Open the IntelliCaster application.
-2. Go to the Settings tab and enter your OpenAI and ElevenLabs API keys. Adjust any other settings as needed. A restart of the software may be required after changing settings.
-3. Launch an iRacing replay and jump to a race lap.
-4. Press the 'Start Commentary' button to initiate commentary. The replay will automatically rewind to the beginning of the race session.
-5. Enjoy the AI-generated commentary as the race unfolds.
-6. To stop the commentary, simply press the 'Stop Commentary' button. IntelliCaster will then render a video file with the commentary.
+1. Open IntelliCaster. The application interface should appear.
+2. In the Settings tab, enter your OpenAI and ElevenLabs API keys.
+3. Adjust any other necessary settings. Note that a restart of the software might be required after modifying settings.
+4. To generate commentary, open an iRacing replay and navigate to any race lap.
+5. Press the "Start Commentary" button. IntelliCaster will rewind the replay to the beginning of the session and start generating commentary.
+6. Once you're done, press the "Stop Commentary" button. IntelliCaster will then render the video file with the added commentary.
 
 ## API Usage and Costs
 
