@@ -159,16 +159,10 @@ class TextGenerator:
         # Start building the system message
         new_msg = ""
 
-        # Get the names of the commentators
-        pbp_name = common.settings["commentary"]["pbp_voice"]
-        color_name = common.settings["commentary"]["color_voice"]
-
         # Add messages based on role
         if role == "play-by-play":
             # Add the name to the system message
-            new_msg += "You are an iRacing play-by-play commentator named "
-            new_msg += f"{pbp_name}. "
-            new_msg += f"Your co-commentator is {color_name}. "
+            new_msg += "You are an iRacing play-by-play commentator. "
 
             # Add play-by-play instructions
             new_msg += "You will respond with only one sentence. "
@@ -176,9 +170,7 @@ class TextGenerator:
 
         elif role == "color":
             # Add the name to the system message
-            new_msg += "You are an iRacing color commentator named "
-            new_msg += f"{color_name}. "
-            new_msg += f"Your co-commentator is {pbp_name}. "
+            new_msg += "You are an iRacing color commentator. "
 
             # Add color instructions
             new_msg += "You will respond with one to two short sentences. "
@@ -188,9 +180,6 @@ class TextGenerator:
         # Add common instructions
         new_msg += "Almost always refer to drivers by only their surname. "
         new_msg += f"Use a {tone} tone. "
-        new_msg += "Occasionally mention your co-commentator by name, but " \
-            "never ask them a question. "
-        new_msg += "Never say your own name. "
 
         # Add additional info to the end of the system message
         new_msg += other_info
@@ -355,7 +344,7 @@ class TextGenerator:
         # Add the response to the list of previous responses
         formatted_answer = {
             "role": "assistant",
-            "name": pbp_name if role == "play-by-play" else color_name,
+            "name": "Play-By-Play" if role == "play-by-play" else "Color",
             "content": answer
         }
         self.previous_responses.append(formatted_answer)
