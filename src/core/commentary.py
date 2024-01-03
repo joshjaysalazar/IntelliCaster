@@ -76,14 +76,14 @@ class Commentary:
             other_info=other_info
         )
 
+        # Add the message to the message box
+        common.app.add_message(f"{role.title()}: {text}")
+
         # Pick the correct voice for the role
         if role == "play-by-play":
             voice = common.settings["commentary"]["pbp_voice"]
         elif role == "color":
             voice = common.settings["commentary"]["color_voice"]
-        
-        # Add the message to the message box
-        common.app.add_message(f"{voice}: {text}")
 
         # Calculate how long it took to generate the text
         gpt_time = time.time() - start_time
