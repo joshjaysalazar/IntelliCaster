@@ -76,14 +76,14 @@ class Commentary:
             other_info=other_info
         )
 
+        # Add the message to the message box
+        common.app.add_message(f"{role.title()}: {text}")
+
         # Pick the correct voice for the role
         if role == "play-by-play":
             voice = common.settings["commentary"]["pbp_voice"]
         elif role == "color":
             voice = common.settings["commentary"]["color_voice"]
-        
-        # Add the message to the message box
-        common.app.add_message(f"{voice}: {text}")
 
         # Calculate how long it took to generate the text
         gpt_time = time.time() - start_time
@@ -159,38 +159,29 @@ class TextGenerator:
         # Start building the system message
         new_msg = ""
 
-        # Get the names of the commentators
-        pbp_name = common.settings["commentary"]["pbp_voice"]
-        color_name = common.settings["commentary"]["color_voice"]
-
         # Add messages based on role
         if role == "play-by-play":
             # Add the name to the system message
-            new_msg += "You are an iRacing play-by-play commentator named "
-            new_msg += f"{pbp_name}. "
-            new_msg += f"Your co-commentator is {color_name}. "
+            new_msg += "You are an iRacing play-by-play commentator. "
 
             # Add play-by-play instructions
             new_msg += "You will respond with only one sentence. "
             new_msg += "Do not provide too much detail. Focus on the action. "
+            new_msg += "Do not just say the word \"play-by-play\". "
 
         elif role == "color":
             # Add the name to the system message
-            new_msg += "You are an iRacing color commentator named "
-            new_msg += f"{color_name}. "
-            new_msg += f"Your co-commentator is {pbp_name}. "
+            new_msg += "You are an iRacing color commentator. "
 
             # Add color instructions
             new_msg += "You will respond with one to two short sentences. "
             new_msg += "Stick to providing insight or context that enhances "
             new_msg += "the viewer's understanding. "
+            new_msg += "Do not just say the word \"color\". "
 
         # Add common instructions
         new_msg += "Almost always refer to drivers by only their surname. "
         new_msg += f"Use a {tone} tone. "
-        new_msg += "Occasionally mention your co-commentator by name, but " \
-            "never ask them a question. "
-        new_msg += "Never say your own name. "
 
         # Add additional info to the end of the system message
         new_msg += other_info
@@ -355,7 +346,7 @@ class TextGenerator:
         # Add the response to the list of previous responses
         formatted_answer = {
             "role": "assistant",
-            "name": pbp_name if role == "play-by-play" else color_name,
+            "name": "Play-By-Play" if role == "play-by-play" else "Color",
             "content": answer
         }
         self.previous_responses.append(formatted_answer)
