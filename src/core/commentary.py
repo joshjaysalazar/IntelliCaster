@@ -265,7 +265,8 @@ class TextGenerator:
         messages.append(event_msg)
 
         # Add the lap percent message
-        lap_msg += f"The event occurred on {lap_percent}% of the lap. "
+        lap_percent = round(lap_percent * 100, 2)
+        lap_msg = f"The event occurred at {lap_percent}% of the lap. "
         lap_msg += "Infer the corner name or number based on that percentage."
         lap_pct_msg = {
             "role": "user",
