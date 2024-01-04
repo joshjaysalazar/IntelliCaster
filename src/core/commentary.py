@@ -183,6 +183,7 @@ class TextGenerator:
             new_msg += "You will respond with one to two short sentences. "
             new_msg += "Stick to providing insight or context that enhances "
             new_msg += "the viewer's understanding. "
+            new_msg += "Do not make up corner names or numbers. "
             new_msg += "Do not just say the word \"color\". "
 
         # Add common instructions
@@ -269,8 +270,8 @@ class TextGenerator:
             lap_percent = round(lap_percent * 100, 2)
             lap_msg = f"The event occurred at {lap_percent}% of the lap. "
             lap_msg += "Infer the corner name or number based on that. "
-            lap_msg += "Do not announce the corner name or number unless you "
-            lap_msg += "are certain of it. "
+            lap_msg += "Occasionally announce the corner name or number, but "
+            lap_msg += "do not do it every time."
             lap_pct_msg = {
                 "role": "user",
                 "content": lap_msg
