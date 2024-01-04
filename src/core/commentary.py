@@ -38,7 +38,8 @@ class Commentary:
 
     def generate(
             self, 
-            event, 
+            event,
+            lap_percent,
             role, 
             tone, 
             other_info="", 
@@ -52,6 +53,8 @@ class Commentary:
 
         Args:
             event (str): The event that occurred.
+            lap_percent (float): The percentage of the lap the event occurred
+                on.
             role (str): The role of the commentator.
             tone (str): The tone of the commentary.
             other_info (str): Additional information to be included in the
@@ -71,6 +74,7 @@ class Commentary:
         # Generate the commentary text
         text = self.text_generator.generate(
             event=event,
+            lap_percent=lap_percent,
             role=role,
             tone=tone,
             other_info=other_info
@@ -135,7 +139,7 @@ class TextGenerator:
         # Create an empty list to hold previous responses
         self.previous_responses = []
     
-    def generate(self, event, role, tone, other_info=""):
+    def generate(self, event, lap_percent, role, tone, other_info=""):
         """Generate text commentary for the given event.
         
         Generates text commentary for the given event based on the provided
@@ -145,6 +149,8 @@ class TextGenerator:
         
         Args:
             event (str): The event that occurred.
+            lap_percent (float): The percentage of the lap the event occurred
+                on.
             role (str): The role of the commentator.
             tone (str): The tone of the commentary.
             other_info (str): Additional information to be included in the
@@ -177,6 +183,7 @@ class TextGenerator:
             new_msg += "You will respond with one to two short sentences. "
             new_msg += "Stick to providing insight or context that enhances "
             new_msg += "the viewer's understanding. "
+            new_msg += "Do not make up corner names or numbers. "
             new_msg += "Do not just say the word \"color\". "
 
         # Add common instructions
@@ -257,6 +264,20 @@ class TextGenerator:
             "content": event
         }
         messages.append(event_msg)
+
+        # Add the lap percent message
+        if lap_percent != None:
+            lap_percent = round(lap_percent * 100, 2)
+            lap_msg = f"The event occurred at {lap_percent}% of the lap. "
+            lap_msg += "Infer the corner name or number based on that. "
+            lap_msg += "Occasionally announce the corner name or number, but "
+            lap_msg += "do not do it every time. Check the message history "
+            lap_msg += "to make sure you are not announcing corners too often."
+            lap_pct_msg = {
+                "role": "user",
+                "content": lap_msg
+            }
+            messages.append(lap_pct_msg)
 
         # Add the event message to previous messages
         self.previous_responses.append(event_msg)
