@@ -1,5 +1,6 @@
 from copy import deepcopy
 import time
+from pprint import pprint
 
 from core import common
 
@@ -228,6 +229,31 @@ class Events:
             if event["id"] == id:
                 self.events.remove(event)
 
+    def _remove_duplicates(self, events):
+        """Remove events with duplicate descriptions from the list, leaving only
+        the most recent event (which should be the first of its kind in the
+        list).
+
+        Args:
+            events (list): A list of events
+        
+        Returns:
+            list: A list of events with duplicates removed
+        """
+        # Create a new list to store the events
+        new_events = []
+
+        # Go through the events list
+        for event in events:
+            # If the event is not in the new list, add it
+            if event["description"] in [e["description"] for e in new_events]:
+                continue
+            else:
+                new_events.append(event)
+
+        # Return the new list
+        return new_events
+
     def _update_drivers(self):
         """Update the drivers list.
 
@@ -326,6 +352,11 @@ class Events:
         
         # Sort the events list by timestamp, with the most recent first
         self.events.sort(key=lambda x: x["timestamp"], reverse=True)
+
+        # Remove duplicate events
+        self.events = self._remove_duplicates(self.events)
+
+        pprint(self.events)
 
         # Event priority list
         priority = ["stopped", "overtake"]
