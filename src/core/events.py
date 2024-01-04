@@ -33,11 +33,21 @@ class Events:
             description (str): A description of the event
             focus (int): The number of the driver to focus on
         """
+        # Get the lap percent of the focused driver
+        if focus != None:
+            for driver in common.drivers:
+                if driver["number"] == focus:
+                    lap_percent = driver["lap_percent"]
+                    break
+        else:
+            lap_percent = None
+
         # Create a new event
         new_event = {
             "id": self.id_counter,
             "type": type,
             "description": description,
+            "lap_percent": lap_percent,
             "focus": focus,
             "timestamp": time.time()
         }
