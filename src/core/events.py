@@ -104,6 +104,7 @@ class Events:
                     "laps_completed": 0,
                     "laps_started": 0,
                     "last_lap": None,
+                    "last_stopped": None,
                     "license": driver["LicString"],
                     "name": driver["UserName"],
                     "number": driver["CarNumberRaw"],
@@ -161,6 +162,12 @@ class Events:
                 if overtaken["laps_completed"] < 0:
                     continue
 
+                # If lap percent is exactly 0, driver is likely not on track
+                if driver["lap_percent"] == 0:
+                    continue
+                if overtaken["lap_percent"] == 0:
+                    continue
+
                 # If an legitimate overtake was found, add it to the events list
                 driver_name = common.remove_numbers(driver["name"])
                 overtaken_name = common.remove_numbers(overtaken["name"])
@@ -209,10 +216,25 @@ class Events:
                 if driver["laps_completed"] < 0:
                     continue
 
+                # If lap percent is exactly 0, driver is likely not on track
+                if driver["lap_percent"] == 0:
+                    continue
+
+                # If driver last stopped less than 10 seconds ago, don't report
+                if driver["last_stopped"]:
+                    if time.time() - driver["last_stopped"] < 10:
+                        continue
+
                 # If a legitimate stopped car was found, add it to events list
                 driver_name = common.remove_numbers(driver["name"])
                 description = f"{driver_name} is stopped on track"
                 self._add("stopped", description, driver["number"])
+
+                # Update the driver's last stopped time
+                for i, d in enumerate(common.drivers):
+                    if d["name"] == driver["name"]:
+                        common.drivers[i]["last_stopped"] = time.time()
+                        break
 
                 # End this iteration of the loop
                 break
@@ -227,6 +249,31 @@ class Events:
         for event in self.events:
             if event["id"] == id:
                 self.events.remove(event)
+
+    def _remove_duplicates(self, events):
+        """Remove events with duplicate descriptions from the list, leaving only
+        the most recent event (which should be the first of its kind in the
+        list).
+
+        Args:
+            events (list): A list of events
+        
+        Returns:
+            list: A list of events with duplicates removed
+        """
+        # Create a new list to store the events
+        new_events = []
+
+        # Go through the events list
+        for event in events:
+            # If the event is not in the new list, add it
+            if event["description"] in [e["description"] for e in new_events]:
+                continue
+            else:
+                new_events.append(event)
+
+        # Return the new list
+        return new_events
 
     def _update_drivers(self):
         """Update the drivers list.
@@ -326,6 +373,9 @@ class Events:
         
         # Sort the events list by timestamp, with the most recent first
         self.events.sort(key=lambda x: x["timestamp"], reverse=True)
+
+        # Remove duplicate events
+        self.events = self._remove_duplicates(self.events)
 
         # Event priority list
         priority = ["stopped", "overtake"]
