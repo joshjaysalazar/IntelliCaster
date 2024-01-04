@@ -1,6 +1,5 @@
 from copy import deepcopy
 import time
-from pprint import pprint
 
 from core import common
 
@@ -377,8 +376,6 @@ class Events:
 
         # Remove duplicate events
         self.events = self._remove_duplicates(self.events)
-
-        pprint(self.events)
 
         # Event priority list
         priority = ["stopped", "overtake"]
