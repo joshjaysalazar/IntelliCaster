@@ -162,6 +162,12 @@ class Events:
                 if overtaken["laps_completed"] < 0:
                     continue
 
+                # If lap percent is exactly 0, driver is likely not on track
+                if driver["lap_percent"] == 0:
+                    continue
+                if overtaken["lap_percent"] == 0:
+                    continue
+
                 # If an legitimate overtake was found, add it to the events list
                 driver_name = common.remove_numbers(driver["name"])
                 overtaken_name = common.remove_numbers(overtaken["name"])
@@ -208,6 +214,10 @@ class Events:
 
                 # If laps completed is negative (DNF), don't report it
                 if driver["laps_completed"] < 0:
+                    continue
+
+                # If lap percent is exactly 0, driver is likely not on track
+                if driver["lap_percent"] == 0:
                     continue
 
                 # If a legitimate stopped car was found, add it to events list
