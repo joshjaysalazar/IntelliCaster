@@ -232,7 +232,10 @@ class Events:
                 self._add("stopped", description, driver["number"])
 
                 # Update the driver's last stopped time
-                common.drivers[driver["idx"]]["last_stopped"] = time.time()
+                for i, d in enumerate(common.drivers):
+                    if d["name"] == driver["name"]:
+                        common.drivers[i]["last_stopped"] = time.time()
+                        break
 
                 # End this iteration of the loop
                 break
