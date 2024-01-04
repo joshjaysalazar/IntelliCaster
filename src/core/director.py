@@ -114,6 +114,7 @@ class Director:
         # Generate the commentary
         self.commentary.generate(
             event["description"],
+            event["lap_percent"],
             "play-by-play",
             "neutral",
             common.instructions[event["type"]],

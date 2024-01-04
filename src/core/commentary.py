@@ -135,7 +135,7 @@ class TextGenerator:
         # Create an empty list to hold previous responses
         self.previous_responses = []
     
-    def generate(self, event, role, tone, other_info=""):
+    def generate(self, event, lap_percent, role, tone, other_info=""):
         """Generate text commentary for the given event.
         
         Generates text commentary for the given event based on the provided
@@ -257,6 +257,15 @@ class TextGenerator:
             "content": event
         }
         messages.append(event_msg)
+
+        # Add the lap percent message
+        lap_msg += f"The event occurred on {lap_percent}% of the lap. "
+        lap_msg += "Infer the corner name or number based on that percentage."
+        lap_pct_msg = {
+            "role": "user",
+            "content": lap_msg
+        }
+        messages.append(lap_pct_msg)
 
         # Add the event message to previous messages
         self.previous_responses.append(event_msg)
