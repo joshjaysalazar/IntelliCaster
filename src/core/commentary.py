@@ -268,7 +268,9 @@ class TextGenerator:
         if lap_percent != None:
             lap_percent = round(lap_percent * 100, 2)
             lap_msg = f"The event occurred at {lap_percent}% of the lap. "
-            lap_msg += "Infer the corner name or number based on that percentage."
+            lap_msg += "Infer the corner name or number based on that. "
+            lap_msg += "Do not announce the corner name or number unless you "
+            lap_msg += "are certain of it. "
             lap_pct_msg = {
                 "role": "user",
                 "content": lap_msg
