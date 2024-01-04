@@ -93,6 +93,7 @@ class Director:
         if random.random() < chance:
             self.commentary.generate(
                 "Add color commentary to the previous commentary.",
+                None,
                 "color",
                 "neutral",
                 yelling=True,
