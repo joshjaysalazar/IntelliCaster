@@ -105,6 +105,7 @@ class Events:
                     "laps_completed": 0,
                     "laps_started": 0,
                     "last_lap": None,
+                    "last_stopped": None,
                     "license": driver["LicString"],
                     "name": driver["UserName"],
                     "number": driver["CarNumberRaw"],
@@ -220,10 +221,18 @@ class Events:
                 if driver["lap_percent"] == 0:
                     continue
 
+                # If driver last stopped less than 10 seconds ago, don't report
+                if driver["last_stopped"]:
+                    if time.time() - driver["last_stopped"] < 10:
+                        continue
+
                 # If a legitimate stopped car was found, add it to events list
                 driver_name = common.remove_numbers(driver["name"])
                 description = f"{driver_name} is stopped on track"
                 self._add("stopped", description, driver["number"])
+
+                # Update the driver's last stopped time
+                common.drivers[driver["idx"]]["last_stopped"] = time.time()
 
                 # End this iteration of the loop
                 break
