@@ -38,7 +38,8 @@ class Commentary:
 
     def generate(
             self, 
-            event, 
+            event,
+            lap_percent,
             role, 
             tone, 
             other_info="", 
@@ -52,6 +53,8 @@ class Commentary:
 
         Args:
             event (str): The event that occurred.
+            lap_percent (float): The percentage of the lap the event occurred
+                on.
             role (str): The role of the commentator.
             tone (str): The tone of the commentary.
             other_info (str): Additional information to be included in the
@@ -71,6 +74,7 @@ class Commentary:
         # Generate the commentary text
         text = self.text_generator.generate(
             event=event,
+            lap_percent=lap_percent,
             role=role,
             tone=tone,
             other_info=other_info
@@ -145,6 +149,8 @@ class TextGenerator:
         
         Args:
             event (str): The event that occurred.
+            lap_percent (float): The percentage of the lap the event occurred
+                on.
             role (str): The role of the commentator.
             tone (str): The tone of the commentary.
             other_info (str): Additional information to be included in the
