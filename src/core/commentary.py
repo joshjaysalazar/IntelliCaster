@@ -271,7 +271,8 @@ class TextGenerator:
             lap_msg = f"The event occurred at {lap_percent}% of the lap. "
             lap_msg += "Infer the corner name or number based on that. "
             lap_msg += "Occasionally announce the corner name or number, but "
-            lap_msg += "do not do it every time."
+            lap_msg += "do not do it every time. Check the message history "
+            lap_msg += "to make sure you are not announcing corners too often."
             lap_pct_msg = {
                 "role": "user",
                 "content": lap_msg
