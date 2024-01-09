@@ -109,7 +109,7 @@ class ProgressTracker(ProgressBarLogger):
         self.remaining = remaining
         self.okay = okay
 
-        # Note the start time
+        #
         self.start_time = time.time()
 
     def _calculate_time_remaining(self, progress):
@@ -124,15 +124,16 @@ class ProgressTracker(ProgressBarLogger):
         Returns:
             str: The time remaining
         """
-        # Calculate the time elapsed
-        elapsed = time.time() - self.start_time
-
         # If progress is 0, return "Calculating..."
         if progress == 0:
             return "Calculating..."
 
-        # Calculate the time remaining
-        remaining = (elapsed / progress) * (1 - progress)
+        # Calculate how long the current progress has taken
+        elapsed = time.time() - self.start_time
+
+        # Multiply the time it took to get to the current progress by the
+        # remaining progress to make an estimate of the time remaining
+        remaining = elapsed * (1 - progress)
 
         # Format the time remaining
         remaining = time.strftime("%H:%M:%S", time.gmtime(remaining))
