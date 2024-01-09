@@ -1,3 +1,5 @@
+import time
+
 import customtkinter as ctk
 from proglog import ProgressBarLogger
 
@@ -38,6 +40,7 @@ class Export(ctk.CTkToplevel):
         self.progress_tracker = ProgressTracker(
             self.lbl_message,
             self.prg_bar,
+            self.lbl_time_remaining,
             self.btn_okay
         )
 
@@ -57,6 +60,14 @@ class Export(ctk.CTkToplevel):
             font=ctk.CTkFont(size=14)
         )
         self.lbl_message.pack(pady=20)
+
+        # Create a time remaining label
+        self.lbl_time_remaining = ctk.CTkLabel(
+            self,
+            text="Time remaining: Calculating...",
+            font=ctk.CTkFont(size=12)
+        )
+        self.lbl_time_remaining.pack(pady=(0, 20))
 
         # Create progress bar
         self.prg_bar = ctk.CTkProgressBar(
@@ -83,7 +94,7 @@ class ProgressTracker(ProgressBarLogger):
     export. It is used by the export window to track the progress of the export.
     """
 
-    def __init__(self, message, progress, okay):
+    def __init__(self, message, progress, remaining, okay):
         """Constructor for the progress tracker
 
         Args:
@@ -95,7 +106,39 @@ class ProgressTracker(ProgressBarLogger):
         # Member variables
         self.message = message
         self.progress = progress
+        self.remaining = remaining
         self.okay = okay
+
+        # Note the start time
+        self.start_time = time.time()
+
+    def _calculate_time_remaining(self, progress):
+        """Calculate the time remaining
+
+        Calculates the time remaining for the export. This method is called by
+        the callback method.
+
+        Args:
+            progress (float): The current progress
+
+        Returns:
+            str: The time remaining
+        """
+        # Calculate the time elapsed
+        elapsed = time.time() - self.start_time
+
+        # If progress is 0, return "Calculating..."
+        if progress == 0:
+            return "Calculating..."
+
+        # Calculate the time remaining
+        remaining = (elapsed / progress) * (1 - progress)
+
+        # Format the time remaining
+        remaining = time.strftime("%H:%M:%S", time.gmtime(remaining))
+
+        # Return the time remaining
+        return remaining
 
     def _format_text(self, text):
         """Format text for the message label
@@ -154,7 +197,12 @@ class ProgressTracker(ProgressBarLogger):
                 to None.
         """
         # Update progress bar
-        self.progress.set(value / self.bars[bar]["total"])
+        total = value / self.bars[bar]["total"]
+        self.progress.set(total)
+
+        # Update time remaining label
+        remaining = self._calculate_time_remaining(total)
+        self.remaining.configure(text=f"Time remaining: {remaining}")
 
     def callback(self, **changes):
         """Callback method for the progress tracker
