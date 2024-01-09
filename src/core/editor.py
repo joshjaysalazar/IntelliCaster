@@ -1,5 +1,6 @@
 import os
 
+from customtkinter import filedialog
 from moviepy.audio.AudioClip import CompositeAudioClip
 from moviepy.audio.fx.audio_normalize import audio_normalize
 from moviepy.audio.fx.volumex import volumex
@@ -142,6 +143,20 @@ class Editor:
         audio clips. This method is called by the main window when the user
         clicks the 'Stop Commentary' button.
         """
+        # Ask the user where to save the video
+        target = filedialog.asksaveasfilename(
+            filetypes=[(
+                "Video File",
+                f"*.{common.settings['general']['video_format']}"
+            )],
+            initialfile="output_video",
+            title="Save Video"
+        )
+        
+        # Return if the user canceled
+        if target == "":
+            return
+
         # Create export window
         export_window = export.Export(common.app)
 
@@ -171,7 +186,7 @@ class Editor:
 
         # Write the result to a file
         video.write_videofile(
-            f"output_video.{common.settings['general']['video_format']}",
+            f"{target}.{common.settings['general']['video_format']}",
             fps=int(common.settings["general"]["video_framerate"]),
             logger=export_window.progress_tracker
         )
