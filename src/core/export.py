@@ -20,7 +20,6 @@ class CancelConfirm(ctk.CTkToplevel):
         # Set window properties
         self.title("Cancel Export")
         self.resizable(False, False)
-        self.attributes("-topmost", True)
 
         # Reposition window
         w = 400
