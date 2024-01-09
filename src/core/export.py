@@ -64,7 +64,7 @@ class Export(ctk.CTkToplevel):
         # Create a time remaining label
         self.lbl_time_remaining = ctk.CTkLabel(
             self,
-            text="Time remaining: Calculating...",
+            text="Estimated time remaining: Calculating...",
             font=ctk.CTkFont(size=12)
         )
         self.lbl_time_remaining.pack(pady=(0, 20))
@@ -202,7 +202,7 @@ class ProgressTracker(ProgressBarLogger):
 
         # Update time remaining label
         remaining = self._calculate_time_remaining(total)
-        self.remaining.configure(text=f"Time remaining: {remaining}")
+        self.remaining.configure(text=f"Estimated time remaining: {remaining}")
 
     def callback(self, **changes):
         """Callback method for the progress tracker
