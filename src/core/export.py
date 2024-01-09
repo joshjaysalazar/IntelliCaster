@@ -222,7 +222,7 @@ class ProgressTracker(ProgressBarLogger):
 
         # Custom message for writing video
         if text.startswith("Writing video "):
-            text = "Writing video file..."
+            text = "Exporting video file..."
 
         # Custom final message and replace cancel button with okay button
         if text.startswith("video ready "):
