@@ -27,7 +27,7 @@ class Export(ctk.CTkToplevel):
 
         # Reposition window
         w = 540
-        h = 100
+        h = 150
         x = master.winfo_rootx() + (master.winfo_width() // 2) - (w // 2)
         y = master.winfo_rooty() + (master.winfo_height() // 2) - (h // 2)
         self.geometry(f"{w}x{h}+{x}+{y}")
@@ -36,7 +36,12 @@ class Export(ctk.CTkToplevel):
         self._create_widgets()
 
         # Create progress tracker object
-        self.progress_tracker = ProgressTracker(self.lbl_message, self.prg_bar)
+        self.progress_tracker = ProgressTracker(
+            self.lbl_message,
+            self.prg_bar,
+            self.btn_cancel,
+            self.btn_okay
+        )
 
     def _create_widgets(self):
         """Create widgets for the window
@@ -61,6 +66,21 @@ class Export(ctk.CTkToplevel):
         self.prg_bar.pack(pady=(0, 20))
         self.prg_bar.set(0)
 
+        # Create cancel button
+        self.btn_cancel = ctk.CTkButton(
+            self,
+            text="Cancel",
+            command=self.destroy
+        )
+        self.btn_cancel.pack(pady=(0, 20))
+
+        # Create hidden okay button (don't pack it until the export is done)
+        self.btn_okay = ctk.CTkButton(
+            self,
+            text="Okay",
+            command=self.destroy
+        )
+
 class ProgressTracker(ProgressBarLogger):
     """Progress tracker
 
@@ -68,7 +88,7 @@ class ProgressTracker(ProgressBarLogger):
     export. It is used by the export window to track the progress of the export.
     """
 
-    def __init__(self, message, progress):
+    def __init__(self, message, progress, cancel, okay):
         """Constructor for the progress tracker
 
         Args:
@@ -80,6 +100,8 @@ class ProgressTracker(ProgressBarLogger):
         # Member variables
         self.message = message
         self.progress = progress
+        self.cancel = cancel
+        self.okay = okay
 
     def _format_text(self, text):
         """Format text for the message label
@@ -116,9 +138,11 @@ class ProgressTracker(ProgressBarLogger):
         if text.startswith("Writing video "):
             text = "Writing video file..."
 
-        # Custom final message
+        # Custom final message and replace cancel button with okay button
         if text.startswith("video ready "):
             text = "Video exported successfully!"
+            self.cancel.pack_forget()
+            self.okay.pack(pady=(0, 20))
 
         # Return the text
         return text
