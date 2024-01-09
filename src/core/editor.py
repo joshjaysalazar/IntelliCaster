@@ -121,7 +121,10 @@ class Editor:
             VideoFileClip: The video clip
         """
         # Get the iRacing videos folder
-        path = os.path.join(common.settings["general"]["iracing_path"], "videos")
+        path = os.path.join(
+            common.settings["general"]["iracing_path"],
+            "videos"
+        )
 
         # Find the most recent .mp4 video in that folder
         files = []
