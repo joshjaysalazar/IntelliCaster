@@ -25,10 +25,11 @@ class Export(ctk.CTkToplevel):
         # Set window properties
         self.title("Export Video")
         self.resizable(False, False)
+        self.attributes("-topmost", True)
 
         # Reposition window
         w = 540
-        h = 150
+        h = 200
         x = master.winfo_rootx() + (master.winfo_width() // 2) - (w // 2)
         y = master.winfo_rooty() + (master.winfo_height() // 2) - (h // 2)
         self.geometry(f"{w}x{h}+{x}+{y}")
