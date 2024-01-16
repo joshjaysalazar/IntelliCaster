@@ -158,6 +158,11 @@ class Editor:
         
         # Return if the user canceled
         if target == "":
+            # Clean up videos directory
+            self._delete_commentary_audio()
+            self._delete_latest_video()
+            self._delete_screenshot()
+
             return
 
         # Create export window
