@@ -167,16 +167,18 @@ class ProgressTracker(ProgressBarLogger):
         if text.startswith("Building video "):
             text = "Building video..."
 
-        # Custom message for building audio
+        # Custom message for building audio (also reset start time)
         if text.startswith("Writing audio "):
+            self.start_time = time.time()
             text = "Building audio track..."
 
         # Custom message for done
         if text.startswith("Done"):
             text = "Done!"
 
-        # Custom message for writing video
+        # Custom message for writing video (also reset start time)
         if text.startswith("Writing video "):
+            self.start_time = time.time()
             text = "Exporting video file..."
 
         # Custom final message and active the okay button
