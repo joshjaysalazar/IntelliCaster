@@ -193,7 +193,7 @@ class Director:
         temporary file that keeps track of the files used by Intellicaster in
         the iRacing videos folder if it doesn't already exist.
         """
-        # Create a file in the videos folder called intellicaster.tmp if it doesn't exist
+        # Create a file in the videos folder called intellicaster.tmp if needed
         path = os.path.join(
             common.settings["general"]["iracing_path"],
             "videos",
