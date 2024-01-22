@@ -444,6 +444,15 @@ class VoiceGenerator:
         # Save the audio to a file
         elevenlabs.save(audio, os.path.join(path, file_name))
 
+        # Add the new audio file to intellicaster.tmp
+        path = os.path.join(
+            common.settings["general"]["iracing_path"],
+            "videos",
+            "intellicaster.tmp"
+        )
+        with open(path, "a") as file:
+            file.write(f"{file_name}\n")
+
         # Get the length of the audio file
         mp3_file = MP3(os.path.join(path, file_name))
         length = mp3_file.info.length
