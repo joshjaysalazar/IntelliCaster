@@ -1,4 +1,5 @@
 import os
+import time
 
 from customtkinter import filedialog
 from moviepy.audio.AudioClip import CompositeAudioClip
@@ -146,6 +147,9 @@ class Editor:
         
         # Return if the user canceled
         if target == "":
+            # Wait 3 seconds to ensure all of the files are written
+            time.sleep(3)
+
             # Clean up videos directory
             self.cleanup()
 
@@ -184,6 +188,9 @@ class Editor:
             fps=int(common.settings["general"]["video_framerate"]),
             logger=export_window.progress_tracker
         )
+
+        # Wait 3 seconds to ensure all of the files are written
+        time.sleep(3)
 
         # Clean up videos directory
         self.cleanup()
