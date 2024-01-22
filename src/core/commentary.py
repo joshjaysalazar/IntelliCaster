@@ -310,6 +310,24 @@ class TextGenerator:
             screenshot_path = os.path.join(path, "screenshot.png")
             screenshot.save(screenshot_path)
 
+            # Add screenshot to intellicaster.tmp if it's not already there
+            path = os.path.join(
+                common.settings["general"]["iracing_path"],
+                "videos",
+                "intellicaster.tmp"
+            )
+
+            with open(path, "r") as file:
+                # Get the file contents
+                contents = file.read()
+
+                # Get a list of all of the files
+                files = contents.split("\n")
+                
+            if "screenshot.png" not in files:
+                with open(path, "a") as file:
+                    file.write("screenshot.png\n")
+
             # Process the image and save it
             with Image.open(screenshot_path) as image:
                 # Get the image's current dimensions
