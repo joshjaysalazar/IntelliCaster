@@ -19,6 +19,41 @@ class Editor:
     file.
     """
 
+    def cleanup(self):
+        """Clean up the videos folder
+
+        Cleans up the videos folder by deleting all of the files listed in the
+        intellicaster.tmp file. This is used to clean up the videos folder after
+        the video has been exported.
+        """
+        # Get the intellicaster.tmp file path
+        path = os.path.join(
+            common.settings["general"]["iracing_path"],
+            "videos",
+            "intellicaster.tmp"
+        )
+
+        # Return if the file doesn't exist
+        if not os.path.exists(path):
+            return
+        
+        # Read the file
+        with open(path, "r") as file:
+            # Get the file contents
+            contents = file.read()
+
+            # Get a list of all of the files
+            files = contents.split("\n")
+
+        # Delete all of the files
+        for file in files:
+            # Skip empty lines
+            if file == "":
+                continue
+
+            # Delete the file
+            os.remove(file)
+
     def _delete_commentary_audio(self):
         """Delete the commentary audio clips from the iRacing videos folder
 
