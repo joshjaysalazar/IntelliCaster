@@ -323,7 +323,7 @@ class TextGenerator:
 
                 # Get a list of all of the files
                 files = contents.split("\n")
-                
+
             if "screenshot.png" not in files:
                 with open(path, "a") as file:
                     file.write("screenshot.png\n")
@@ -463,12 +463,7 @@ class VoiceGenerator:
         elevenlabs.save(audio, os.path.join(path, file_name))
 
         # Add the new audio file to intellicaster.tmp
-        path = os.path.join(
-            common.settings["general"]["iracing_path"],
-            "videos",
-            "intellicaster.tmp"
-        )
-        with open(path, "a") as file:
+        with open(os.path.join(path, "intellicaster.tmp"), "a") as file:
             file.write(f"{file_name}\n")
 
         # Get the length of the audio file

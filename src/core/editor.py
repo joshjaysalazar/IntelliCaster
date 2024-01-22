@@ -58,8 +58,9 @@ class Editor:
                 file
             )
 
-            # Delete the file
-            os.remove(file_to_delete)
+            # Delete the file if it exist
+            if os.path.exists(file_to_delete):
+                os.remove(file_to_delete)
 
     def _get_commentary_audio(self):
         """Get the commentary audio clips from the iRacing videos folder
