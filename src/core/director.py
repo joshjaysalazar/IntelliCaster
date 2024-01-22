@@ -203,6 +203,22 @@ class Director:
             with open(path, "w") as f:
                 f.write("intellicaster.tmp\n")
 
+        # Get the video file with the most recent timestamp in the videos folder
+        path = os.path.join(
+            common.settings["general"]["iracing_path"],
+            "videos"
+        )
+        files = []
+        for file in os.listdir(path):
+            if file.endswith(common.settings["general"]["video_format"]):
+                files.append(os.path.join(path, file))
+        files.sort(key=os.path.getmtime)
+        latest_video = files[-1]
+
+        # Append the latest video to the intellicaster.tmp file
+        with open(os.path.join(path, "intellicaster.tmp"), "a") as f:
+            f.write(os.path.basename(latest_video) + "\n")
+        
         # Create the camera manager
         self.camera = camera.Camera()
 
