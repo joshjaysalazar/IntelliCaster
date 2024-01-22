@@ -189,8 +189,20 @@ class Director:
         """The main loop for the Director class.
 
         This method keeps running as long as the director is set to run. It
-        handles all of the logic for generating commentary.
+        handles all of the logic for generating commentary. It also creates the
+        temporary file that keeps track of the files used by Intellicaster in
+        the iRacing videos folder if it doesn't already exist.
         """
+        # Create a file in the videos folder called intellicaster.tmp if it doesn't exist
+        path = os.path.join(
+            common.settings["general"]["iracing_path"],
+            "videos",
+            "intellicaster.tmp"
+        )
+        if not os.path.exists(path):
+            with open(path, "w") as f:
+                f.write("intellicaster.tmp\n")
+
         # Create the camera manager
         self.camera = camera.Camera()
 
