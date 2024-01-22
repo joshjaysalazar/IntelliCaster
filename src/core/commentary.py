@@ -232,13 +232,14 @@ class TextGenerator:
         # Start building the event info system message
         new_msg = ""
 
-        # Gather the information from iRacing
-        track = common.ir["WeekendInfo"]["TrackDisplayName"]
-        city = common.ir["WeekendInfo"]["TrackCity"]
-        country = common.ir["WeekendInfo"]["TrackCountry"]
-        air_temp = common.ir["WeekendInfo"]["TrackAirTemp"]
-        track_temp = common.ir["WeekendInfo"]["TrackSurfaceTemp"]
-        skies = common.ir["WeekendInfo"]["TrackSkies"]
+        # Gather the information from iRacing if it's running
+        if common.ir.is_initialized and common.ir.is_connected:
+            track = common.ir["WeekendInfo"]["TrackDisplayName"]
+            city = common.ir["WeekendInfo"]["TrackCity"]
+            country = common.ir["WeekendInfo"]["TrackCountry"]
+            air_temp = common.ir["WeekendInfo"]["TrackAirTemp"]
+            track_temp = common.ir["WeekendInfo"]["TrackSurfaceTemp"]
+            skies = common.ir["WeekendInfo"]["TrackSkies"]
 
         # Compile that information into a message
         new_msg += f"The race is at {track} in {city}, {country}. "
