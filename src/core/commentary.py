@@ -232,13 +232,14 @@ class TextGenerator:
         # Start building the event info system message
         new_msg = ""
 
-        # Gather the information from iRacing
-        track = common.ir["WeekendInfo"]["TrackDisplayName"]
-        city = common.ir["WeekendInfo"]["TrackCity"]
-        country = common.ir["WeekendInfo"]["TrackCountry"]
-        air_temp = common.ir["WeekendInfo"]["TrackAirTemp"]
-        track_temp = common.ir["WeekendInfo"]["TrackSurfaceTemp"]
-        skies = common.ir["WeekendInfo"]["TrackSkies"]
+        # Gather the information from iRacing if it's running
+        if common.ir.is_initialized and common.ir.is_connected:
+            track = common.ir["WeekendInfo"]["TrackDisplayName"]
+            city = common.ir["WeekendInfo"]["TrackCity"]
+            country = common.ir["WeekendInfo"]["TrackCountry"]
+            air_temp = common.ir["WeekendInfo"]["TrackAirTemp"]
+            track_temp = common.ir["WeekendInfo"]["TrackSurfaceTemp"]
+            skies = common.ir["WeekendInfo"]["TrackSkies"]
 
         # Compile that information into a message
         new_msg += f"The race is at {track} in {city}, {country}. "
@@ -309,6 +310,24 @@ class TextGenerator:
             # Save the screenshot
             screenshot_path = os.path.join(path, "screenshot.png")
             screenshot.save(screenshot_path)
+
+            # Add screenshot to intellicaster.tmp if it's not already there
+            path = os.path.join(
+                common.settings["general"]["iracing_path"],
+                "videos",
+                "intellicaster.tmp"
+            )
+
+            with open(path, "r") as file:
+                # Get the file contents
+                contents = file.read()
+
+                # Get a list of all of the files
+                files = contents.split("\n")
+
+            if "screenshot.png" not in files:
+                with open(path, "a") as file:
+                    file.write("screenshot.png\n")
 
             # Process the image and save it
             with Image.open(screenshot_path) as image:
@@ -443,6 +462,10 @@ class VoiceGenerator:
 
         # Save the audio to a file
         elevenlabs.save(audio, os.path.join(path, file_name))
+
+        # Add the new audio file to intellicaster.tmp
+        with open(os.path.join(path, "intellicaster.tmp"), "a") as file:
+            file.write(f"{file_name}\n")
 
         # Get the length of the audio file
         mp3_file = MP3(os.path.join(path, file_name))

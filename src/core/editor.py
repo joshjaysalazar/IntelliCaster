@@ -1,4 +1,5 @@
 import os
+import time
 
 from customtkinter import filedialog
 from moviepy.audio.AudioClip import CompositeAudioClip
@@ -19,60 +20,48 @@ class Editor:
     file.
     """
 
-    def _delete_commentary_audio(self):
-        """Delete the commentary audio clips from the iRacing videos folder
+    def cleanup(self):
+        """Clean up the videos folder
 
-        Deletes the commentary audio clips from the iRacing videos folder. This
-        is used to clean up the videos folder after the video has been exported.
+        Cleans up the videos folder by deleting all of the files listed in the
+        intellicaster.tmp file. This is used to clean up the videos folder after
+        the video has been exported.
         """
-        # Get the iRacing videos folder
-        path = os.path.join(common.settings["general"]["iracing_path"], "videos")
-
-        # Get a list of all of the .mp3 files in that folder
-        files = []
-        for file in os.listdir(path):
-            if file.endswith(".mp3"):
-                files.append(os.path.join(path, file))
-
-        # Delete all of the .mp3 files
-        for file in files:
-            os.remove(file)
-
-    def _delete_latest_video(self):
-        """Delete the latest video from the iRacing videos folder
-        
-        Deletes the latest video from the iRacing videos folder. This is used to
-        clean up the videos folder after the video has been exported.
-        """
-        # Get the iRacing videos folder
-        path = os.path.join(common.settings["general"]["iracing_path"], "videos")
-
-        # Find the most recent .mp4 video in that folder
-        files = []
-        for file in os.listdir(path):
-            if file.endswith(".mp4"):
-                files.append(os.path.join(path, file))
-        latest_file = max(files, key=os.path.getctime)
-
-        # Delete the file
-        os.remove(latest_file)
-    
-    def _delete_screenshot(self):
-        """Delete the screenshot from the iRacing videos folder
-        
-        Deletes the screenshot from the iRacing videos folder. This is used to
-        clean up the videos folder after the video has been exported.
-        """
-        # Get the path to the screenshot
+        # Get the intellicaster.tmp file path
         path = os.path.join(
             common.settings["general"]["iracing_path"],
             "videos",
-            "screenshot.png"
+            "intellicaster.tmp"
         )
 
-        # Delete the file if it exists
-        if os.path.exists(path):
-            os.remove(path)
+        # Return if the file doesn't exist
+        if not os.path.exists(path):
+            return
+        
+        # Read the file
+        with open(path, "r") as file:
+            # Get the file contents
+            contents = file.read()
+
+            # Get a list of all of the files
+            files = contents.split("\n")
+
+        # Delete all of the files
+        for file in files:
+            # Skip empty lines
+            if file == "":
+                continue
+
+            # Get the path to the file
+            file_to_delete = os.path.join(
+                common.settings["general"]["iracing_path"],
+                "videos",
+                file
+            )
+
+            # Delete the file if it exist
+            if os.path.exists(file_to_delete):
+                os.remove(file_to_delete)
 
     def _get_commentary_audio(self):
         """Get the commentary audio clips from the iRacing videos folder
@@ -158,10 +147,11 @@ class Editor:
         
         # Return if the user canceled
         if target == "":
+            # Wait 3 seconds to ensure all of the files are written
+            time.sleep(3)
+
             # Clean up videos directory
-            self._delete_commentary_audio()
-            self._delete_latest_video()
-            self._delete_screenshot()
+            self.cleanup()
 
             return
 
@@ -199,7 +189,8 @@ class Editor:
             logger=export_window.progress_tracker
         )
 
+        # Wait 3 seconds to ensure all of the files are written
+        time.sleep(3)
+
         # Clean up videos directory
-        self._delete_commentary_audio()
-        self._delete_latest_video()
-        self._delete_screenshot()
+        self.cleanup()

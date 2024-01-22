@@ -924,6 +924,9 @@ class App(ctk.CTk):
             # Change button text
             self.btn_start_stop.configure(text="⏹ Stop Commentary")
 
+            # Run editor's cleanup in case of crash during previous run
+            self.editor.cleanup()
+
             # Run the director in a separate thread
             self.director.start()
 
