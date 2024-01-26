@@ -275,95 +275,63 @@ class TextGenerator:
         # Add the event message to previous messages
         self.previous_responses.append(event_msg)
 
-        # If the vision model is being used, add the image to the messages
-        model_setting = common.settings["commentary"]["gpt_model"]
-        if model_setting == "GPT-4 Turbo with Vision":
-            # Wait a moment for the camera to focus
-            time.sleep(0.25)
+        # Get the iRacing window
+        window = gw.getWindowsWithTitle("iRacing.com Simulator")[0]
 
-            # Set the screenshot path
-            path = os.path.join(
-                common.settings["general"]["iracing_path"],
-                "videos"
-            )
+        # Get the coordinates of the window
+        x = window.left
+        y = window.top
+        width = window.width
+        height = window.height
 
-            # Get the iRacing window
-            window = gw.getWindowsWithTitle("iRacing.com Simulator")[0]
+        # Take a screenshot of the window
+        screenshot = pyautogui.screenshot(region=(x, y, width, height))
 
-            # Get the coordinates of the window
-            x = window.left
-            y = window.top
-            width = window.width
-            height = window.height
+        # Save the screenshot with a unique name
+        path = os.path.join(
+            common.settings["general"]["iracing_path"],
+            "videos"
+        )
+        screenshot_time = time.time()
+        screenshot_time = int(screenshot_time * 1000)
+        screenshot_file = f"screenshot_{screenshot_time}.png"
+        screenshot_path = os.path.join(path, screenshot_file)
+        screenshot.save(screenshot_path)
 
-            # Take a screenshot of the window
-            screenshot = pyautogui.screenshot(region=(x, y, width, height))
+        # Append screenshot to intellicaster.tmp
+        path = os.path.join(
+            common.settings["general"]["iracing_path"],
+            "videos",
+            "intellicaster.tmp"
+        )
+        with open(path, "a") as file:
+            file.write(f"{screenshot_file}\n")
 
-            # Save the screenshot
-            screenshot_path = os.path.join(path, "screenshot.png")
-            screenshot.save(screenshot_path)
+        # Encode that image in base64
+        with open(screenshot_path, "rb") as file:
+            encoded_image = base64.b64encode(file.read()).decode("utf-8")
 
-            # Add screenshot to intellicaster.tmp if it's not already there
-            path = os.path.join(
-                common.settings["general"]["iracing_path"],
-                "videos",
-                "intellicaster.tmp"
-            )
-
-            with open(path, "r") as file:
-                # Get the file contents
-                contents = file.read()
-
-                # Get a list of all of the files
-                files = contents.split("\n")
-
-            if "screenshot.png" not in files:
-                with open(path, "a") as file:
-                    file.write("screenshot.png\n")
-
-            # Process the image and save it
-            with Image.open(screenshot_path) as image:
-                # Get the image's current dimensions
-                width, height = image.size
-
-                # Crop the left and right sides on center
-                left = width // 4
-                right = width - left
-                top = 0
-                bottom = height
-                image = image.crop((left, top, right, bottom))
-
-                # Resize the image
-                image = image.resize((512, 512))
-
-                # Save the image
-                image.save(screenshot_path)
-
-            # Encode that image in base64
-            with open(screenshot_path, "rb") as file:
-                encoded_image = base64.b64encode(file.read()).decode("utf-8")
-
-            # Create the image message
-            image_msg = {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": "Use this image in addition to the other " \
-                            "information to help you commentate."
-                    },
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/jpeg;base64,{encoded_image}",
-                            "detail": "low"
-                        }
+        # Create the image message
+        image_msg = {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Use this image in addition to the other " \
+                        "information to help you commentate."
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{encoded_image}",
+                        "detail": "low"
                     }
-                ]
-            }
+                }
+            ]
+        }
 
-            # Add the image message to the list of messages
-            messages.append(image_msg)
+        # Add the image message to the list of messages
+        messages.append(image_msg)
 
         # Call the API
         response = self.client.chat.completions.create(
