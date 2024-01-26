@@ -51,7 +51,6 @@ def create_settings_file(file_name):
 
         # Set up commentary section
         config.add_section("commentary")
-        config.set("commentary", "gpt_model", "GPT-4 Turbo")
         config.set("commentary", "pbp_voice", "Harry")
         config.set("commentary", "color_voice", "Elli")
         config.set("commentary", "color_chance", "0.5")
