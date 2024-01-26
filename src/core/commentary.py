@@ -1,13 +1,9 @@
-import base64
 import os
 import time
 
 import elevenlabs
 from mutagen.mp3 import MP3
 import openai
-from PIL import Image
-import pyautogui
-import pygetwindow as gw
 
 from core import common
 
@@ -124,17 +120,9 @@ class TextGenerator:
         self.client = openai.OpenAI(
             api_key=common.settings["keys"]["openai_api_key"]
         )
-
-        # Pick the appropriate model based on settings
-        model_setting = common.settings["commentary"]["gpt_model"]
-        if model_setting == "GPT-3.5 Turbo":
-            self.model = "gpt-3.5-turbo"
-        elif model_setting == "GPT-4 Turbo":
-            self.model = "gpt-4-1106-preview"
-        elif model_setting == "GPT-4 Turbo with Vision":
-            self.model = "gpt-4-vision-preview"
-        else:
-            raise ValueError("Invalid GPT model setting.")
+        
+        # Set the GPT model to use
+        self.model = "gpt-4-turbo-preview"
 
         # Create an empty list to hold previous responses
         self.previous_responses = []
@@ -282,96 +270,6 @@ class TextGenerator:
 
         # Add the event message to previous messages
         self.previous_responses.append(event_msg)
-
-        # If the vision model is being used, add the image to the messages
-        model_setting = common.settings["commentary"]["gpt_model"]
-        if model_setting == "GPT-4 Turbo with Vision":
-            # Wait a moment for the camera to focus
-            time.sleep(0.25)
-
-            # Set the screenshot path
-            path = os.path.join(
-                common.settings["general"]["iracing_path"],
-                "videos"
-            )
-
-            # Get the iRacing window
-            window = gw.getWindowsWithTitle("iRacing.com Simulator")[0]
-
-            # Get the coordinates of the window
-            x = window.left
-            y = window.top
-            width = window.width
-            height = window.height
-
-            # Take a screenshot of the window
-            screenshot = pyautogui.screenshot(region=(x, y, width, height))
-
-            # Save the screenshot
-            screenshot_path = os.path.join(path, "screenshot.png")
-            screenshot.save(screenshot_path)
-
-            # Add screenshot to intellicaster.tmp if it's not already there
-            path = os.path.join(
-                common.settings["general"]["iracing_path"],
-                "videos",
-                "intellicaster.tmp"
-            )
-
-            with open(path, "r") as file:
-                # Get the file contents
-                contents = file.read()
-
-                # Get a list of all of the files
-                files = contents.split("\n")
-
-            if "screenshot.png" not in files:
-                with open(path, "a") as file:
-                    file.write("screenshot.png\n")
-
-            # Process the image and save it
-            with Image.open(screenshot_path) as image:
-                # Get the image's current dimensions
-                width, height = image.size
-
-                # Crop the left and right sides on center
-                left = width // 4
-                right = width - left
-                top = 0
-                bottom = height
-                image = image.crop((left, top, right, bottom))
-
-                # Resize the image
-                image = image.resize((512, 512))
-
-                # Save the image
-                image.save(screenshot_path)
-
-            # Encode that image in base64
-            with open(screenshot_path, "rb") as file:
-                encoded_image = base64.b64encode(file.read()).decode("utf-8")
-
-            # Create the image message
-            image_msg = {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": "Use this image in addition to the other " \
-                            "information to help you commentate."
-                    },
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/jpeg;base64,{encoded_image}",
-                            "detail": "low"
-                        }
-                    }
-                ]
-            }
-
-            # Add the image message to the list of messages
-            messages.append(image_msg)
 
         # Call the API
         response = self.client.chat.completions.create(

@@ -51,7 +51,6 @@ def create_settings_file(file_name):
 
         # Set up commentary section
         config.add_section("commentary")
-        config.set("commentary", "gpt_model", "GPT-4 Turbo")
         config.set("commentary", "pbp_voice", "Harry")
         config.set("commentary", "color_voice", "Elli")
         config.set("commentary", "color_chance", "0.5")
@@ -62,7 +61,7 @@ def create_settings_file(file_name):
         config.set("system", "context_file", "context.json")
         config.set("system", "director_update_freq", "1")
         config.set("system", "events_update_freq", "1")
-        config.set("system", "event_hist_len", "10")
+        config.set("system", "event_hist_len", "25")
 
         # Write to file
         with open(file_name, "w") as config_file:
