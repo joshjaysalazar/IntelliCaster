@@ -318,7 +318,8 @@ class TextGenerator:
                 {
                     "type": "text",
                     "text": "Use this image in addition to the other " \
-                        "information to help you commentate."
+                        "information to help you commentate. If the image " \
+                        "is not helpful, ignore it."
                 },
                 {
                     "type": "image_url",
