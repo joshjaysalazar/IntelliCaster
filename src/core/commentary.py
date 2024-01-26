@@ -1,13 +1,9 @@
-import base64
 import os
 import time
 
 import elevenlabs
 from mutagen.mp3 import MP3
 import openai
-from PIL import Image
-import pyautogui
-import pygetwindow as gw
 
 from core import common
 
