@@ -105,7 +105,7 @@ class Events:
                     "laps_completed": 0,
                     "laps_started": 0,
                     "lap_times": [],
-                    "last_lap": None,
+                    "last_lap_time": None,
                     "last_stopped": None,
                     "license": driver["LicString"],
                     "name": driver["UserName"],
@@ -304,16 +304,16 @@ class Events:
                 for j, driver in enumerate(common.drivers):
                     if driver["idx"] == i:
                         # Get the driver's last lap time
-                        last_lap = common.ir["CarIdxLastLapTime"][i]
-                        common.drivers[j]["last_lap"] = last_lap
+                        last_lap_time = common.ir["CarIdxLastLapTime"][i]
+                        common.drivers[j]["last_lap_time"] = last_lap_time
 
                         # If there's no fastest lap, set it to the last lap
                         if driver["fastest_lap"] == None:
-                            common.drivers[j]["fastest_lap"] = last_lap
+                            common.drivers[j]["fastest_lap"] = last_lap_time
                         
                         # If the last lap is faster than the fastest lap, update
-                        elif last_lap < driver["fastest_lap"]:
-                            common.drivers[j]["fastest_lap"] = last_lap
+                        elif last_lap_time < driver["fastest_lap"]:
+                            common.drivers[j]["fastest_lap"] = last_lap_time
 
                         # Update percentage of lap completed
                         lap_percent = common.ir["CarIdxLapDistPct"][i]
