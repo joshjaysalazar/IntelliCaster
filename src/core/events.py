@@ -399,7 +399,7 @@ class Events:
                 driver_total = driver_current + driver_laps
 
                 # Calculate the gap to leader
-                gap_to_leader = driver_total - leader_total
+                gap_to_leader = leader_total - driver_total
 
                 # Update the driver's gap to leader
                 common.drivers[i]["gap_to_leader"] = gap_to_leader
