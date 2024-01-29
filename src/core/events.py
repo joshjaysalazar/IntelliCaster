@@ -325,6 +325,10 @@ class Events:
                         if last_lap_time != old_last_lap and last_lap_time > 0:
                             common.drivers[j]["lap_times"].append(last_lap_time)
 
+                        # Update the current lap time
+                        current_lap_time = common.ir["CarIdxEstTime"][i]
+                        common.drivers[j]["current_lap_time"] = current_lap_time
+
                         # Update percentage of lap completed
                         lap_percent = common.ir["CarIdxLapDistPct"][i]
                         common.drivers[j]["lap_percent"] = lap_percent
