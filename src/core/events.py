@@ -93,6 +93,7 @@ class Events:
             driver_dict.append(
                 {
                     "car_name": driver["CarScreenNameShort"],
+                    "current_lap_time": 0,
                     "fastest_lap": None,
                     "gap_to_leader": None,
                     "grid_position": quali_pos,
@@ -103,6 +104,7 @@ class Events:
                     "lap_percent": 0,
                     "laps_completed": 0,
                     "laps_started": 0,
+                    "lap_times": [],
                     "last_lap": None,
                     "last_stopped": None,
                     "license": driver["LicString"],
