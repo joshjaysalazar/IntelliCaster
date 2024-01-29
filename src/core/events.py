@@ -377,6 +377,33 @@ class Events:
         else:
             common.drivers.sort(key=lambda x: x["grid_position"])
 
+        # After sorting by position, update the gaps
+        for i, driver in enumerate(common.drivers):
+            # If the driver is the leader, gap to leader is 0
+            if i == 0:
+                common.drivers[i]["gap_to_leader"] = 0.
+
+            # Otherwise, calculate the gap to leader
+            else:
+                # Get the leader car
+                leader = common.drivers[0]
+                
+                # Get the leader's current lap time plus all previous laps
+                leader_current = leader["current_lap_time"]
+                leader_laps = sum(leader["lap_times"])
+                leader_total = leader_current + leader_laps
+
+                # Get this driver's current lap time plus all previous laps
+                driver_current = driver["current_lap_time"]
+                driver_laps = sum(driver["lap_times"])
+                driver_total = driver_current + driver_laps
+
+                # Calculate the gap to leader
+                gap_to_leader = driver_total - leader_total
+
+                # Update the driver's gap to leader
+                common.drivers[i]["gap_to_leader"] = gap_to_leader
+
     def get_next_event(self):
         """Pick the next event to report.
         
