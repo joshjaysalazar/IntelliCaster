@@ -93,6 +93,7 @@ class Events:
             driver_dict.append(
                 {
                     "car_name": driver["CarScreenNameShort"],
+                    "current_lap_time": 0,
                     "fastest_lap": None,
                     "gap_to_leader": None,
                     "grid_position": quali_pos,
@@ -103,7 +104,8 @@ class Events:
                     "lap_percent": 0,
                     "laps_completed": 0,
                     "laps_started": 0,
-                    "last_lap": None,
+                    "lap_times": [],
+                    "last_lap_time": None,
                     "last_stopped": None,
                     "license": driver["LicString"],
                     "name": driver["UserName"],
@@ -301,17 +303,31 @@ class Events:
                 # Find the driver in the drivers list at this index
                 for j, driver in enumerate(common.drivers):
                     if driver["idx"] == i:
-                        # Get the driver's last lap time
-                        last_lap = common.ir["CarIdxLastLapTime"][i]
-                        common.drivers[j]["last_lap"] = last_lap
+                        # Get old last lap for later comparison
+                        old_last_lap = driver["last_lap_time"]
+
+                        # Get the driver's last lap time if it exists
+                        last_lap_time = common.ir["CarIdxLastLapTime"][i]
+                        if last_lap_time > 0: 
+                            common.drivers[j]["last_lap_time"] = last_lap_time
 
                         # If there's no fastest lap, set it to the last lap
                         if driver["fastest_lap"] == None:
-                            common.drivers[j]["fastest_lap"] = last_lap
+                            if last_lap_time > 0:
+                                common.drivers[j]["fastest_lap"] = last_lap_time
                         
                         # If the last lap is faster than the fastest lap, update
-                        elif last_lap < driver["fastest_lap"]:
-                            common.drivers[j]["fastest_lap"] = last_lap
+                        elif last_lap_time < driver["fastest_lap"]:
+                            if last_lap_time > 0:
+                                common.drivers[j]["fastest_lap"] = last_lap_time
+                        
+                        # If new last lap different than old, append to lap list
+                        if last_lap_time != old_last_lap and last_lap_time > 0:
+                            common.drivers[j]["lap_times"].append(last_lap_time)
+
+                        # Update the current lap time
+                        current_lap_time = common.ir["CarIdxEstTime"][i]
+                        common.drivers[j]["current_lap_time"] = current_lap_time
 
                         # Update percentage of lap completed
                         lap_percent = common.ir["CarIdxLapDistPct"][i]
@@ -360,6 +376,33 @@ class Events:
         # Otherwise, sort by grid position
         else:
             common.drivers.sort(key=lambda x: x["grid_position"])
+
+        # After sorting by position, update the gaps
+        for i, driver in enumerate(common.drivers):
+            # If the driver is the leader, gap to leader is 0
+            if i == 0:
+                common.drivers[i]["gap_to_leader"] = 0.
+
+            # Otherwise, calculate the gap to leader
+            else:
+                # Get the leader car
+                leader = common.drivers[0]
+                
+                # Get the leader's current lap time plus all previous laps
+                leader_current = leader["current_lap_time"]
+                leader_laps = sum(leader["lap_times"])
+                leader_total = leader_current + leader_laps
+
+                # Get this driver's current lap time plus all previous laps
+                driver_current = driver["current_lap_time"]
+                driver_laps = sum(driver["lap_times"])
+                driver_total = driver_current + driver_laps
+
+                # Calculate the gap to leader
+                gap_to_leader = leader_total - driver_total
+
+                # Update the driver's gap to leader
+                common.drivers[i]["gap_to_leader"] = gap_to_leader
 
     def get_next_event(self):
         """Pick the next event to report.

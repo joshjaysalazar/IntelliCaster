@@ -254,11 +254,15 @@ class TextGenerator:
         }
         messages.append(event_msg)
 
+        # Add the event message to previous messages
+        self.previous_responses.append(event_msg)
+
         # Add the lap percent message
         if lap_percent != None:
             lap_percent = round(lap_percent * 100, 2)
             lap_msg = f"The event occurred at {lap_percent}% of the lap. "
             lap_msg += "Infer the corner name or number based on that. "
+            lap_msg += "Be sure to account for the length of straights. "
             lap_msg += "Occasionally announce the corner name or number, but "
             lap_msg += "do not do it every time. Check the message history "
             lap_msg += "to make sure you are not announcing corners too often."
@@ -268,8 +272,17 @@ class TextGenerator:
             }
             messages.append(lap_pct_msg)
 
-        # Add the event message to previous messages
-        self.previous_responses.append(event_msg)
+        # Add the gaps to leader message (from common.drivers)
+        gap_msg = "Here are the gaps to the leader: \n"
+        for driver in common.drivers:
+            gap_msg += f"{driver['name']}: {driver['gap_to_leader']}\n"
+        gap_msg += "Only use this information if it is relevant to the event. "
+        gap_msg += "If gaps have been mentioned recently, do not mention them."
+        gap_msg = {
+            "role": "user",
+            "content": gap_msg
+        }
+        messages.append(gap_msg)
 
         # Call the API
         response = self.client.chat.completions.create(
