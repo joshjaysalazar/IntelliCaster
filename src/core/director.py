@@ -194,7 +194,7 @@ class Director:
         the iRacing videos folder if it doesn't already exist.
         """
         # Wait one second to ensure video capture is started
-        time.sleep(1)
+        time.sleep(2)
         
         # Create a file in the videos folder called intellicaster.tmp if needed
         path = os.path.join(
