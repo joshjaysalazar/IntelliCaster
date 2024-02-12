@@ -6,7 +6,6 @@ from mutagen.mp3 import MP3
 import openai
 
 from core import common
-from pprint import pprint
 
 
 class Commentary:
@@ -303,11 +302,6 @@ class TextGenerator:
                 "content": event_msg
             }
             messages.append(event_msg)
-
-        print()
-        print("--------------------")
-        print()
-        pprint(messages)
 
         # Call the API
         response = self.client.chat.completions.create(
