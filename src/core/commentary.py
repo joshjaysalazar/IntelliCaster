@@ -140,10 +140,12 @@ class TextGenerator:
 
         # Add the lap percentage
         adjusted_percent = event["lap_percent"] * 100.
+        adjusted_percent = round(adjusted_percent, 3)
         event_str += f"{adjusted_percent}% of the way through the lap - "
 
         # Get the amount of time ago it occurred
         time_ago = time.time() - event["timestamp"]
+        time_ago = round(time_ago, 3)
 
         # Add the time
         event_str += f"{time_ago} seconds ago"
@@ -282,7 +284,8 @@ class TextGenerator:
         # Add the gaps to leader message (from common.drivers)
         gap_msg = "\n\nHere are the gaps to the leader:\n"
         for driver in common.drivers:
-            gap_msg += f"- {driver['name']}: {driver['gap_to_leader']}"
+            rounded_gap = round(driver["gap_to_leader"], 3)
+            gap_msg += f"- {driver['name']}: {rounded_gap}"
             gap_msg += "\n"
         gap_msg += "Only use this information if it is relevant to the event. "
         gap_msg += "If gaps have been mentioned recently, do not mention them."
