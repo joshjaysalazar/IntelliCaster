@@ -140,7 +140,7 @@ class TextGenerator:
 
         # Add the lap percentage
         adjusted_percent = event["lap_percent"] * 100.
-        event_str += f"{event['lap_percent']}% of the way through the lap - "
+        event_str += f"{adjusted_percent}% of the way through the lap - "
 
         # Get the amount of time ago it occurred
         time_ago = time.time() - event["timestamp"]
