@@ -264,6 +264,26 @@ class TextGenerator:
         }
         messages.append(sys_event)
 
+        # Add the gaps to leader message (from common.drivers)
+        gap_msg = "Here are the gaps to the leader:\n"
+        for driver in common.drivers:
+            driver_name = common.remove_numbers(driver["name"])
+            rounded_gap = round(driver["gap_to_leader"], 3)
+            gap_msg += f"- {driver_name}: +{rounded_gap}"
+            gap_msg += "\n"
+        gap_msg += "Only use this information if it is relevant to the event. "
+        gap_msg += "If gaps have been mentioned recently, do not mention them."
+        gap_msg = {
+            "role": "system",
+            "name": "gaps_to_leader",
+            "content": gap_msg
+        }
+        messages.append(gap_msg)
+
+        # Add all previous responses to the list
+        for msg in self.previous_responses:
+            messages.append(msg)
+
         # Add the event messages if this is the play-by-play role
         if role == "play-by-play":
             event_msg = "The following events have recently occurred:\n"
@@ -284,29 +304,10 @@ class TextGenerator:
             }
             messages.append(event_msg)
 
-        # Add the gaps to leader message (from common.drivers)
-        gap_msg = "Here are the gaps to the leader:\n"
-        for driver in common.drivers:
-            driver_name = common.remove_numbers(driver["name"])
-            rounded_gap = round(driver["gap_to_leader"], 3)
-            gap_msg += f"- {driver_name}: +{rounded_gap}"
-            gap_msg += "\n"
-        gap_msg += "Only use this information if it is relevant to the event. "
-        gap_msg += "If gaps have been mentioned recently, do not mention them."
-        gap_msg = {
-            "role": "user",
-            "content": gap_msg
-        }
-        messages.append(gap_msg)
-
         print()
         print("--------------------")
         print()
         pprint(messages)
-
-        # Add all previous responses to the list
-        for msg in self.previous_responses:
-            messages.append(msg)
 
         # Call the API
         response = self.client.chat.completions.create(
