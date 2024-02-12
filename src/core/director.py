@@ -93,14 +93,11 @@ class Director:
         if random.random() < chance:
             self.commentary.generate(
                 "Add color commentary to the previous commentary.",
-                None,
                 "color",
-                "neutral",
-                yelling=True,
                 rec_start_time=common.recording_start_time
             )
 
-    def _generate_event_commentary(self, event):
+    def _generate_event_commentary(self, events):
         """Generate commentary for an event.
 
         This method generates commentary for a specified event. It also changes
@@ -110,16 +107,12 @@ class Director:
             event (dict): A dictionary containing information about the event.
         """
         # Move the camera to focus on the event
-        self.camera.change_camera(event["focus"], "TV1")
+        # self.camera.change_camera(event["focus"], "TV1")
 
         # Generate the commentary
         self.commentary.generate(
-            event["description"],
-            event["lap_percent"],
+            events,
             "play-by-play",
-            "neutral",
-            common.instructions[event["type"]],
-            yelling=True,
             rec_start_time=common.recording_start_time
         )
 
@@ -280,12 +273,12 @@ class Director:
 
             # If the race has started, generate commentary
             if common.race_started and common.all_cars_started:
-                # Get the next event to generate commentary for
-                event = self.events.get_next_event()
+                # Get the list of recent events
+                events = self.events.get_events()
 
                 # If an event was found, report it
-                if event:
-                    self._generate_event_commentary(event)
+                if len(events) > 0:
+                    self._generate_event_commentary(events)
 
                 # Occasionally generate color commentary
                 self._generate_color_commentary()

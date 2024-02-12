@@ -34,12 +34,8 @@ class Commentary:
 
     def generate(
             self, 
-            event,
-            lap_percent,
-            role, 
-            tone, 
-            other_info="", 
-            yelling=False,
+            events,
+            role,
             rec_start_time=0
         ):
         """Generate commentary for the given event.
@@ -69,11 +65,8 @@ class Commentary:
 
         # Generate the commentary text
         text = self.text_generator.generate(
-            event=event,
-            lap_percent=lap_percent,
+            events=events,
             role=role,
-            tone=tone,
-            other_info=other_info
         )
 
         # Add the message to the message box
@@ -93,7 +86,6 @@ class Commentary:
             text=text,
             timestamp=timestamp,
             gpt_time=gpt_time,
-            yelling=yelling,
             voice=voice
         )
 
@@ -127,7 +119,7 @@ class TextGenerator:
         # Create an empty list to hold previous responses
         self.previous_responses = []
     
-    def generate(self, event, lap_percent, role, tone, other_info=""):
+    def generate(self, events, role):
         """Generate text commentary for the given event.
         
         Generates text commentary for the given event based on the provided
@@ -176,10 +168,6 @@ class TextGenerator:
 
         # Add common instructions
         new_msg += "Almost always refer to drivers by only their surname. "
-        new_msg += f"Use a {tone} tone. "
-
-        # Add additional info to the end of the system message
-        new_msg += other_info
 
         # Add the initial system message
         sys_init = {
@@ -247,35 +235,28 @@ class TextGenerator:
         for msg in self.previous_responses:
             messages.append(msg)
 
-        # Add the event message
+        # Add the event messages
+        event_msg = "The following events have recently occurred:\n"
+        for event in events:
+            event_msg += f"- {event}"
+            event_msg += "\n"
+        event_msg += "Report on the most exciting events. "
+        event_msg += "If two events are related, mention them together. "
+        event_msg += "Do not repeat events that have already been mentioned. "
         event_msg = {
             "role": "user",
-            "content": event
+            "content": event_msg
         }
         messages.append(event_msg)
 
         # Add the event message to previous messages
         self.previous_responses.append(event_msg)
 
-        # Add the lap percent message
-        if lap_percent != None:
-            lap_percent = round(lap_percent * 100, 2)
-            lap_msg = f"The event occurred at {lap_percent}% of the lap. "
-            lap_msg += "Infer the corner name or number based on that. "
-            lap_msg += "Be sure to account for the length of straights. "
-            lap_msg += "Occasionally announce the corner name or number, but "
-            lap_msg += "do not do it every time. Check the message history "
-            lap_msg += "to make sure you are not announcing corners too often."
-            lap_pct_msg = {
-                "role": "user",
-                "content": lap_msg
-            }
-            messages.append(lap_pct_msg)
-
         # Add the gaps to leader message (from common.drivers)
-        gap_msg = "Here are the gaps to the leader: \n"
+        gap_msg = "\n\nHere are the gaps to the leader:\n"
         for driver in common.drivers:
-            gap_msg += f"{driver['name']}: {driver['gap_to_leader']}\n"
+            gap_msg += f"- {driver['name']}: {driver['gap_to_leader']}"
+            gap_msg += "\n"
         gap_msg += "Only use this information if it is relevant to the event. "
         gap_msg += "If gaps have been mentioned recently, do not mention them."
         gap_msg = {
@@ -328,7 +309,7 @@ class VoiceGenerator:
         # Set the API key
         elevenlabs.set_api_key(common.settings["keys"]["elevenlabs_api_key"])
 
-    def generate(self, text, timestamp, gpt_time, yelling=False, voice="Harry"):
+    def generate(self, text, timestamp, gpt_time, voice="Harry"):
         """Generate and save audio for the provided text.
 
         Calls the ElevenLabs API to create audio from the text using the
@@ -342,12 +323,6 @@ class VoiceGenerator:
         """
         # Get the start time of this method
         start_time = time.time()
-
-        # Convert to yelling for voice commentary if requested
-        if yelling:
-            text = text.upper()
-            if text[-1] == ".":
-                text = text[:-1] + "!!!"
 
         # Replace "P" with "P-" to avoid issues with the API
         for i in range(len(text)):
