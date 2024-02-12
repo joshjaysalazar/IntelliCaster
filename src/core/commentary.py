@@ -68,6 +68,7 @@ class Commentary:
         text = self.text_generator.generate(
             events=events,
             role=role,
+            camera=camera
         )
 
         # Add the message to the message box
@@ -152,7 +153,7 @@ class TextGenerator:
 
         return event_str
 
-    def generate(self, events, role):
+    def generate(self, events, role, camera=None):
         """Generate text commentary for the given event.
         
         Generates text commentary for the given event based on the provided
