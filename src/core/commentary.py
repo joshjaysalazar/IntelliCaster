@@ -119,6 +119,36 @@ class TextGenerator:
         # Create an empty list to hold previous responses
         self.previous_responses = []
     
+    def _parse_event(self, event):
+        """Parse the event dictionary to create a string.
+        
+        Args:
+            event (dict): The event dictionary to parse.
+            
+        Returns:
+            str: The parsed event string.
+        """
+        # Create the string to return
+        event_str = ""
+        
+        # Add the event type
+        event_str += f"{event['type']} - "
+
+        # Add the description
+        event_str += f"{event['description']} - "
+
+        # Add the lap percentage
+        event_str += f"{event['lap_percent']}% of the way through the lap - "
+
+        # Get the amount of time ago it occurred and round it to hundredths
+        time_ago = time.time() - event["timestamp"]
+        time_ago = round(time_ago, 2)
+
+        # Add the time
+        event_str += f"{time_ago} seconds ago"
+
+        return event_str
+
     def generate(self, events, role):
         """Generate text commentary for the given event.
         
@@ -238,7 +268,8 @@ class TextGenerator:
         # Add the event messages
         event_msg = "The following events have recently occurred:\n"
         for event in events:
-            event_msg += f"- {event}"
+            parsed_event = self._parse_event(event)
+            event_msg += f"- {parsed_event}"
             event_msg += "\n"
         event_msg += "Report on the most exciting events. "
         event_msg += "If two events are related, mention them together. "
