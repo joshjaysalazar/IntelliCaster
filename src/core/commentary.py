@@ -262,7 +262,7 @@ class TextGenerator:
         }
         messages.append(sys_event)
 
-        # Add all previous messages to the list
+        # Add all previous responses to the list
         for msg in self.previous_responses:
             messages.append(msg)
 
@@ -283,9 +283,6 @@ class TextGenerator:
         }
         messages.append(event_msg)
 
-        # Add the event message to previous messages
-        self.previous_responses.append(event_msg)
-
         # Add the gaps to leader message (from common.drivers)
         gap_msg = "\n\nHere are the gaps to the leader:\n"
         for driver in common.drivers:
@@ -299,7 +296,10 @@ class TextGenerator:
         }
         messages.append(gap_msg)
 
-        # pprint(messages)
+        print()
+        print("--------------------")
+        print()
+        pprint(messages)
 
         # Call the API
         response = self.client.chat.completions.create(
