@@ -404,6 +404,24 @@ class Events:
                 # Update the driver's gap to leader
                 common.drivers[i]["gap_to_leader"] = gap_to_leader
 
+    def get_events(self):
+        """Get the events list.
+        
+        Sort the events list by timestamp and remove duplicates before returning
+        it.
+        
+        Returns:
+            list: The events list
+        """
+        # Sort the events list by timestamp
+        self.events.sort(key=lambda x: x["timestamp"], reverse=True)
+
+        # Remove duplicate events
+        self.events = self._remove_duplicates(self.events)
+
+        # Return the events list
+        return self.events
+
     def get_next_event(self):
         """Pick the next event to report.
         
