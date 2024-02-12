@@ -120,7 +120,53 @@ class TextGenerator:
 
         # Create an empty list to hold previous responses
         self.previous_responses = []
-    
+
+    def _get_camera_focus(self, event):
+        """Get the camera for the given event.
+        
+        Using GPT to determine which car to focus on, pick a car to focus on
+        based on the event.
+        
+        Args:
+            event (str): The event that occurred.
+            
+        Returns:
+            str: The camera to focus on.
+        """
+        # Create an empty list of messages
+        messages = []
+
+        # Create the instruction message
+        content = "Based on the commentary generated for this event, which car "
+        content += "should the camera focus on? "
+        content += "Answer with only the driver's name, nothing else."
+        instruction = {
+            "role": "system",
+            "name": "camera_focus",
+            "content": content
+        }
+        messages.append(instruction)
+
+        # Add the event message
+        event_msg = {
+            "role": "user",
+            "content": event
+        }
+        messages.append(event_msg)
+
+        # Call the API
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            max_tokens=100
+        )
+
+        # Extract the response
+        answer = response.choices[0].message.content
+
+        # Return the answer
+        return answer
+
     def _parse_event(self, event):
         """Parse the event dictionary to create a string.
         
@@ -305,7 +351,7 @@ class TextGenerator:
             }
             messages.append(event_msg)
 
-        # Call the API
+        # Call the API for the main response
         response = self.client.chat.completions.create(
             model=self.model,
             messages=messages,
@@ -322,6 +368,10 @@ class TextGenerator:
             "content": answer
         }
         self.previous_responses.append(formatted_answer)
+
+        # Get the camera focus target
+        next_camera = self._get_camera_focus(answer)
+        print(f"Next camera: {next_camera}")
 
         # If the list is too long, remove the two oldest responses
         length = int(common.settings["commentary"]["memory_limit"]) * 2
