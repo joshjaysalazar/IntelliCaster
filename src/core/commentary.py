@@ -284,7 +284,7 @@ class TextGenerator:
         messages.append(event_msg)
 
         # Add the gaps to leader message (from common.drivers)
-        gap_msg = "\n\nHere are the gaps to the leader:\n"
+        gap_msg = "Here are the gaps to the leader:\n"
         for driver in common.drivers:
             rounded_gap = round(driver["gap_to_leader"], 3)
             gap_msg += f"- {driver['name']}: +{rounded_gap}"
