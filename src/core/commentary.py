@@ -1,5 +1,6 @@
 import os
 import time
+from pprint import pprint
 
 import elevenlabs
 from mutagen.mp3 import MP3
@@ -296,7 +297,7 @@ class TextGenerator:
         if common.ir.is_initialized and common.ir.is_connected:
             new_msg = ""
 
-            # Gather the information
+            # Gather the general information
             track = common.ir["WeekendInfo"]["TrackDisplayName"]
             city = common.ir["WeekendInfo"]["TrackCity"]
             country = common.ir["WeekendInfo"]["TrackCountry"]
@@ -351,12 +352,43 @@ class TextGenerator:
             event_msg += "lap percentage, and/or time. "
             event_msg += "DO NOT mention the exact time of the event. "
             event_msg += "Use lap distance to estimate the corner name/number. "
-            event_msg += "NEVER repeat events that have already been mentioned."
+            event_msg += "NEVER repeat events that have already been reported. "
+
+        # Otherwise, create an empty message
+        else:
+            event_msg = ""
+
+        # If the race has a lap count, get the laps started and total
+        if common.ir.is_initialized and common.ir.is_connected:
+            if common.ir["SessionLapsTotal"] < 30000:
+                current_lap = max(common.ir["CarIdxLap"])
+                total_laps = common.ir["SessionLapsTotal"]
+
+                # Add the lap information to the message
+                event_msg += f"The race is on lap {current_lap}/{total_laps}."
+            
+            # Otherwise, the race is timed, so get those numbers instead
+            else:
+                current_time = common.race_time
+                total_time = common.ir["SessionTimeTotal"]
+
+                # Convert the times to minutes and seconds
+                current_time = time.strftime("%M:%S", time.gmtime(current_time))
+                total_time = time.strftime("%M:%S", time.gmtime(total_time))
+
+                # Add the time information to the message
+                event_msg += f"{current_time} of {total_time} has elapsed "
+                event_msg += "in the race."
+        
+        # If the event message is not empty, add it to the list of messages
+        if event_msg != "":
             event_msg = {
-                "role": "user",
-                "content": event_msg
-            }
+                    "role": "user",
+                    "content": event_msg
+                }
             messages.append(event_msg)
+
+        pprint(messages)
 
         # Call the API for the main response
         response = self.client.chat.completions.create(
