@@ -264,24 +264,25 @@ class TextGenerator:
         }
         messages.append(sys_event)
 
-        # Add the event messages
-        event_msg = "The following events have recently occurred:\n"
-        for event in events:
-            parsed_event = self._parse_event(event)
-            event_msg += f"- {parsed_event}"
-            event_msg += "\n"
-        event_msg += "Report on the most exciting events. "
-        event_msg += "If two events are related, mention them together. "
-        event_msg += "Determine if events are related by type, lap percentage, "
-        event_msg += "and/or time. "
-        event_msg += "DO NOT mention the exact time of the event. "
-        event_msg += "Use the lap distance to estimate the corner name/number. "
-        event_msg += "NEVER repeat events that have already been mentioned. "
-        event_msg = {
-            "role": "user",
-            "content": event_msg
-        }
-        messages.append(event_msg)
+        # Add the event messages if this is the play-by-play role
+        if role == "play-by-play":
+            event_msg = "The following events have recently occurred:\n"
+            for event in events:
+                parsed_event = self._parse_event(event)
+                event_msg += f"- {parsed_event}"
+                event_msg += "\n"
+            event_msg += "Report on the most exciting events. "
+            event_msg += "If two events are related, mention them together. "
+            event_msg += "Determine if events are related by type, "
+            event_msg += "lap percentage, and/or time. "
+            event_msg += "DO NOT mention the exact time of the event. "
+            event_msg += "Use lap distance to estimate the corner name/number. "
+            event_msg += "NEVER repeat events that have already been mentioned."
+            event_msg = {
+                "role": "user",
+                "content": event_msg
+            }
+            messages.append(event_msg)
 
         # Add the gaps to leader message (from common.drivers)
         gap_msg = "Here are the gaps to the leader:\n"

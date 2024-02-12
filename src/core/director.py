@@ -281,7 +281,7 @@ class Director:
                     self._generate_event_commentary(events)
 
                 # Occasionally generate color commentary
-                # self._generate_color_commentary()
+                self._generate_color_commentary()
             
             # Wait the amount of time specified in the settings
             time.sleep(float(common.settings["system"]["director_update_freq"]))
