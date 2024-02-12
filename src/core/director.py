@@ -217,7 +217,7 @@ class Director:
         # Keep running until told to stop
         while common.running:
             # Detect if the race has started
-            if common.ir["RaceLaps"] > 0 and not common.race_started:
+            if common.ir["SessionState"] == 4 and not common.race_started:
                 common.race_started = True
                 common.start_time = common.ir["SessionTime"]
 
@@ -262,6 +262,10 @@ class Director:
 
                 # Switch to the first car that's not in the pits
                 self.camera.change_camera(driver, "TV1")
+
+                # Wait a tenth of a second, then continue to update quickly
+                time.sleep(0.1)
+                continue
 
             # Check if all cars have crossed the start line if needed
             if not common.all_cars_started:
