@@ -421,39 +421,6 @@ class Events:
 
         # Return the events list
         return self.events
-
-    def get_next_event(self):
-        """Pick the next event to report.
-        
-        Returns:
-            dict: The next event to report
-        """
-        # If there are no events, return None
-        if not self.events:
-            return None
-        
-        # Sort the events list by timestamp, with the most recent first
-        self.events.sort(key=lambda x: x["timestamp"], reverse=True)
-
-        # Remove duplicate events
-        self.events = self._remove_duplicates(self.events)
-
-        # Event priority list
-        priority = ["stopped", "overtake"]
-
-        # Go through the priority list
-        for p in priority:
-            # Go through the events list
-            for event in self.events:
-                # If the event type matches the priority, return it
-                if event["type"] == p:
-                    self._remove(event["id"])
-                    return event
-
-        # As a fallback, return the first event in the list and remove it
-        event = self.events[0]
-        self._remove(event["id"])
-        return event
     
     def run(self):
         """Run the events thread.
