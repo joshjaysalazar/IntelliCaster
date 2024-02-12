@@ -372,9 +372,15 @@ class TextGenerator:
                 current_time = common.race_time
                 total_time = common.ir["SessionTimeTotal"]
 
-                # Convert the times to minutes and seconds
-                current_time = time.strftime("%M:%S", time.gmtime(current_time))
-                total_time = time.strftime("%M:%S", time.gmtime(total_time))
+                # Convert the times to hours, minutes, and seconds
+                current_time = time.strftime(
+                    "%H:%M:%S",
+                    time.gmtime(current_time)
+                )
+                total_time = time.strftime(
+                    "%H:%M:%S",
+                    time.gmtime(total_time)
+                )
 
                 # Add the time information to the message
                 event_msg += f"{current_time} of {total_time} has elapsed "
