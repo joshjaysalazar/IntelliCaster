@@ -292,11 +292,11 @@ class TextGenerator:
             }
             messages.append(sys_context)
 
-        # Start building the event info system message
-        new_msg = ""
-
-        # Gather the information from iRacing if it's running
+        # Start building the event info system message if iRacing is connected
         if common.ir.is_initialized and common.ir.is_connected:
+            new_msg = ""
+
+            # Gather the information
             track = common.ir["WeekendInfo"]["TrackDisplayName"]
             city = common.ir["WeekendInfo"]["TrackCity"]
             country = common.ir["WeekendInfo"]["TrackCountry"]
@@ -304,19 +304,19 @@ class TextGenerator:
             track_temp = common.ir["WeekendInfo"]["TrackSurfaceTemp"]
             skies = common.ir["WeekendInfo"]["TrackSkies"]
 
-        # Compile that information into a message
-        new_msg += f"The race is at {track} in {city}, {country}. "
-        new_msg += f"The air temperature is {air_temp}., and "
-        new_msg += f"the track temperature is {track_temp}. "
-        new_msg += f"The skies are {skies.lower()}. "
+            # Compile that information into a message
+            new_msg += f"The race is at {track} in {city}, {country}. "
+            new_msg += f"The air temperature is {air_temp}., and "
+            new_msg += f"the track temperature is {track_temp}. "
+            new_msg += f"The skies are {skies.lower()}. "
 
-        # Add the event info system message
-        sys_event = {
-            "role": "system",
-            "name": "event_info",
-            "content": new_msg
-        }
-        messages.append(sys_event)
+            # Add the event info system message
+            sys_event = {
+                "role": "system",
+                "name": "event_info",
+                "content": new_msg
+            }
+            messages.append(sys_event)
 
         # Add the gaps to leader message (from common.drivers)
         gap_msg = "Here are the gaps to the leader:\n"
