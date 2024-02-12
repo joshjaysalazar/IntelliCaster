@@ -94,7 +94,8 @@ class Director:
             self.commentary.generate(
                 "Add color commentary to the previous commentary.",
                 "color",
-                rec_start_time=common.recording_start_time
+                rec_start_time=common.recording_start_time,
+                camera=self.camera
             )
 
     def _generate_event_commentary(self, events):
@@ -113,7 +114,8 @@ class Director:
         self.commentary.generate(
             events,
             "play-by-play",
-            rec_start_time=common.recording_start_time
+            rec_start_time=common.recording_start_time,
+            camera=self.camera
         )
 
     def _update_iracing_settings(self):

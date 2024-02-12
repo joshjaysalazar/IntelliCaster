@@ -36,7 +36,8 @@ class Commentary:
             self, 
             events,
             role,
-            rec_start_time=0
+            rec_start_time=0,
+            camera=None
         ):
         """Generate commentary for the given event.
 
