@@ -262,10 +262,6 @@ class TextGenerator:
         }
         messages.append(sys_event)
 
-        # Add all previous responses to the list
-        for msg in self.previous_responses:
-            messages.append(msg)
-
         # Add the event messages
         event_msg = "The following events have recently occurred:\n"
         for event in events:
@@ -300,6 +296,10 @@ class TextGenerator:
         print("--------------------")
         print()
         pprint(messages)
+
+        # Add all previous responses to the list
+        for msg in self.previous_responses:
+            messages.append(msg)
 
         # Call the API
         response = self.client.chat.completions.create(
