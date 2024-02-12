@@ -131,7 +131,7 @@ class TextGenerator:
             event (str): The event that occurred.
             
         Returns:
-            str: The camera to focus on.
+            int: The car number to focus on.
         """
         # Create an empty list of messages
         messages = []
@@ -139,7 +139,13 @@ class TextGenerator:
         # Create the instruction message
         content = "Based on the commentary generated for this event, which car "
         content += "should the camera focus on? "
-        content += "Answer with only the driver's name, nothing else."
+        content += "Answer with only the driver's full name from the following "
+        content += "list, exactly as it appears in this list, "
+        content += "and nothing else.\n\n"
+        content += "The drivers are:\n"
+        for driver in common.drivers:
+            content += f"{driver["name"]}"
+            content += "\n"
         instruction = {
             "role": "system",
             "name": "camera_focus",
@@ -164,8 +170,13 @@ class TextGenerator:
         # Extract the response
         answer = response.choices[0].message.content
 
-        # Return the answer
-        return answer
+        # Pick the driver number which matches the answer
+        for driver in common.drivers:
+            if driver["name"].lower() in answer.lower():
+                return driver["number"]
+            
+        # If no match is found, return None
+        return None
 
     def _parse_event(self, event):
         """Parse the event dictionary to create a string.
@@ -371,7 +382,10 @@ class TextGenerator:
 
         # Get the camera focus target
         next_camera = self._get_camera_focus(answer)
-        print(f"Next camera: {next_camera}")
+
+        # Switch the camera to the new target
+        if next_camera is not None:
+            camera.change_camera(next_camera, "TV1")
 
         # If the list is too long, remove the two oldest responses
         length = int(common.settings["commentary"]["memory_limit"]) * 2
