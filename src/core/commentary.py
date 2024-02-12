@@ -1,5 +1,6 @@
 import os
 import time
+from pprint import pprint
 
 import elevenlabs
 from mutagen.mp3 import MP3
@@ -34,13 +35,10 @@ class Commentary:
 
     def generate(
             self, 
-            event,
-            lap_percent,
-            role, 
-            tone, 
-            other_info="", 
-            yelling=False,
-            rec_start_time=0
+            events,
+            role,
+            rec_start_time=0,
+            camera=None
         ):
         """Generate commentary for the given event.
 
@@ -69,11 +67,9 @@ class Commentary:
 
         # Generate the commentary text
         text = self.text_generator.generate(
-            event=event,
-            lap_percent=lap_percent,
+            events=events,
             role=role,
-            tone=tone,
-            other_info=other_info
+            camera=camera
         )
 
         # Add the message to the message box
@@ -93,7 +89,6 @@ class Commentary:
             text=text,
             timestamp=timestamp,
             gpt_time=gpt_time,
-            yelling=yelling,
             voice=voice
         )
 
@@ -126,8 +121,97 @@ class TextGenerator:
 
         # Create an empty list to hold previous responses
         self.previous_responses = []
-    
-    def generate(self, event, lap_percent, role, tone, other_info=""):
+
+    def _get_camera_focus(self, event):
+        """Get the camera for the given event.
+        
+        Using GPT to determine which car to focus on, pick a car to focus on
+        based on the event.
+        
+        Args:
+            event (str): The event that occurred.
+            
+        Returns:
+            int: The car number to focus on.
+        """
+        # Create an empty list of messages
+        messages = []
+
+        # Create the instruction message
+        content = "Based on the commentary generated for this event, which car "
+        content += "should the camera focus on? "
+        content += "Answer with only the driver's full name from the following "
+        content += "list, exactly as it appears in this list, "
+        content += "and nothing else.\n\n"
+        content += "The drivers are:\n"
+        for driver in common.drivers:
+            content += f"{driver["name"]}"
+            content += "\n"
+        instruction = {
+            "role": "system",
+            "name": "camera_focus",
+            "content": content
+        }
+        messages.append(instruction)
+
+        # Add the event message
+        event_msg = {
+            "role": "user",
+            "content": event
+        }
+        messages.append(event_msg)
+
+        # Call the API
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            max_tokens=100
+        )
+
+        # Extract the response
+        answer = response.choices[0].message.content
+
+        # Pick the driver number which matches the answer
+        for driver in common.drivers:
+            if driver["name"].lower() in answer.lower():
+                return driver["number"]
+            
+        # If no match is found, return None
+        return None
+
+    def _parse_event(self, event):
+        """Parse the event dictionary to create a string.
+        
+        Args:
+            event (dict): The event dictionary to parse.
+            
+        Returns:
+            str: The parsed event string.
+        """
+        # Create the string to return
+        event_str = ""
+        
+        # Add the event type
+        event_str += f"{event['type']} - "
+
+        # Add the description
+        event_str += f"{event['description']} - "
+
+        # Add the lap percentage
+        adjusted_percent = event["lap_percent"] * 100.
+        adjusted_percent = round(adjusted_percent, 3)
+        event_str += f"{adjusted_percent}% of the way through the lap - "
+
+        # Get the amount of time ago it occurred
+        time_ago = time.time() - event["timestamp"]
+        time_ago = round(time_ago, 3)
+
+        # Add the time
+        event_str += f"{time_ago} seconds ago"
+
+        return event_str
+
+    def generate(self, events, role, camera=None):
         """Generate text commentary for the given event.
         
         Generates text commentary for the given event based on the provided
@@ -136,13 +220,9 @@ class TextGenerator:
         previous responses.
         
         Args:
-            event (str): The event that occurred.
-            lap_percent (float): The percentage of the lap the event occurred
-                on.
+            events (list): A list of events that have occurred.
             role (str): The role of the commentator.
-            tone (str): The tone of the commentary.
-            other_info (str): Additional information to be included in the
-                system message.
+            camera (int): The car number to focus on.
         
         Returns:
             str: The generated commentary.
@@ -176,10 +256,6 @@ class TextGenerator:
 
         # Add common instructions
         new_msg += "Almost always refer to drivers by only their surname. "
-        new_msg += f"Use a {tone} tone. "
-
-        # Add additional info to the end of the system message
-        new_msg += other_info
 
         # Add the initial system message
         sys_init = {
@@ -217,11 +293,11 @@ class TextGenerator:
             }
             messages.append(sys_context)
 
-        # Start building the event info system message
-        new_msg = ""
-
-        # Gather the information from iRacing if it's running
+        # Start building the event info system message if iRacing is connected
         if common.ir.is_initialized and common.ir.is_connected:
+            new_msg = ""
+
+            # Gather the general information
             track = common.ir["WeekendInfo"]["TrackDisplayName"]
             city = common.ir["WeekendInfo"]["TrackCity"]
             country = common.ir["WeekendInfo"]["TrackCountry"]
@@ -229,62 +305,98 @@ class TextGenerator:
             track_temp = common.ir["WeekendInfo"]["TrackSurfaceTemp"]
             skies = common.ir["WeekendInfo"]["TrackSkies"]
 
-        # Compile that information into a message
-        new_msg += f"The race is at {track} in {city}, {country}. "
-        new_msg += f"The air temperature is {air_temp}., and "
-        new_msg += f"the track temperature is {track_temp}. "
-        new_msg += f"The skies are {skies.lower()}. "
+            # Compile that information into a message
+            new_msg += f"The race is at {track} in {city}, {country}. "
+            new_msg += f"The air temperature is {air_temp}., and "
+            new_msg += f"the track temperature is {track_temp}. "
+            new_msg += f"The skies are {skies.lower()}. "
 
-        # Add the event info system message
-        sys_event = {
-            "role": "system",
-            "name": "event_info",
-            "content": new_msg
-        }
-        messages.append(sys_event)
-
-        # Add all previous messages to the list
-        for msg in self.previous_responses:
-            messages.append(msg)
-
-        # Add the event message
-        event_msg = {
-            "role": "user",
-            "content": event
-        }
-        messages.append(event_msg)
-
-        # Add the event message to previous messages
-        self.previous_responses.append(event_msg)
-
-        # Add the lap percent message
-        if lap_percent != None:
-            lap_percent = round(lap_percent * 100, 2)
-            lap_msg = f"The event occurred at {lap_percent}% of the lap. "
-            lap_msg += "Infer the corner name or number based on that. "
-            lap_msg += "Be sure to account for the length of straights. "
-            lap_msg += "Occasionally announce the corner name or number, but "
-            lap_msg += "do not do it every time. Check the message history "
-            lap_msg += "to make sure you are not announcing corners too often."
-            lap_pct_msg = {
-                "role": "user",
-                "content": lap_msg
+            # Add the event info system message
+            sys_event = {
+                "role": "system",
+                "name": "event_info",
+                "content": new_msg
             }
-            messages.append(lap_pct_msg)
+            messages.append(sys_event)
 
         # Add the gaps to leader message (from common.drivers)
-        gap_msg = "Here are the gaps to the leader: \n"
+        gap_msg = "Here are the gaps to the leader:\n"
         for driver in common.drivers:
-            gap_msg += f"{driver['name']}: {driver['gap_to_leader']}\n"
+            driver_name = common.remove_numbers(driver["name"])
+            rounded_gap = round(driver["gap_to_leader"], 3)
+            gap_msg += f"- {driver_name}: +{rounded_gap}"
+            gap_msg += "\n"
         gap_msg += "Only use this information if it is relevant to the event. "
         gap_msg += "If gaps have been mentioned recently, do not mention them."
         gap_msg = {
-            "role": "user",
+            "role": "system",
+            "name": "gaps_to_leader",
             "content": gap_msg
         }
         messages.append(gap_msg)
 
-        # Call the API
+        # Add all previous responses to the list
+        for msg in self.previous_responses:
+            messages.append(msg)
+
+        # Add the event messages if this is the play-by-play role
+        if role == "play-by-play":
+            event_msg = "The following events have recently occurred:\n"
+            for event in events:
+                parsed_event = self._parse_event(event)
+                event_msg += f"- {parsed_event}"
+                event_msg += "\n"
+            event_msg += "Report on the most exciting events. "
+            event_msg += "If two events are related, mention them together. "
+            event_msg += "Determine if events are related by type, "
+            event_msg += "lap percentage, and/or time. "
+            event_msg += "DO NOT mention the exact time of the event. "
+            event_msg += "Use lap distance to estimate the corner name/number. "
+            event_msg += "NEVER repeat events that have already been reported. "
+
+        # Otherwise, create an empty message
+        else:
+            event_msg = ""
+
+        # If the race has a lap count, get the laps started and total
+        if common.ir.is_initialized and common.ir.is_connected:
+            if common.ir["SessionLapsTotal"] < 30000:
+                current_lap = max(common.ir["CarIdxLap"])
+                total_laps = common.ir["SessionLapsTotal"]
+
+                # Add the lap information to the message
+                event_msg += f"The race is on lap {current_lap}/{total_laps}."
+            
+            # Otherwise, the race is timed, so get those numbers instead
+            else:
+                current_time = common.race_time
+                total_time = common.ir["SessionTimeTotal"]
+
+                # Convert the times to hours, minutes, and seconds
+                current_time = time.strftime(
+                    "%H:%M:%S",
+                    time.gmtime(current_time)
+                )
+                total_time = time.strftime(
+                    "%H:%M:%S",
+                    time.gmtime(total_time)
+                )
+
+                # Add the time information to the message
+                event_msg += f"{current_time} of {total_time} has elapsed "
+                event_msg += "in the race."
+        
+        # If the event message is not empty, add it to the list of messages
+        if event_msg != "":
+            event_msg = {
+                    "role": "user",
+                    "content": event_msg
+                }
+            messages.append(event_msg)
+
+        pprint(messages)
+
+        # Call the API for the main response
         response = self.client.chat.completions.create(
             model=self.model,
             messages=messages,
@@ -301,6 +413,13 @@ class TextGenerator:
             "content": answer
         }
         self.previous_responses.append(formatted_answer)
+
+        # Get the camera focus target
+        next_camera = self._get_camera_focus(answer)
+
+        # Switch the camera to the new target
+        if next_camera is not None:
+            camera.change_camera(next_camera, "TV1")
 
         # If the list is too long, remove the two oldest responses
         length = int(common.settings["commentary"]["memory_limit"]) * 2
@@ -328,7 +447,7 @@ class VoiceGenerator:
         # Set the API key
         elevenlabs.set_api_key(common.settings["keys"]["elevenlabs_api_key"])
 
-    def generate(self, text, timestamp, gpt_time, yelling=False, voice="Harry"):
+    def generate(self, text, timestamp, gpt_time, voice="Harry"):
         """Generate and save audio for the provided text.
 
         Calls the ElevenLabs API to create audio from the text using the
@@ -342,12 +461,6 @@ class VoiceGenerator:
         """
         # Get the start time of this method
         start_time = time.time()
-
-        # Convert to yelling for voice commentary if requested
-        if yelling:
-            text = text.upper()
-            if text[-1] == ".":
-                text = text[:-1] + "!!!"
 
         # Replace "P" with "P-" to avoid issues with the API
         for i in range(len(text)):

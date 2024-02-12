@@ -93,34 +93,23 @@ class Director:
         if random.random() < chance:
             self.commentary.generate(
                 "Add color commentary to the previous commentary.",
-                None,
                 "color",
-                "neutral",
-                yelling=True,
-                rec_start_time=common.recording_start_time
+                rec_start_time=common.recording_start_time,
+                camera=self.camera
             )
 
-    def _generate_event_commentary(self, event):
+    def _generate_event_commentary(self, events):
         """Generate commentary for an event.
-
-        This method generates commentary for a specified event. It also changes
-        the camera to focus on the event.
 
         Args:
             event (dict): A dictionary containing information about the event.
         """
-        # Move the camera to focus on the event
-        self.camera.change_camera(event["focus"], "TV1")
-
         # Generate the commentary
         self.commentary.generate(
-            event["description"],
-            event["lap_percent"],
+            events,
             "play-by-play",
-            "neutral",
-            common.instructions[event["type"]],
-            yelling=True,
-            rec_start_time=common.recording_start_time
+            rec_start_time=common.recording_start_time,
+            camera=self.camera
         )
 
     def _update_iracing_settings(self):
@@ -228,7 +217,7 @@ class Director:
         # Keep running until told to stop
         while common.running:
             # Detect if the race has started
-            if common.ir["RaceLaps"] > 0 and not common.race_started:
+            if common.ir["SessionState"] == 4 and not common.race_started:
                 common.race_started = True
                 common.start_time = common.ir["SessionTime"]
 
@@ -274,18 +263,22 @@ class Director:
                 # Switch to the first car that's not in the pits
                 self.camera.change_camera(driver, "TV1")
 
+                # Wait a tenth of a second, then continue to update quickly
+                time.sleep(0.1)
+                continue
+
             # Check if all cars have crossed the start line if needed
             if not common.all_cars_started:
                 common.all_cars_started = self._check_all_cars_started()
 
             # If the race has started, generate commentary
             if common.race_started and common.all_cars_started:
-                # Get the next event to generate commentary for
-                event = self.events.get_next_event()
+                # Get the list of recent events
+                events = self.events.get_events()
 
                 # If an event was found, report it
-                if event:
-                    self._generate_event_commentary(event)
+                if len(events) > 0:
+                    self._generate_event_commentary(events)
 
                 # Occasionally generate color commentary
                 self._generate_color_commentary()
