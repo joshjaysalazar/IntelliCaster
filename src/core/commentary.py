@@ -286,8 +286,9 @@ class TextGenerator:
         # Add the gaps to leader message (from common.drivers)
         gap_msg = "Here are the gaps to the leader:\n"
         for driver in common.drivers:
+            driver_name = common.remove_numbers(driver["name"])
             rounded_gap = round(driver["gap_to_leader"], 3)
-            gap_msg += f"- {driver['name']}: +{rounded_gap}"
+            gap_msg += f"- {driver_name}: +{rounded_gap}"
             gap_msg += "\n"
         gap_msg += "Only use this information if it is relevant to the event. "
         gap_msg += "If gaps have been mentioned recently, do not mention them."
