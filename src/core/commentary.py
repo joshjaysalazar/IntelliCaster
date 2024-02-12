@@ -273,6 +273,8 @@ class TextGenerator:
             event_msg += "\n"
         event_msg += "Report on the most exciting events. "
         event_msg += "If two events are related, mention them together. "
+        event_msg += "DO NOT mention the exact time of the event. "
+        event_msg += "Use the lap distance to estimate the corner name/number. "
         event_msg += "Do not repeat events that have already been mentioned. "
         event_msg = {
             "role": "user",
