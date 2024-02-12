@@ -219,13 +219,9 @@ class TextGenerator:
         previous responses.
         
         Args:
-            event (str): The event that occurred.
-            lap_percent (float): The percentage of the lap the event occurred
-                on.
+            events (list): A list of events that have occurred.
             role (str): The role of the commentator.
-            tone (str): The tone of the commentary.
-            other_info (str): Additional information to be included in the
-                system message.
+            camera (int): The car number to focus on.
         
         Returns:
             str: The generated commentary.
