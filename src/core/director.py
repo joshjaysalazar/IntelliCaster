@@ -101,15 +101,9 @@ class Director:
     def _generate_event_commentary(self, events):
         """Generate commentary for an event.
 
-        This method generates commentary for a specified event. It also changes
-        the camera to focus on the event.
-
         Args:
             event (dict): A dictionary containing information about the event.
         """
-        # Move the camera to focus on the event
-        # self.camera.change_camera(event["focus"], "TV1")
-
         # Generate the commentary
         self.commentary.generate(
             events,
