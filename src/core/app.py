@@ -117,6 +117,62 @@ class App(ctk.CTk):
         )
         self.btn_start_stop.pack(padx=20, pady=20)
 
+    def _create_checkbox(self, master, name, text, default, variable={}):
+        """Create a checkbox for the frame.
+        
+        Creates a checkbox for the frame that is used to toggle a setting on or
+        off. If a default value is provided, the checkbox is set to that value.
+        
+        Args:
+            name (str): The name of the checkbox to create.
+            text (str): The text to display next to the checkbox.
+            default (str): The default value to set the checkbox to.
+            variable (dict): The dictionary to add the checkbox to.
+        """
+        # Create label
+        lbl = ctk.CTkLabel(
+            master=master,
+            text=text,
+            font=ctk.CTkFont(size=14)
+        )
+
+        # Grid label
+        lbl.grid(
+            row=self.row,
+            column=0,
+            sticky="e",
+            padx=20,
+            pady=(0, 20)
+        )
+
+        # Create checkbox
+        chk = ctk.CTkCheckBox(
+            master=master,
+            text=""
+        )
+
+        # If default value is provided, set checkbox to that value
+        if default == "1":
+            chk.select()
+        else:
+            chk.deselect()
+
+        # Grid checkbox
+        chk.grid(
+            row=self.row,
+            column=1,
+            columnspan=3,
+            sticky="ew",
+            padx=(0, 20),
+            pady=(0, 20)
+        )
+
+        # Increment row
+        self.row += 1
+
+        # Add checkbox to current settings
+        variable[self.current_section][name] = chk
+
     def _create_context(self):
         """Create the context frame and its components.
 
@@ -636,6 +692,16 @@ class App(ctk.CTk):
             variable=self.current_settings
         )
 
+        # Create realistic camera checkbox
+        default = common.settings["commentary"]["realistic_camera"]
+        self._create_checkbox(
+            self.frm_settings,
+            "realistic_camera",
+            "Use only realistic camera angles",
+            default,
+            variable=self.current_settings
+        )
+
         # Create memory limit entry box
         default = common.settings["commentary"]["memory_limit"]
         self._create_entry(
@@ -812,7 +878,7 @@ class App(ctk.CTk):
         # Update settings with values from entry boxes
         for key in self.current_settings:
             for setting in self.current_settings[key]:
-                new_setting = self.current_settings[key][setting].get()
+                new_setting = str(self.current_settings[key][setting].get())
                 common.settings[key][setting] = new_setting
 
         # Save settings to file
