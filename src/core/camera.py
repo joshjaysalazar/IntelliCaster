@@ -35,6 +35,8 @@ class Camera:
         # If realistic cameras is enabled, remove unrealistic cameras
         if common.settings["commentary"]["realistic_camera"] == "1":
             cams_to_remove = (
+                "Nose",
+                "Gearbox",
                 "LF Susp",
                 "RF Susp",
                 "LR Susp",
