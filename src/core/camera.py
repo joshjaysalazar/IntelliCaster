@@ -72,8 +72,16 @@ class Camera:
             if angle in cameras:
                 cameras.remove(angle)
 
+        # Set the probability of the cameras
+        weights = []
+        for camera in cameras:
+            if "TV" in camera:
+                weights.append(5)
+            else:
+                weights.append(1)
+
         # Choose a random camera
-        random_camera = random.choice(cameras)
+        random_camera = random.choices(cameras, weights=weights, k=1)[0]
 
         # Change the camera
-        self.change_camera(car_idx, self.cameras[random_camera])
+        self.change_camera(car_idx, random_camera)

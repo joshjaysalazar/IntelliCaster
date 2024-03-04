@@ -416,7 +416,7 @@ class TextGenerator:
 
         # Switch the camera to the new target
         if next_camera is not None:
-            camera.change_camera(next_camera, "TV1")
+            camera.choose_random_camera(next_camera)
 
         # If the list is too long, remove the two oldest responses
         length = int(common.settings["commentary"]["memory_limit"]) * 2
