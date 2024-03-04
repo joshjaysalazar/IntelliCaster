@@ -16,6 +16,9 @@ class Camera:
         # Camera Dictionary
         self.cameras = self._get_cameras()
 
+        # Store current camera
+        self.current_camera = None
+
     def _get_cameras(self):
         """Returns a dictionary of camera names and numbers
         
@@ -56,6 +59,7 @@ class Camera:
             camera_name (str): Name of the camera
         """
         common.ir.cam_switch_num(car_idx, self.cameras[camera_name])
+        self.current_camera = camera_name
 
     def choose_random_camera(self, car_idx):
         """Chooses a random camera for a specific car
@@ -71,6 +75,10 @@ class Camera:
         for angle in bad_angles:
             if angle in cameras:
                 cameras.remove(angle)
+
+        # Remove current camera
+        if self.current_camera in cameras:
+            cameras.remove(self.current_camera)
 
         # Set the probability of the cameras
         weights = []
