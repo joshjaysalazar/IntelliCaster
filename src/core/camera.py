@@ -29,6 +29,21 @@ class Camera:
         for camera in common.ir["CameraInfo"]["Groups"]:
             cameras[camera["GroupName"]] = camera["GroupNum"]
 
+        # If realistic cameras is enabled, remove unrealistic cameras
+        if common.settings["commentary"]["realistic_camera"] == "1":
+            cams_to_remove = (
+                "LF Susp",
+                "RF Susp",
+                "LR Susp",
+                "RR Susp",
+                "Cockpit",
+                "Chase",
+                "Far Chase",
+                "Rear Chase"
+            )
+            for cam in cams_to_remove:
+                del cameras[cam]
+                
         # Return the dictionary
         return cameras
     
