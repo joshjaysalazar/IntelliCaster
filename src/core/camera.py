@@ -42,8 +42,9 @@ class Camera:
                 "Rear Chase"
             )
             for cam in cams_to_remove:
-                del cameras[cam]
-                
+                if cam in cameras:
+                    del cameras[cam]
+
         # Return the dictionary
         return cameras
     
@@ -62,8 +63,17 @@ class Camera:
         Args:
             car_idx (int): Index of the car
         """
+        # Get the cameras
+        cameras = list(self.cameras.keys())
+
+        # Remove angles that don't focus on a specific car
+        bad_angles = ("Scenic", "Pit Lane", "Pit Lane 2")
+        for angle in bad_angles:
+            if angle in cameras:
+                cameras.remove(angle)
+
         # Choose a random camera
-        random_camera = random.choice(list(self.cameras.keys()))
+        random_camera = random.choice(cameras)
 
         # Change the camera
         self.change_camera(car_idx, self.cameras[random_camera])
