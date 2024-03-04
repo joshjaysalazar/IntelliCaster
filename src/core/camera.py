@@ -1,3 +1,5 @@
+import random
+
 from core import common
 
 
@@ -38,3 +40,15 @@ class Camera:
             camera_name (str): Name of the camera
         """
         common.ir.cam_switch_num(car_idx, self.cameras[camera_name])
+
+    def choose_random_camera(self, car_idx):
+        """Chooses a random camera for a specific car
+        
+        Args:
+            car_idx (int): Index of the car
+        """
+        # Choose a random camera
+        random_camera = random.choice(list(self.cameras.keys()))
+
+        # Change the camera
+        self.change_camera(car_idx, self.cameras[random_camera])
