@@ -76,7 +76,7 @@ class Camera:
         weights = []
         for camera in cameras:
             if "TV" in camera:
-                weights.append(5)
+                weights.append(10)
             else:
                 weights.append(1)
 
