@@ -54,6 +54,7 @@ def create_settings_file(file_name):
         config.set("commentary", "pbp_voice", "Harry")
         config.set("commentary", "color_voice", "Elli")
         config.set("commentary", "color_chance", "0.5")
+        config.set("commentary", "realistic_camera", "1")
         config.set("commentary", "memory_limit", "10")
 
         # Set up system section

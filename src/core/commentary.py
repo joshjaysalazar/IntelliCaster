@@ -1,6 +1,5 @@
 import os
 import time
-from pprint import pprint
 
 import elevenlabs
 from mutagen.mp3 import MP3
@@ -394,8 +393,6 @@ class TextGenerator:
                 }
             messages.append(event_msg)
 
-        pprint(messages)
-
         # Call the API for the main response
         response = self.client.chat.completions.create(
             model=self.model,
@@ -419,7 +416,7 @@ class TextGenerator:
 
         # Switch the camera to the new target
         if next_camera is not None:
-            camera.change_camera(next_camera, "TV1")
+            camera.choose_random_camera(next_camera)
 
         # If the list is too long, remove the two oldest responses
         length = int(common.settings["commentary"]["memory_limit"]) * 2
