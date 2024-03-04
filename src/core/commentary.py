@@ -1,6 +1,5 @@
 import os
 import time
-from pprint import pprint
 
 import elevenlabs
 from mutagen.mp3 import MP3
@@ -393,8 +392,6 @@ class TextGenerator:
                     "content": event_msg
                 }
             messages.append(event_msg)
-
-        pprint(messages)
 
         # Call the API for the main response
         response = self.client.chat.completions.create(
