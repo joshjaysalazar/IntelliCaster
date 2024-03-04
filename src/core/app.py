@@ -697,7 +697,7 @@ class App(ctk.CTk):
         self._create_checkbox(
             self.frm_settings,
             "realistic_camera",
-            "Use only realistic camera angles",
+            "Realistic Camera Angles",
             default,
             variable=self.current_settings
         )
