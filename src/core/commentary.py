@@ -227,6 +227,7 @@ class TextGenerator:
             str: The generated commentary.
         """
         def instructions_message():
+            """Add the instructions system message to the list of messages."""
             nonlocal messages
 
             # Start building the system message
@@ -266,6 +267,7 @@ class TextGenerator:
             messages.append(formatted_message)
         
         def context_message():
+            """Add the context system message to the list of messages."""
             nonlocal messages
 
             # Start building the context system message
@@ -297,6 +299,7 @@ class TextGenerator:
                 messages.append(formatted_message)
 
         def event_info_message():
+            """Add the event info system message to the list of messages."""
             nonlocal messages
 
             # Build the event info system message if iRacing is connected
@@ -326,6 +329,9 @@ class TextGenerator:
                 messages.append(formatted_message)
             
         def gaps_message():
+            """Add the gaps to the leader system message to the list of
+            messages.
+            """
             nonlocal messages
 
             # Add the gaps to leader message (from common.drivers)
@@ -346,6 +352,9 @@ class TextGenerator:
             messages.append(formatted_message)
 
         def previous_responses_message():
+            """Add the previous responses system message to the list of
+            messages.
+            """
             nonlocal messages
 
             # Add all previous responses to the list
@@ -353,6 +362,7 @@ class TextGenerator:
                 messages.append(msg)
 
         def new_message():
+            """Add the new message to the list of messages."""
             nonlocal messages
 
             # Add the event messages if this is the play-by-play role
