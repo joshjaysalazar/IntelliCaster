@@ -353,7 +353,11 @@ class Events:
                         common.drivers[j]["gap_to_leader"] = gap_to_leader
 
                         # Update pits status
-                        in_pits = common.ir["CarIdxOnPitRoad"][i]
+                        track_surface = common.ir["CarIdxTrackSurface"][i]
+                        if track_surface == 1 or track_surface == 2:
+                            in_pits = True
+                        else:
+                            in_pits = False
                         common.drivers[j]["in_pits"] = in_pits
 
                         # Update on track status
