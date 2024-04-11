@@ -226,172 +226,211 @@ class TextGenerator:
         Returns:
             str: The generated commentary.
         """
+        def instructions_message():
+            """Add the instructions system message to the list of messages."""
+            nonlocal messages
+
+            # Start building the system message
+            message = ""
+
+            # Add messages based on role
+            if role == "play-by-play":
+                # Add the name to the system message
+                message += "You are an iRacing play-by-play commentator. "
+
+                # Add play-by-play instructions
+                message += "You will respond with only one sentence. "
+                message += "Do not provide too much detail. Focus on the "
+                message += "action. Do not just say the word \"play-by-play\". "
+
+            elif role == "color":
+                # Add the name to the system message
+                message += "You are an iRacing color commentator. "
+
+                # Add color instructions
+                message += "You will respond with one to two short sentences. "
+                message += "Stick to providing insight or context that "
+                message += "enhances the viewer's understanding. "
+                message += "Do not make up corner names or numbers. "
+                message += "Do not just say the word \"color\". "
+
+            # Add common instructions
+            message += "Almost always refer to drivers by only their surname. "
+
+            # Add the initial system message
+            formatted_message = {
+                "role": "system",
+                "name": "instructions",
+                "content": message
+            }
+
+            messages.append(formatted_message)
+        
+        def context_message():
+            """Add the context system message to the list of messages."""
+            nonlocal messages
+
+            # Start building the context system message
+            message = ""
+
+            # For each available value, add it to the message
+            if common.context.get("league", {}).get("name") is not None:
+                message += f"The league is {common.context['league']['name']}. "
+            if common.context.get("league", {}).get("short_name") is not None:
+                # If league short name is one word, add hyphens between letters
+                if len(common.context["league"]["short_name"].split()) == 1:
+                    short_name = ""
+                    for letter in common.context["league"]["short_name"]:
+                        short_name += f"{letter.upper()}-"
+
+                    # Remove the last hyphen
+                    short_name = short_name[:-1]
+
+                message += "The league can be abbreviated as "
+                message += f"{short_name}. "
+
+            # If the new message is not empty, add it to the list of messages
+            if message != "":
+                formatted_message = {
+                    "role": "system",
+                    "name": "context",
+                    "content": message
+                }
+                messages.append(formatted_message)
+
+        def event_info_message():
+            """Add the event info system message to the list of messages."""
+            nonlocal messages
+
+            # Build the event info system message if iRacing is connected
+            if common.ir.is_initialized and common.ir.is_connected:
+                message = ""
+
+                # Gather the general information
+                track = common.ir["WeekendInfo"]["TrackDisplayName"]
+                city = common.ir["WeekendInfo"]["TrackCity"]
+                country = common.ir["WeekendInfo"]["TrackCountry"]
+                air_temp = common.ir["WeekendInfo"]["TrackAirTemp"]
+                track_temp = common.ir["WeekendInfo"]["TrackSurfaceTemp"]
+                skies = common.ir["WeekendInfo"]["TrackSkies"]
+
+                # Compile that information into a message
+                message += f"The race is at {track} in {city}, {country}. "
+                message += f"The air temperature is {air_temp}., and "
+                message += f"the track temperature is {track_temp}. "
+                message += f"The skies are {skies.lower()}. "
+
+                # Add the event info system message
+                formatted_message = {
+                    "role": "system",
+                    "name": "event_info",
+                    "content": message
+                }
+                messages.append(formatted_message)
+            
+        def gaps_message():
+            """Add the gaps to the leader system message to the list of
+            messages.
+            """
+            nonlocal messages
+
+            # Add the gaps to leader message (from common.drivers)
+            message = "Here are the gaps to the leader:\n"
+            for driver in common.drivers:
+                driver_name = common.remove_numbers(driver["name"])
+                rounded_gap = round(driver["gap_to_leader"], 3)
+                message += f"- {driver_name}: +{rounded_gap}"
+                message += "\n"
+            message += "Only use this information if it is relevant to the "
+            message += "event. If gaps have been mentioned recently, do not "
+            message += "mention them again."
+            formatted_message = {
+                "role": "system",
+                "name": "gaps_to_leader",
+                "content": message
+            }
+            messages.append(formatted_message)
+
+        def previous_responses_message():
+            """Add the previous responses system message to the list of
+            messages.
+            """
+            nonlocal messages
+
+            # Add all previous responses to the list
+            for msg in self.previous_responses:
+                messages.append(msg)
+
+        def new_message():
+            """Add the new message to the list of messages."""
+            nonlocal messages
+
+            # Add the event messages if this is the play-by-play role
+            if role == "play-by-play":
+                message = "The following events have recently occurred:\n"
+                for event in events:
+                    parsed_event = self._parse_event(event)
+                    message += f"- {parsed_event}"
+                    message += "\n"
+                message += "Report on the most exciting events. "
+                message += "If two events are related, mention them together. "
+                message += "Determine if events are related by type, "
+                message += "lap percentage, and/or time. "
+                message += "DO NOT mention the exact time of the event. "
+                message += "Use lap distance to estimate the corner "
+                message += "name/number. NEVER repeat events that have already "
+                message += "been reported. "
+
+            # Otherwise, create an empty message
+            else:
+                message = ""
+
+            # If the race has a lap count, get the laps started and total
+            if common.ir.is_initialized and common.ir.is_connected:
+                if common.ir["SessionLapsTotal"] < 30000:
+                    current_lap = max(common.ir["CarIdxLap"])
+                    total_laps = common.ir["SessionLapsTotal"]
+
+                    # Add the lap information to the message
+                    message += f"The race is on lap {current_lap}/{total_laps}."
+                
+                # Otherwise, the race is timed, so get those numbers instead
+                else:
+                    current_time = common.race_time
+                    total_time = common.ir["SessionTimeTotal"]
+
+                    # Convert the times to hours, minutes, and seconds
+                    current_time = time.strftime(
+                        "%H:%M:%S",
+                        time.gmtime(current_time)
+                    )
+                    total_time = time.strftime(
+                        "%H:%M:%S",
+                        time.gmtime(total_time)
+                    )
+
+                    # Add the time information to the message
+                    message += f"{current_time} of {total_time} has elapsed "
+                    message += "in the race."
+            
+            # If the event message is not empty, add it to the list of messages
+            if message != "":
+                formatted_message = {
+                        "role": "user",
+                        "content": message
+                    }
+                messages.append(formatted_message)
+
         # Create an empty list to hold the messages
         messages = []
 
-        # Start building the system message
-        new_msg = ""
-
-        # Add messages based on role
-        if role == "play-by-play":
-            # Add the name to the system message
-            new_msg += "You are an iRacing play-by-play commentator. "
-
-            # Add play-by-play instructions
-            new_msg += "You will respond with only one sentence. "
-            new_msg += "Do not provide too much detail. Focus on the action. "
-            new_msg += "Do not just say the word \"play-by-play\". "
-
-        elif role == "color":
-            # Add the name to the system message
-            new_msg += "You are an iRacing color commentator. "
-
-            # Add color instructions
-            new_msg += "You will respond with one to two short sentences. "
-            new_msg += "Stick to providing insight or context that enhances "
-            new_msg += "the viewer's understanding. "
-            new_msg += "Do not make up corner names or numbers. "
-            new_msg += "Do not just say the word \"color\". "
-
-        # Add common instructions
-        new_msg += "Almost always refer to drivers by only their surname. "
-
-        # Add the initial system message
-        sys_init = {
-            "role": "system",
-            "name": "instructions",
-            "content": new_msg
-        }
-        messages.append(sys_init)
-
-        # Start building the context system message
-        new_msg = ""
-
-        # For each available value, add it to the message
-        if common.context.get("league", {}).get("name") is not None:
-            new_msg += f"The league is {common.context['league']['name']}. "
-        if common.context.get("league", {}).get("short_name") is not None:
-            # If the league short name is one word, add hyphens between letters
-            if len(common.context["league"]["short_name"].split()) == 1:
-                short_name = ""
-                for letter in common.context["league"]["short_name"]:
-                    short_name += f"{letter.upper()}-"
-
-                # Remove the last hyphen
-                short_name = short_name[:-1]
-
-            new_msg += "The league can be abbreviated as "
-            new_msg += f"{short_name}. "
-
-        # If the new message is not empty, add it to the list of messages
-        if new_msg != "":
-            sys_context = {
-                "role": "system",
-                "name": "context",
-                "content": new_msg
-            }
-            messages.append(sys_context)
-
-        # Start building the event info system message if iRacing is connected
-        if common.ir.is_initialized and common.ir.is_connected:
-            new_msg = ""
-
-            # Gather the general information
-            track = common.ir["WeekendInfo"]["TrackDisplayName"]
-            city = common.ir["WeekendInfo"]["TrackCity"]
-            country = common.ir["WeekendInfo"]["TrackCountry"]
-            air_temp = common.ir["WeekendInfo"]["TrackAirTemp"]
-            track_temp = common.ir["WeekendInfo"]["TrackSurfaceTemp"]
-            skies = common.ir["WeekendInfo"]["TrackSkies"]
-
-            # Compile that information into a message
-            new_msg += f"The race is at {track} in {city}, {country}. "
-            new_msg += f"The air temperature is {air_temp}., and "
-            new_msg += f"the track temperature is {track_temp}. "
-            new_msg += f"The skies are {skies.lower()}. "
-
-            # Add the event info system message
-            sys_event = {
-                "role": "system",
-                "name": "event_info",
-                "content": new_msg
-            }
-            messages.append(sys_event)
-
-        # Add the gaps to leader message (from common.drivers)
-        gap_msg = "Here are the gaps to the leader:\n"
-        for driver in common.drivers:
-            driver_name = common.remove_numbers(driver["name"])
-            rounded_gap = round(driver["gap_to_leader"], 3)
-            gap_msg += f"- {driver_name}: +{rounded_gap}"
-            gap_msg += "\n"
-        gap_msg += "Only use this information if it is relevant to the event. "
-        gap_msg += "If gaps have been mentioned recently, do not mention them."
-        gap_msg = {
-            "role": "system",
-            "name": "gaps_to_leader",
-            "content": gap_msg
-        }
-        messages.append(gap_msg)
-
-        # Add all previous responses to the list
-        for msg in self.previous_responses:
-            messages.append(msg)
-
-        # Add the event messages if this is the play-by-play role
-        if role == "play-by-play":
-            event_msg = "The following events have recently occurred:\n"
-            for event in events:
-                parsed_event = self._parse_event(event)
-                event_msg += f"- {parsed_event}"
-                event_msg += "\n"
-            event_msg += "Report on the most exciting events. "
-            event_msg += "If two events are related, mention them together. "
-            event_msg += "Determine if events are related by type, "
-            event_msg += "lap percentage, and/or time. "
-            event_msg += "DO NOT mention the exact time of the event. "
-            event_msg += "Use lap distance to estimate the corner name/number. "
-            event_msg += "NEVER repeat events that have already been reported. "
-
-        # Otherwise, create an empty message
-        else:
-            event_msg = ""
-
-        # If the race has a lap count, get the laps started and total
-        if common.ir.is_initialized and common.ir.is_connected:
-            if common.ir["SessionLapsTotal"] < 30000:
-                current_lap = max(common.ir["CarIdxLap"])
-                total_laps = common.ir["SessionLapsTotal"]
-
-                # Add the lap information to the message
-                event_msg += f"The race is on lap {current_lap}/{total_laps}."
-            
-            # Otherwise, the race is timed, so get those numbers instead
-            else:
-                current_time = common.race_time
-                total_time = common.ir["SessionTimeTotal"]
-
-                # Convert the times to hours, minutes, and seconds
-                current_time = time.strftime(
-                    "%H:%M:%S",
-                    time.gmtime(current_time)
-                )
-                total_time = time.strftime(
-                    "%H:%M:%S",
-                    time.gmtime(total_time)
-                )
-
-                # Add the time information to the message
-                event_msg += f"{current_time} of {total_time} has elapsed "
-                event_msg += "in the race."
-        
-        # If the event message is not empty, add it to the list of messages
-        if event_msg != "":
-            event_msg = {
-                    "role": "user",
-                    "content": event_msg
-                }
-            messages.append(event_msg)
+        # Build the prompt
+        instructions_message()
+        context_message()
+        event_info_message()
+        gaps_message()
+        previous_responses_message()
+        new_message()
 
         # Call the API for the main response
         response = self.client.chat.completions.create(
